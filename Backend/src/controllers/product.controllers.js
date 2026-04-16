@@ -62,3 +62,100 @@ export const createProduct = async (req, res,next) => {
     })
   }
 };
+
+async function getAllProducts(req, res) {
+  try {
+    const products = await Product.find()
+      .populate("product_category", "category_name")
+      .populate("product_subCategory", "sub_category_name");
+
+    return res.status(200).json(
+      new ApiResponse(200, products, "Products fetched successfully")
+    );
+  } catch (error) {
+    console.error("Get All Products Error:", error);
+    return res.status(error.statusCode).json({
+      statusCode: error.statusCode,
+      success: error.success,
+      message: error.message
+    });
+  }
+}
+
+async function getProductById(req, res) {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id)
+      .populate("product_category", "category_name")
+      .populate("product_subCategory", "sub_category_name");
+
+    if (!product) {
+      throw new ApiError(404, "Product not found");
+    }
+
+    return res.status(200).json(
+      new ApiResponse(200, product, "Product fetched successfully")
+    );
+  } catch (error) {
+    console.error("Get Product by ID Error:", error);
+    return res.status(error.statusCode).json({
+      statusCode: error.statusCode,
+      success: error.success,
+      message: error.message
+    });
+  }
+}
+
+async function updateProduct(req, res) {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const product = await Product.findByIdAndUpdate(id, updateData, { new: true });
+
+    if (!product) {
+      throw new ApiError(404, "Product not found");
+    }
+
+    return res.status(200).json(
+      new ApiResponse(200, product, "Product updated successfully")
+    );
+  } catch (error) {
+    console.error("Update Product Error:", error);
+    return res.status(error.statusCode).json({
+      statusCode: error.statusCode,
+      success: error.success,
+      message: error.message
+    });
+  }
+}
+
+async function deleteProduct(req, res) {
+  try {
+    const { id } = req.params;
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      throw new ApiError(404, "Product not found");
+    }
+
+    return res.status(200).json(
+      new ApiResponse(200, product, "Product deleted successfully")
+    );
+  } catch (error) {
+    console.error("Delete Product Error:", error);
+    return res.status(error.statusCode).json({
+      statusCode: error.statusCode,
+      success: error.success,
+      message: error.message
+    });
+  }
+}
+
+export {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct
+};  

@@ -11,6 +11,7 @@ export const api = createApi({
   }),                       
   
   endpoints: (builder) => ({
+    
     createCategories : builder.mutation({
         query: (body) => ({
             url:"api/categories/createCategories",
@@ -19,7 +20,19 @@ export const api = createApi({
         })
     }),
 
+    getCategories : builder.mutation({
+        query: () => ({
+            url:"api/categories/getCategories",
+            method:"GET",
+            body
+        })
+    }),
+
   })
+
+  
+
+
 });
 
 export const {
