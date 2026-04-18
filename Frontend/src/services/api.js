@@ -10,7 +10,7 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
   }),     
   
-  tagTypes : ["Category","CategoryById","Product","ProductById"] ,
+  tagTypes : ["Category","CategoryById","Product","ProductById","User","UserById"] ,
   
   endpoints: (builder) => ({
 
@@ -86,7 +86,7 @@ export const api = createApi({
     }), 
 
     updateProduct : builder.mutation({
-        query: ({id,...body}) => ({
+        query: ({id,body}) => ({
             url:`api/products/${id}`,
             method:"PUT",
             body
@@ -103,7 +103,32 @@ export const api = createApi({
     }),
 
 
+    // users api services 
 
+    registerUser : builder.mutation({
+        query: (body) => ({
+            url:"api/user/registerUser",
+            method:"POST",
+            body
+        }),
+        invalidatesTags: ['User'],
+    }),
+
+    getAllUsers: builder.query({
+        query: () => ({
+            url:"api/user/getAllUsers",
+            method:"GET"
+        }),
+        providesTags: [{type:'User'}]
+    }),
+
+    getUserByid : builder.query({
+        query: (id) => ({
+            url:`api/user/${id}`,
+            method:"GET",
+        }),
+        providesTags:[{type:"UserById"}]
+    }),
   })
 });
 
@@ -120,4 +145,9 @@ export const {
   useGetProductByidQuery,
   useUpdateProductMutation,
   useDeleteProductMutation,
+
+  // user
+  useRegisterUserMutation,
+  useGetAllUsersQuery,
+  useGetUserByidQuery
 } = api;

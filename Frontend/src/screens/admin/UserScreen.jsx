@@ -1,63 +1,77 @@
-const userRows = [
-  {
-    id: 1,
-    name: "Aarav Sharma",
-    mobileNumber: "+91 98765 43210",
-    emailId: "aarav.sharma@example.com",
-    registeredAt: "15 Apr 2026",
-  },
-  {
-    id: 2,
-    name: "Priya Verma",
-    mobileNumber: "+91 91234 56789",
-    emailId: "priya.verma@example.com",
-    registeredAt: "13 Apr 2026",
-  },
-  {
-    id: 3,
-    name: "Rohan Mehta",
-    mobileNumber: "+91 99887 76655",
-    emailId: "rohan.mehta@example.com",
-    registeredAt: "11 Apr 2026",
-  },
-  {
-    id: 4,
-    name: "Sneha Kapoor",
-    mobileNumber: "+91 90123 45678",
-    emailId: "sneha.kapoor@example.com",
-    registeredAt: "09 Apr 2026",
-  },
-  {
-    id: 5,
-    name: "Kabir Singh",
-    mobileNumber: "+91 97654 32109",
-    emailId: "kabir.singh@example.com",
-    registeredAt: "07 Apr 2026",
-  },
-  {
-    id: 6,
-    name: "Ananya Gupta",
-    mobileNumber: "+91 93456 78901",
-    emailId: "ananya.gupta@example.com",
-    registeredAt: "05 Apr 2026",
-  },
-  {
-    id: 7,
-    name: "Dev Malhotra",
-    mobileNumber: "+91 98989 12121",
-    emailId: "dev.malhotra@example.com",
-    registeredAt: "03 Apr 2026",
-  },
-  {
-    id: 8,
-    name: "Ishita Jain",
-    mobileNumber: "+91 95555 66778",
-    emailId: "ishita.jain@example.com",
-    registeredAt: "01 Apr 2026",
-  },
-];
+import { useState } from "react";
+import CreateUser from "../../components/createUser";
+import { useGetAllUsersQuery } from "../../services/api";
+import { data, useNavigate } from "react-router-dom";
+
+// const userRows = [
+//   {
+//     id: 1,
+//     name: "Aarav Sharma",
+//     mobileNumber: "+91 98765 43210",
+//     emailId: "aarav.sharma@example.com",
+//     registeredAt: "15 Apr 2026",
+//   },
+//   {
+//     id: 2,
+//     name: "Priya Verma",
+//     mobileNumber: "+91 91234 56789",
+//     emailId: "priya.verma@example.com",
+//     registeredAt: "13 Apr 2026",
+//   },
+//   {
+//     id: 3,
+//     name: "Rohan Mehta",
+//     mobileNumber: "+91 99887 76655",
+//     emailId: "rohan.mehta@example.com",
+//     registeredAt: "11 Apr 2026",
+//   },
+//   {
+//     id: 4,
+//     name: "Sneha Kapoor",
+//     mobileNumber: "+91 90123 45678",
+//     emailId: "sneha.kapoor@example.com",
+//     registeredAt: "09 Apr 2026",
+//   },
+//   {
+//     id: 5,
+//     name: "Kabir Singh",
+//     mobileNumber: "+91 97654 32109",
+//     emailId: "kabir.singh@example.com",
+//     registeredAt: "07 Apr 2026",
+//   },
+//   {
+//     id: 6,
+//     name: "Ananya Gupta",
+//     mobileNumber: "+91 93456 78901",
+//     emailId: "ananya.gupta@example.com",
+//     registeredAt: "05 Apr 2026",
+//   },
+//   {
+//     id: 7,
+//     name: "Dev Malhotra",
+//     mobileNumber: "+91 98989 12121",
+//     emailId: "dev.malhotra@example.com",
+//     registeredAt: "03 Apr 2026",
+//   },
+//   {
+//     id: 8,
+//     name: "Ishita Jain",
+//     mobileNumber: "+91 95555 66778",
+//     emailId: "ishita.jain@example.com",
+//     registeredAt: "01 Apr 2026",
+//   },
+// ];
 
 function UserScreen() {
+  const navigate = useNavigate();
+  const [isOpen,setIsOpen] = useState(false)
+  const {data : userRows} = useGetAllUsersQuery()
+  
+
+  const onClose = () => {
+    setIsOpen(false)
+  }
+  console.log("user data :",userRows)
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
@@ -70,6 +84,7 @@ function UserScreen() {
 
           <button
             type="button"
+            onClick={() => {setIsOpen(true)}}
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-500"
           >
             <PlusIcon className="h-5 w-5" />
@@ -98,9 +113,18 @@ function UserScreen() {
                 </thead>
 
                 <tbody>
-                  {userRows.map((row,index) => (
+                  {userRows?.data?.map((row,index) => (
                     <tr
                       key={row.id}
+                      key={row._id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => navigate(`/admin/user/${row._id}`)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              navigate(`/admin/user/${row.id}`);
+                            }
+                          }}
                       className="group transition hover:bg-blue-50/70"
                     >
                       <TableCell>
@@ -122,13 +146,13 @@ function UserScreen() {
 
                       <TableCell>
                         <p className="text-sm leading-6 text-slate-500">
-                          {row.emailId}
+                          {row.email}
                         </p>
                       </TableCell>
 
                       <TableCell>
                         <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">
-                          {row.registeredAt}
+                          {new Date(row.createdAt).toLocaleDateString()}
                         </span>
                       </TableCell>
                     </tr>
@@ -139,6 +163,13 @@ function UserScreen() {
           </div>
         </div>
       </div>
+      <CreateUser
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              setIsCreateModalOpen={setIsOpen}
+              // onSubmit={handleCreateCategory}
+              // mode="create"
+            />
     </section>
   );
 }

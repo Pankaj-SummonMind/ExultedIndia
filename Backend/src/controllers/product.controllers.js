@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 const createProduct = async (req, res) => {
   try {
-    const {
+    let {
       product_name,
       product_category,
       product_subCategory,
@@ -28,14 +28,18 @@ const createProduct = async (req, res) => {
     }
 
     // uploaded files
-    const imageUrls = req.files
-      ? req.files.map(file => {
-          const filePath = file.path.replace(/\\/g, "/");
-          return `${req.protocol}://${req.get("host")}/${filePath}`;
-        })
-      : [];
+    const images = req.files
+  ? req.files.map(file => {
+      const filePath = file.path.replace(/\\/g, "/");
 
-    console.log("Image URLs:", imageUrls);
+      return {
+        url: `${req.protocol}://${req.get("host")}/${filePath}`,
+        public_id: ""
+      };
+    })
+  : [];
+
+    console.log("Image URLs:", images);
 
     // validations
     const categoryExists = await Categories.findById(product_category);
@@ -43,6 +47,18 @@ const createProduct = async (req, res) => {
 
     const subCategoryExists = await SubCategories.findById(product_subCategory);
     if (!subCategoryExists) throw new ApiError(404, "Subcategory not found");
+
+    if (!specifications) {
+  specifications = [];
+    } else if (!Array.isArray(specifications)) {
+      specifications = [specifications];
+    }
+
+    specifications = specifications.map(item =>
+      typeof item === "string"
+        ? JSON.parse(item)
+        : item
+    );
 
     // create product
     const product = await Product.create({
@@ -52,7 +68,7 @@ const createProduct = async (req, res) => {
       description,
       features: features || [],
       specifications: specifications || [],
-      images: imageUrls
+      images: images
     });
 
     return res.status(201).json(

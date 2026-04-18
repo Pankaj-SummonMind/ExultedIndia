@@ -17,8 +17,12 @@ const userSchema = new Schema({
     message:{
         type:String,
         trim:true
+    },
+    },
+    {
+    timestamps: true, // createdAt, updatedAt
     }
-})
+)
 
 const User = mongoose.model("User",userSchema);
 

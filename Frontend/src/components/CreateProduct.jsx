@@ -201,58 +201,65 @@ function CreateProduct({
     updateField("images", selectedFiles);
   };
 
-  const handleSubmit = async(event) => {
-    event.preventDefault();
+  const handleSubmit = async (event) => {
+  event.preventDefault();
 
-    const payload = {
-      ...formData,
-      productName: formData.productName.trim(),
-      description: formData.description.trim(),
-      features: formData.features.map((item) => item.trim()).filter(Boolean),
-      specifications: formData.specifications.filter(
-        (item) => item.key.trim() && item.value.trim()
-      ),
-    };
+  try {
+    const payload = new FormData();
 
-    if(mode === "create"){
-      try {
-      console.log("createProductForm", payload);
-        const res =await addProduct({
-          product_name : payload.productName,
-          product_category: payload.category,
-          product_subCategory:payload.subCategory,
-          description:payload.description,
-          features:payload.features,
-          specifications:payload.specifications,
-          images:payload.images
-        }).unwrap()
-        console.log("res afte radding product: ",res)
-        onShowList() 
-      } catch (error) {
-        console.log("errror ", error)
-      }
-    }
-    if(mode === "update"){
-      console.log("updated data payload: ",payload)
-      try {
-        const res = await updateProduct({
-          id : payload.id,
-          product_name : payload.productName,
-          product_category: payload.category,
-          product_subCategory:payload.subCategory,
-          description:payload.description,
-          features:payload.features,
-          specifications:payload.specifications,
-          images:payload.images
-        }).unwrap()
-        console.log("DATA after update : ",res)
-        onShowList() 
-      } catch (error) {
-        console.log("error while update product",error)
-      }
+    payload.append("product_name", formData.productName.trim());
+    payload.append("product_category", formData.category);
+    payload.append("product_subCategory", formData.subCategory);
+    payload.append("description", formData.description.trim());
+
+    // features
+    formData.features
+      .map(item => item.trim())
+      .filter(Boolean)
+      .forEach(item => {
+        payload.append("features[]", item);
+      });
+
+    // specifications
+    formData.specifications
+      .filter(item => item.key.trim() && item.value.trim())
+      .forEach(item => {
+        payload.append(
+          "specifications[]",
+          JSON.stringify({
+            key: item.key.trim(),
+            value: item.value.trim()
+          })
+        );
+      });
+
+    // images
+    formData.images.forEach(file => {
+      payload.append("images", file);
+    });
+
+    // CREATE
+    if (mode === "create") {
+      const res = await addProduct(payload).unwrap();
+      console.log("Created:", res);
     }
 
-  };
+    // UPDATE
+    if (mode === "update") {
+      const res = await updateProduct({
+        id: formData.id,
+        data: payload
+      }).unwrap();
+
+      console.log("Updated:", res);
+    }
+
+    onShowList();
+
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">

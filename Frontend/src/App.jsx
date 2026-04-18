@@ -6,6 +6,7 @@ import ProductScreen from "./screens/admin/ProductScreen";
 import UserScreen from "./screens/admin/UserScreen";
 import CategoryById from "./screens/admin/furtherScreen/CategoryById";
 import ProductById from "./screens/admin/furtherScreen/ProductById";
+import UserById from "./screens/admin/furtherScreen/UserByid";
 
 function App() {
   return(
@@ -19,6 +20,7 @@ function App() {
           <Route path="category" element={<CategoryScreen />} />
           <Route path="category/:id" element={<CategoryById />} />
           <Route path="product/:id" element={<ProductById />} />
+          <Route path="user/:id" element={<UserById />} />
           <Route path="product" element={<ProductScreen />} />
           <Route path="user" element={<UserScreen />} />
         </Route>

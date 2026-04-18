@@ -30,6 +30,27 @@ const sidebarItems = [
     Icon: UsersIcon,
     available: true,
   },
+  {
+    id: "pages",
+    label: "Pages",
+    to: "/admin/pages",
+    Icon: UsersIcon,
+    available: false,
+  },
+  {
+    id: "Social Media",
+    label: "Social Media",
+    to: "/admin/socialmedia",
+    Icon: UsersIcon,
+    available: false,
+  },
+  {
+    id: "certificate",
+    label: "Certificates",
+    to: "/admin/certificate",
+    Icon: UsersIcon,
+    available: false,
+  },
 ];
 
 function AdminLayout() {
