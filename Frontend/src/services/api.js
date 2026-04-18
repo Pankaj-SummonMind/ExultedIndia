@@ -8,33 +8,116 @@ export const api = createApi({
 
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_URL,
-  }),                       
+  }),     
+  
+  tagTypes : ["Category","CategoryById","Product","ProductById"] ,
   
   endpoints: (builder) => ({
-    
+
+    // categories api services 
+
     createCategories : builder.mutation({
         query: (body) => ({
             url:"api/categories/createCategories",
             method:"POST",
             body
-        })
+        }),
+        invalidatesTags: ['Category'],
     }),
 
-    getCategories : builder.mutation({
+    getCategories: builder.query({
         query: () => ({
             url:"api/categories/getCategories",
-            method:"GET",
-            body
-        })
+            method:"GET"
+        }),
+        providesTags: [{type:'Category'}]
     }),
 
+    updateCategories : builder.mutation({
+        query: ({id,...body}) => ({
+            url:`api/categories/${id}`,
+            method:"PUT",
+            body
+        }),
+        invalidatesTags:["CategoryById","Category"]
+    }),
+
+    getCategoriesById : builder.query({
+        query: (id) => ({
+            url:`api/categories/${id}`,
+            method:"GET",
+        }),
+        providesTags:[{type:"CategoryById"}]
+    }), 
+
+    deleteCategories : builder.mutation({
+        query: (id) => ({
+            url:`api/categories/${id}`,
+            method:"DELETE", 
+        }),
+        invalidatesTags:['Category']
+    }),
+
+    // products api servies 
+
+    addProduct : builder.mutation({
+        query: (body) => ({
+            url:"api/products/createProduct",
+            method:"POST",
+            body
+        }),
+        invalidatesTags: ['Product'],
+    }),
+
+    getProduct: builder.query({
+        query: () => ({
+            url:"api/products/getProduct",
+            method:"GET"
+        }),
+        providesTags: [{type:'Product'}]
+    }),
+
+    getProductByid : builder.query({
+        query: (id) => ({
+            url:`api/products/${id}`,
+            method:"GET",
+        }),
+        providesTags:[{type:"ProductById"}]
+    }), 
+
+    updateProduct : builder.mutation({
+        query: ({id,...body}) => ({
+            url:`api/products/${id}`,
+            method:"PUT",
+            body
+        }),
+        invalidatesTags:["ProductById","Product"]
+    }),
+
+    deleteProduct : builder.mutation({
+        query: (id) => ({
+            url:`api/products/${id}`,
+            method:"DELETE", 
+        }),
+        invalidatesTags:['Product']
+    }),
+
+
+
   })
-
-  
-
-
 });
 
 export const {
-  useCreateCategoriesMutation
+  useCreateCategoriesMutation,
+  useGetCategoriesQuery,
+  useGetCategoriesByIdQuery,
+  useUpdateCategoriesMutation,
+  useDeleteCategoriesMutation,
+
+  // product
+  useAddProductMutation,
+  useGetProductQuery,
+  useGetProductByidQuery,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
 } = api;

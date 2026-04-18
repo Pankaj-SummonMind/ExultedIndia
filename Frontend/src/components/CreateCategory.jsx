@@ -1,83 +1,90 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
+import { useCreateCategoriesMutation, useUpdateCategoriesMutation } from '../services/api';
 
-function CreateCategory({ isOpen, onClose, onSubmit }) {
-  const [categoryName, setCategoryName] = useState("");
-  const [subCategories, setSubCategories] = useState([""]);
+
+function CreateCategory({ isOpen, onClose, onSubmit, initialData = null, mode = 'create',setIsCreateModalOpen }) {
+  const [createCategories,isLoading] = useCreateCategoriesMutation();
+  const [updateCategories,{isLoading:isUpdateLoading}] = useUpdateCategoriesMutation();
+  const emptySub = { name: '' };
+  const [categoryName, setCategoryName] = useState('');
+  const [subCategories, setSubCategories] = useState([emptySub]);
 
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+    if (!isOpen) return;
+    setCategoryName(initialData?.categoryName || '');
+    setSubCategories(initialData?.subCategory?.length ? initialData.subCategory : [emptySub]);
+  }, [isOpen, initialData]);
 
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
+  const canAddMore = useMemo(() => subCategories.every(item => item.name.trim() !== ''), [subCategories]);
 
-    window.addEventListener("keydown", handleEscape);
+  if (!isOpen) return null;
 
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
 
-  const canAddMore = useMemo(
-    () => subCategories.every((item) => item.trim() !== ""),
-    [subCategories]
-  );
-
-  if (!isOpen) {
-    return null;
-  }
-
-  const handleSubCategoryChange = (index, value) => {
-    setSubCategories((current) =>
-      current.map((item, itemIndex) => (itemIndex === index ? value : item))
-    );
+  const updateSub = (index, value) => {
+    setSubCategories(prev => prev.map((item, i) => i === index ? { ...item, name: value } : item));
   };
 
-  const handleAddMore = () => {
-    if (!canAddMore) {
-      return;
-    }
-
-    setSubCategories((current) => [...current, ""]);
+  const addMore = () => {
+    if (!canAddMore) return;
+    setSubCategories(prev => [...prev, { name: '' }]);
   };
 
-  const handleRemove = (indexToRemove) => {
-    setSubCategories((current) => {
-      if (current.length === 1) {
-        return [""];
-      }
+  const removeSub = (index) => {
+    setSubCategories(prev => prev.length === 1 ? [emptySub] : prev.filter((_, i) => i !== index));
+  };
 
-      return current.filter((_, index) => index !== indexToRemove);
-    });
+  const resetForm = () => {
+    setCategoryName('');
+    setSubCategories([emptySub]);
   };
 
   const handleCancel = () => {
-    setCategoryName("");
-    setSubCategories([""]);
-    onClose();
-  };
+    resetForm();
+    onClose(); 
+  }
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    const trimmedCategoryName = categoryName.trim();
-    const trimmedSubCategories = subCategories
-      .map((item) => item.trim())
-      .filter(Boolean);
-
-    if (!trimmedCategoryName || trimmedSubCategories.length === 0) {
-      return;
+  const submitForm = async (e) => {
+    e.preventDefault();
+    const payload = {
+      id: initialData?.id,
+      categories_name: categoryName.trim(),
+      subCategories: subCategories.map(item => ({ ...item, name: item.name.trim() })).filter(item => item.name)
+    };
+    console.log("payload",payload)
+    if (!payload.categories_name || payload.subCategories.length === 0) return;
+    // onSubmit(payload, mode);
+    if(mode === "create"){
+      try {
+        const res = await createCategories({
+          categories_name:payload.categories_name,
+          subCategories:payload.subCategories
+        }).unwrap()
+        console.log("res after create category: ",res)
+        setIsCreateModalOpen(false);
+        resetForm();
+        onClose();
+      } catch (error) {
+        console.log("error: ",error)
+      }
     }
+    if (mode === "update") {
+      try {
+        const res = await updateCategories({
+          id: payload.id,
+          categories_name: payload.categories_name,
+          subCategories: payload.subCategories
+        }).unwrap();
 
-    onSubmit({
-      categoryName: trimmedCategoryName,
-      subCategory: trimmedSubCategories,
-    });
-    console.log("categoryName : ",categoryName,"subcategory:",subCategories)
-    setCategoryName("");
-    setSubCategories([""]);
+        console.log("res after update category:", res);
+
+        setIsCreateModalOpen(false);
+        resetForm();
+        onClose();
+
+      } catch (error) {
+        console.log("error:", error);
+      }
+}
   };
 
   return (
@@ -93,10 +100,10 @@ function CreateCategory({ isOpen, onClose, onSubmit }) {
         <div className="flex items-start justify-between gap-4 border-b border-blue-100 bg-linear-to-r from-white via-blue-50 to-slate-50 px-5 py-5 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-400">
-              Category Modal
+              {mode === "update" ? "Update Category" : "Category Modal"}
             </p>
             <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
-              Create Category
+              {mode === "update" ? "Update Category" : "Create Category"}
             </h2>
           </div>
 
@@ -110,7 +117,7 @@ function CreateCategory({ isOpen, onClose, onSubmit }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={submitForm} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
             <div className="grid gap-5">
               <FieldShell
@@ -134,15 +141,11 @@ function CreateCategory({ isOpen, onClose, onSubmit }) {
                     <p className="text-sm font-semibold text-slate-700">
                       Sub Categories
                     </p>
-                    {/* <p className="mt-1 text-sm text-slate-500">
-                      Add multiple sub categories. Modal height fixed rahegi,
-                      zyada fields par section scroll karega.
-                    </p> */}
                   </div>
 
                   <button
                     type="button"
-                    onClick={handleAddMore}
+                    onClick={addMore}
                     disabled={!canAddMore}
                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-200 disabled:shadow-none"
                   >
@@ -152,7 +155,7 @@ function CreateCategory({ isOpen, onClose, onSubmit }) {
                 </div>
 
                 <div className="mt-5 flex max-h-[34vh] flex-col gap-4 overflow-y-auto pr-1">
-                  {subCategories.map((value, index) => (
+                  {subCategories.map((item, index) => (
                     <div
                       key={`subcategory-${index}`}
                       className="rounded-3xl border border-blue-100 bg-white p-4 shadow-sm"
@@ -168,9 +171,9 @@ function CreateCategory({ isOpen, onClose, onSubmit }) {
                           <input
                             id={`subCategory-${index}`}
                             type="text"
-                            value={value}
+                            value={item.name}
                             onChange={(event) =>
-                              handleSubCategoryChange(index, event.target.value)
+                              updateSub(index, event.target.value)
                             }
                             placeholder={`Enter sub category ${index + 1}`}
                             className="w-full rounded-2xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100"
@@ -180,7 +183,7 @@ function CreateCategory({ isOpen, onClose, onSubmit }) {
                         <button
                           type="button"
                           aria-label={`Delete sub category ${index + 1}`}
-                          onClick={() => handleRemove(index)}
+                          onClick={() => removeSub(index)}
                           className="inline-flex h-12 w-12 items-center justify-center self-end rounded-2xl border border-red-100 bg-red-50 text-red-500 transition hover:bg-red-100"
                         >
                           <DeleteIcon className="h-5 w-5" />
@@ -206,7 +209,7 @@ function CreateCategory({ isOpen, onClose, onSubmit }) {
               type="submit"
               className="inline-flex items-center justify-center rounded-2xl bg-blue-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-500"
             >
-              Submit
+              {mode === "update" ? "Save Changes" : "Submit"}
             </button>
           </div>
         </form>
@@ -278,3 +281,24 @@ function DeleteIcon({ className }) {
 }
 
 export default CreateCategory;
+
+
+
+//   return (
+//     <div>
+//       <form onSubmit={submitForm}>
+//         <input value={categoryName} onChange={e => setCategoryName(e.target.value)} placeholder='Category Name' />
+//         {subCategories.map((item, index) => (
+//           <div key={index}>
+//             <input value={item.name} onChange={e => updateSub(index, e.target.value)} placeholder={`Sub Category ${index + 1}`} />
+//             <button type='button' onClick={() => removeSub(index)}>Remove</button>
+//           </div>
+//         ))}
+//         <button type='button' onClick={addMore}>Add More</button>
+//         <button type='button' onClick={() => { resetForm(); onClose(); }}>Cancel</button>
+//         <button type='submit'>{mode === 'update' ? 'Save Changes' : 'Submit'}</button>
+//       </form>
+//     </div>
+//   );
+// }
+

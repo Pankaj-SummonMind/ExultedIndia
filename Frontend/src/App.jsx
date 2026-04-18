@@ -4,6 +4,8 @@ import DashboardScreen from "./screens/admin/DashboardScreen";
 import CategoryScreen from "./screens/admin/CategoryScreen";
 import ProductScreen from "./screens/admin/ProductScreen";
 import UserScreen from "./screens/admin/UserScreen";
+import CategoryById from "./screens/admin/furtherScreen/CategoryById";
+import ProductById from "./screens/admin/furtherScreen/ProductById";
 
 function App() {
   return(
@@ -15,6 +17,8 @@ function App() {
         <Route index element={<DashboardScreen />} />
           <Route path="dashboard" element={<DashboardScreen />} />
           <Route path="category" element={<CategoryScreen />} />
+          <Route path="category/:id" element={<CategoryById />} />
+          <Route path="product/:id" element={<ProductById />} />
           <Route path="product" element={<ProductScreen />} />
           <Route path="user" element={<UserScreen />} />
         </Route>

@@ -3,8 +3,8 @@ import cors from "cors"
 import { Router } from "express";
 const router = Router()
 //remove later after adding cloud  services
-// import path from "path"
-// import { fileURLToPath } from "url";
+import path from "path"
+import { fileURLToPath } from "url";
 const app = express();
 
 app.use((req, res, next) => {
@@ -29,9 +29,9 @@ app.use(express.json());
 
 // just to store file at backend and aceess it in frontend letter remove when store file in cloud servises
 // Create __dirname manually (ESM fix)
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-// app.use("/public", express.static(path.join(process.cwd(), "public")));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/public", express.static(path.join(process.cwd(), "public")));
 
 
 //routes import 
@@ -39,10 +39,6 @@ import categoriesRoutes from "./routes/categories.routes.js"
 import productsRoutes from "./routes/product.routes.js"
 import userRoutes from "./routes/user.routes.js"
 // routes declaration
-router.get("/", (req, res) => {
-  console.log("HIT ✅");
-  res.json({ ok: true });
-});
 app.use("/api/categories",categoriesRoutes)
 app.use("/api/products",productsRoutes)
 app.use("/api/user",userRoutes)

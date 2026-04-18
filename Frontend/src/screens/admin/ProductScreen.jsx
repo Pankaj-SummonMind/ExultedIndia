@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { data, useNavigate } from "react-router-dom";
 import CreateProduct from "../../components/CreateProduct";
+import { useGetProductQuery } from "../../services/api";
 
 const productRows = [
   {
@@ -61,10 +63,15 @@ const productRows = [
 ];
 
 function ProductScreen() {
+  const navigate = useNavigate();
+  const {data : allProduct} = useGetProductQuery()
+  console.log(allProduct);
   const [showCreateProduct, setShowCreateProduct] = useState(false);
 
   if (showCreateProduct) {
-    return <CreateProduct onShowList={() => setShowCreateProduct(false)} />;
+    return <CreateProduct 
+    mode = "create"
+    onShowList={() => setShowCreateProduct(false)} />;
   }
 
   return (
@@ -106,43 +113,51 @@ function ProductScreen() {
                 </thead>
 
                 <tbody>
-                  {productRows.map((row, index) => (
-                    <tr
-                      key={row.id}
-                      className="group transition hover:bg-blue-50/70"
-                    >
-                      <TableCell>
-                        <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs font-bold text-blue-700">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                      </TableCell>
+  {allProduct?.data?.map((row, index) => (
+    <tr
+      key={row._id}
+      role="button"
+      tabIndex={0}
+      onClick={() => navigate(`/admin/product/${row._id}`)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          navigate(`/admin/category/${row.id}`);
+                        }
+                      }}
+      className="group transition hover:bg-blue-50/70"
+    >
+      <TableCell>
+        <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs font-bold text-blue-700">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+      </TableCell>
 
-                      <TableCell>
-                        <p className="font-semibold text-slate-700">
-                          {row.name}
-                        </p>
-                      </TableCell>
+      <TableCell>
+        <p className="font-semibold text-slate-700">
+          {row.product_name}
+        </p>
+      </TableCell>
 
-                      <TableCell>
-                        <span className="inline-flex rounded-full bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
-                          {row.category}
-                        </span>
-                      </TableCell>
+      <TableCell>
+        <span className="inline-flex rounded-full bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
+          {row.product_category?.categories_name}
+        </span>
+      </TableCell>
 
-                      <TableCell>
-                        <p className="text-sm leading-6 text-slate-500">
-                          {row.subCategory}
-                        </p>
-                      </TableCell>
+      <TableCell>
+        <p className="text-sm leading-6 text-slate-500">
+          {row.product_subCategory?.name}
+        </p>
+      </TableCell>
 
-                      <TableCell>
-                        <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">
-                          {row.createdAt}
-                        </span>
-                      </TableCell>
-                    </tr>
-                  ))}
-                </tbody>
+      <TableCell>
+        <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">
+          {new Date(row.createdAt).toLocaleDateString()}
+        </span>
+      </TableCell>
+    </tr>
+  ))}
+</tbody>
               </table>
             </div>
           </div>

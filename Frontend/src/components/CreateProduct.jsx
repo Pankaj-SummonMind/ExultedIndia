@@ -1,34 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useAddProductMutation, useGetCategoriesQuery, useUpdateCategoriesMutation, useUpdateProductMutation } from "../services/api";
 
-const categoryOptions = [
-  {
-    value: "Electronics",
-    subCategories: ["Mobiles", "Laptops", "Accessories", "Audio"],
-  },
-  {
-    value: "Fashion",
-    subCategories: ["Footwear", "Men Wear", "Women Wear", "Watches"],
-  },
-  {
-    value: "Home Decor",
-    subCategories: ["Lighting", "Wall Art", "Furnishing", "Storage"],
-  },
-  {
-    value: "Beauty",
-    subCategories: ["Skin Care", "Hair Care", "Makeup", "Fragrance"],
-  },
-  {
-    value: "Sports",
-    subCategories: ["Fitness", "Outdoor", "Accessories", "Nutrition"],
-  },
-  {
-    value: "Furniture",
-    subCategories: ["Office", "Living Room", "Bedroom", "Dining"],
-  },
-];
+
 
 const initialFormState = {
-  productName: "",
+  id:"",
+  productName: "", 
   category: "",
   subCategory: "",
   description: "",
@@ -37,36 +14,86 @@ const initialFormState = {
   images: [],
 };
 
-function CreateProduct({ onShowList }) {
+function CreateProduct({ 
+        onShowList,
+        isOpen,
+        onClose,
+        setIsCreateModalOpen,
+        mode="create",
+        initialData=null
+      }) {
+  const [addProduct,{isLoading}] = useAddProductMutation()
+  const [updateProduct,{isLoading : isUpdateLoading}] = useUpdateProductMutation()
+  const {data} = useGetCategoriesQuery();
+  // console.log("category data:", data)
   const [formData, setFormData] = useState(initialFormState);
   const [categorySearch, setCategorySearch] = useState("");
   const [subCategorySearch, setSubCategorySearch] = useState("");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
+  console.log("initial data ",initialData);
 
-  const filteredCategories = useMemo(
-    () =>
-      categoryOptions.filter((item) =>
-        item.value.toLowerCase().includes(categorySearch.toLowerCase())
-      ),
-    [categorySearch]
-  );
+  const categoryOptions = data?.data || [];
 
-  const availableSubCategories = useMemo(() => {
-    const selectedCategory = categoryOptions.find(
-      (item) => item.value === formData.category
+  useEffect(() => {
+  if (mode === "update" && initialData) {
+    setFormData({
+      id:initialData._id || "",
+      productName: initialData.product_name || "",
+      category: initialData.product_category?._id || "",
+      subCategory: initialData.product_subCategory?._id || "",
+      description: initialData.description || "",
+      features:
+        initialData.features?.length > 0
+          ? initialData.features
+          : [""],
+      specifications:
+        initialData.specifications?.length > 0
+          ? initialData.specifications.map(item => ({
+              key: item.key || "",
+              value: item.value || "",
+            }))
+          : [{ key: "", value: "" }],
+      images: initialData.images || [],
+    });
+
+    setCategorySearch(
+      initialData.product_category?.categories_name || ""
     );
 
-    return selectedCategory ? selectedCategory.subCategories : [];
-  }, [formData.category]);
+    setSubCategorySearch(
+      initialData.product_subCategory?.name || ""
+    );
+  }
 
-  const filteredSubCategories = useMemo(
-    () =>
-      availableSubCategories.filter((item) =>
-        item.toLowerCase().includes(subCategorySearch.toLowerCase())
-      ),
-    [availableSubCategories, subCategorySearch]
+  if (mode === "create") {
+    setFormData(initialFormState);
+    setCategorySearch("");
+    setSubCategorySearch("");
+  }
+}, [mode, initialData]);
+
+  const filteredCategories = useMemo(() => {
+  return categoryOptions.filter(item =>
+    item.categories_name
+      .toLowerCase()
+      .includes(categorySearch.toLowerCase())
   );
+}, [categoryOptions, categorySearch]);
+
+  const availableSubCategories = useMemo(() => {
+  const selectedCategory = categoryOptions.find(
+    item => item._id === formData.category
+  );
+
+  return selectedCategory?.subCategories || [];
+}, [categoryOptions, formData.category]);
+
+  const filteredSubCategories = useMemo(() => {
+  return availableSubCategories.filter(item =>
+    item.name.toLowerCase().includes(subCategorySearch.toLowerCase())
+  );
+}, [availableSubCategories, subCategorySearch]);
 
   const canAddFeature = useMemo(
     () => formData.features.every((item) => item.trim() !== ""),
@@ -85,22 +112,27 @@ function CreateProduct({ onShowList }) {
     setFormData((current) => ({ ...current, [field]: value }));
   };
 
-  const handleCategorySelect = (value) => {
-    setFormData((current) => ({
-      ...current,
-      category: value,
-      subCategory: "",
-    }));
-    setCategorySearch(value);
-    setSubCategorySearch("");
-    setIsCategoryOpen(false);
-  };
+  const handleCategorySelect = (item) => {
+  setFormData(current => ({
+    ...current,
+    category: item._id,
+    subCategory: ""
+  }));
 
-  const handleSubCategorySelect = (value) => {
-    updateField("subCategory", value);
-    setSubCategorySearch(value);
-    setIsSubCategoryOpen(false);
-  };
+  setCategorySearch(item.categories_name);
+  setSubCategorySearch("");
+  setIsCategoryOpen(false);
+};
+
+  const handleSubCategorySelect = (item) => {
+  setFormData(current => ({
+    ...current,
+    subCategory: item._id
+  }));
+
+  setSubCategorySearch(item.name);
+  setIsSubCategoryOpen(false);
+};
 
   const handleFeatureChange = (index, value) => {
     setFormData((current) => ({
@@ -169,7 +201,7 @@ function CreateProduct({ onShowList }) {
     updateField("images", selectedFiles);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
 
     const payload = {
@@ -182,7 +214,44 @@ function CreateProduct({ onShowList }) {
       ),
     };
 
-    console.log("createProductForm", payload);
+    if(mode === "create"){
+      try {
+      console.log("createProductForm", payload);
+        const res =await addProduct({
+          product_name : payload.productName,
+          product_category: payload.category,
+          product_subCategory:payload.subCategory,
+          description:payload.description,
+          features:payload.features,
+          specifications:payload.specifications,
+          images:payload.images
+        }).unwrap()
+        console.log("res afte radding product: ",res)
+        onShowList() 
+      } catch (error) {
+        console.log("errror ", error)
+      }
+    }
+    if(mode === "update"){
+      console.log("updated data payload: ",payload)
+      try {
+        const res = await updateProduct({
+          id : payload.id,
+          product_name : payload.productName,
+          product_category: payload.category,
+          product_subCategory:payload.subCategory,
+          description:payload.description,
+          features:payload.features,
+          specifications:payload.specifications,
+          images:payload.images
+        }).unwrap()
+        console.log("DATA after update : ",res)
+        onShowList() 
+      } catch (error) {
+        console.log("error while update product",error)
+      }
+    }
+
   };
 
   return (
@@ -194,7 +263,7 @@ function CreateProduct({ onShowList }) {
               Product Workspace
             </p>
             <h1 className="mt-2 text-2xl font-bold text-slate-800 sm:text-3xl">
-              Create Product
+              {mode === "create" ? "Create Product" : "Update Product"}
             </h1>
             {/* <p className="mt-3 text-sm leading-6 text-slate-500 sm:text-base">
               Build a complete product entry with searchable category fields,
@@ -209,7 +278,7 @@ function CreateProduct({ onShowList }) {
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white px-5 py-3 text-sm font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50"
           >
             <ListIcon className="h-5 w-5" />
-            Show List
+            {mode === "create" ? "Show List" : "Show Detail"}
           </button>
         </div>
       </div>
@@ -251,7 +320,7 @@ function CreateProduct({ onShowList }) {
                 setSubCategorySearch("");
               }
             }}
-            options={filteredCategories.map((item) => item.value)}
+            options={filteredCategories}
             onSelect={handleCategorySelect}
             emptyLabel="No category found"
           />
@@ -467,7 +536,7 @@ function CreateProduct({ onShowList }) {
             type="submit"
             className="inline-flex items-center justify-center rounded-2xl bg-blue-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-500"
           >
-            Submit Product
+            {mode === "create" ? "Submit Product" : "Update Product"}
           </button>
         </div>
       </form>
@@ -527,14 +596,14 @@ function SearchableSelect({
         {isOpen && !disabled ? (
           <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-20 max-h-64 overflow-y-auto rounded-3xl border border-blue-100 bg-white p-2 shadow-[0_18px_50px_rgba(148,163,184,0.22)]">
             {options.length > 0 ? (
-              options.map((option) => {
-                const isSelected = selectedValue === option;
+              options.map((item) => {
+                const isSelected = selectedValue === item._id ;
 
                 return (
                   <button
-                    key={option}
+                    key={item._id}
                     type="button"
-                    onClick={() => onSelect(option)}
+                    onClick={() => onSelect(item)}
                     className={[
                       "flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm transition",
                       isSelected
@@ -542,7 +611,7 @@ function SearchableSelect({
                         : "text-slate-600 hover:bg-blue-50 hover:text-blue-700",
                     ].join(" ")}
                   >
-                    <span>{option}</span>
+                    <span>{item.categories_name || item.name}</span>
                     {isSelected ? <CheckIcon className="h-4 w-4" /> : null}
                   </button>
                 );

@@ -1,72 +1,50 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { data, useNavigate } from "react-router-dom";
 import CreateCategory from "../../components/CreateCategory";
-
-const initialCategoryRows = [
-  {
-    id: 1,
-    name: "Electronics",
-    subCategory: "Mobiles, Laptops, Accessories",
-    createdAt: "15 Apr 2026",
-  },
-  {
-    id: 2,
-    name: "Fashion",
-    subCategory: "Men, Women, Kids Wear",
-    createdAt: "13 Apr 2026",
-  },
-  {
-    id: 3,
-    name: "Home Decor",
-    subCategory: "Lighting, Wall Art, Furnishing",
-    createdAt: "11 Apr 2026",
-  },
-  {
-    id: 4,
-    name: "Beauty",
-    subCategory: "Skin Care, Hair Care, Makeup",
-    createdAt: "09 Apr 2026",
-  },
-  {
-    id: 5,
-    name: "Sports",
-    subCategory: "Fitness, Outdoor, Indoor Games",
-    createdAt: "07 Apr 2026",
-  },
-  {
-    id: 6,
-    name: "Books",
-    subCategory: "Fiction, Academic, Self Help",
-    createdAt: "05 Apr 2026",
-  },
-  {
-    id: 7,
-    name: "Groceries",
-    subCategory: "Daily Essentials, Snacks, Beverages",
-    createdAt: "03 Apr 2026",
-  },
-  {
-    id: 8,
-    name: "Furniture",
-    subCategory: "Living Room, Bedroom, Office",
-    createdAt: "01 Apr 2026",
-  },
-];
+import { createCategory, getCategories } from "../../data/categoryStore";
+import { useCreateCategoriesMutation, useGetCategoriesQuery, } from "../../services/api";
 
 function CategoryScreen() {
+  const navigate = useNavigate();
+  const [createCategory,{isLoading:isCreateLoading}] = useCreateCategoriesMutation()
+  const {data:allCategories} = useGetCategoriesQuery()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [categoryRows, setCategoryRows] = useState(initialCategoryRows);
   const [createdCategoryForm, setCreatedCategoryForm] = useState({
     categoryName: "",
     subCategory: [],
   });
+  const categoryRows = allCategories?.data?.map((item) => ({
+  id: item._id,
+  name: item.categories_name,
+  subCategory: item.subCategories.map((sub) => sub.name),
+  createdAt: new Date(item.createdAt).toLocaleDateString(),
+})) || [];
+console.log("datA OF ALL CATEGORRIES: ",allCategories)
+//   const [categoryRows, setCategoryRows] = useState([]);
+
+// useEffect(() => {
+//   if (allCategories?.data) {
+//     setCategoryRows(
+//       allCategories.data.map((item) => ({
+//         id: item._id,
+//         name: item.categories_name,
+//         subCategory: item.subCategories.map((sub) => sub.name),
+//         createdAt: new Date(item.createdAt).toLocaleDateString(),
+//       }))
+//     );
+//   }
+// }, [allCategories]);
 
   const stats = useMemo(
     () => [
       { label: "Total Categories", value: String(categoryRows.length) },
       {
-        label: "Active Groups",
+        label: "Sub Categories",
         value: String(
-          new Set(categoryRows.map((item) => item.name.toLowerCase())).size
+          categoryRows.reduce(
+            (total, item) => total + (item.subCategory?.length ?? 0),
+            0
+          )
         ),
       },
       {
@@ -79,39 +57,27 @@ function CategoryScreen() {
     [categoryRows]
   );
 
-  const handleCreateCategory = (formData) => {
-    setCreatedCategoryForm(formData);
+  // const handleCreateCategory = async (payload,mode) => {
+  //   console.log("data before submit to backend:",payload,mode)
+  //   if(mode === "create"){
 
-    const createdDate = "16 Apr 2026";
-
-    setCategoryRows((current) => [
-      {
-        id: current.length + 1,
-        name: formData.categoryName,
-        subCategory: formData.subCategory.join(", "),
-        createdAt: createdDate,
-      },
-      ...current,
-    ]);
-
-    setIsCreateModalOpen(false);
-  };
+  //   }
+  //   try {
+  //     const res = await createCategory({
+  //       categories_name:payload.categoryName,
+  //       subCategories:payload.subCategory
+  //     }).unwrap()
+  //     console.log("res after create category: ",res)
+  //     // setCreatedCategoryForm(formData);
+  //     // setCategoryRows(getCategories());
+  //     setIsCreateModalOpen(false);
+  //   } catch (error) {
+  //     console.log("error: ",error)
+  //   }    
+  // };
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
-      {/* <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {stats.map((item) => (
-          <div
-            key={item.label}
-            className="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-sm shadow-blue-100"
-          >
-            <p className="text-sm font-medium text-slate-500">{item.label}</p>
-            <p className="mt-2 text-2xl font-bold text-slate-800">
-              {item.value}
-            </p>
-          </div>
-        ))}
-      </div> */}
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
         <div className="flex flex-col gap-4 border-b border-blue-100 px-4 py-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between">
@@ -119,31 +85,19 @@ function CategoryScreen() {
             <h2 className="text-lg font-bold text-slate-800 sm:text-xl">
               Category Table
             </h2>
-            {/* <p className="mt-1 text-sm text-slate-500">
-              Scroll inside this section only. Layout outer container se bahar
-              nahi jayega.
-            </p> */}
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-500"
-          >
-            <PlusIcon className="h-5 w-5" />
-            Add Category
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
 
-          {/* <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-              {categoryRows.length} Records
-            </span>
-            {createdCategoryForm.categoryName ? (
-              <span className="rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-blue-600">
-                Last Added {createdCategoryForm.categoryName}
-              </span>
-            ) : null}
-          </div> */}
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-500"
+            >
+              <PlusIcon className="h-5 w-5" />
+              Add Category
+            </button>
+          </div>
         </div>
 
         <div className="min-h-0 flex-1 overflow-hidden p-3 sm:p-4">
@@ -167,7 +121,15 @@ function CategoryScreen() {
                   {categoryRows.map((row, index) => (
                     <tr
                       key={row.id}
-                      className="group transition hover:bg-blue-50/70"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => navigate(`/admin/category/${row.id}`)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          navigate(`/admin/category/${row.id}`);
+                        }
+                      }}
+                      className="group cursor-pointer transition hover:bg-blue-50/70"
                     >
                       <TableCell>
                         <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs font-bold text-blue-700">
@@ -180,15 +142,12 @@ function CategoryScreen() {
                           <p className="font-semibold text-slate-700">
                             {row.name}
                           </p>
-                          {/* <p className="mt-1 text-xs uppercase tracking-[0.22em] text-slate-400">
-                            Primary Group
-                          </p> */}
                         </div>
                       </TableCell>
 
                       <TableCell>
                         <p className="max-w-xs text-sm leading-6 text-slate-500">
-                          {row.subCategory}
+                          {row.subCategory.join(", ")}
                         </p>
                       </TableCell>
 
@@ -209,7 +168,9 @@ function CategoryScreen() {
       <CreateCategory
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateCategory}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+        // onSubmit={handleCreateCategory}
+        mode="create"
       />
     </section>
   );
