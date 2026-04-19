@@ -38,9 +38,11 @@ app.use("/public", express.static(path.join(process.cwd(), "public")));
 import categoriesRoutes from "./routes/categories.routes.js"
 import productsRoutes from "./routes/product.routes.js"
 import userRoutes from "./routes/user.routes.js"
+import socialMedia from "./routes/socialMedia.Routes.js"
 // routes declaration
 app.use("/api/categories",categoriesRoutes)
 app.use("/api/products",productsRoutes)
 app.use("/api/user",userRoutes)
+app.use("/api/socialMedia",socialMedia)
 
 export default app;

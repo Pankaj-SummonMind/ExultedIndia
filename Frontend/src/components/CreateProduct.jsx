@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAddProductMutation, useGetCategoriesQuery, useUpdateCategoriesMutation, useUpdateProductMutation } from "../services/api";
-
-
+import {
+  useAddProductMutation,
+  useGetCategoriesQuery,
+  useUpdateCategoriesMutation,
+  useUpdateProductMutation,
+} from "../services/api";
 
 const initialFormState = {
-  id:"",
-  productName: "", 
+  id: "",
+  productName: "",
   category: "",
   subCategory: "",
   description: "",
@@ -14,98 +17,91 @@ const initialFormState = {
   images: [],
 };
 
-function CreateProduct({ 
-        onShowList,
-        isOpen,
-        onClose,
-        setIsCreateModalOpen,
-        mode="create",
-        initialData=null
-      }) {
-  const [addProduct,{isLoading}] = useAddProductMutation()
-  const [updateProduct,{isLoading : isUpdateLoading}] = useUpdateProductMutation()
-  const {data} = useGetCategoriesQuery();
+function CreateProduct({
+  onShowList,
+  isOpen,
+  onClose,
+  setIsCreateModalOpen,
+  mode = "create",
+  initialData = null,
+}) {
+  const [addProduct, { isLoading }] = useAddProductMutation();
+  const [updateProduct, { isLoading: isUpdateLoading }] =
+    useUpdateProductMutation();
+  const { data } = useGetCategoriesQuery();
   // console.log("category data:", data)
   const [formData, setFormData] = useState(initialFormState);
   const [categorySearch, setCategorySearch] = useState("");
   const [subCategorySearch, setSubCategorySearch] = useState("");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
-  console.log("initial data ",initialData);
+  console.log("initial data ", initialData);
 
   const categoryOptions = data?.data || [];
 
   useEffect(() => {
-  if (mode === "update" && initialData) {
-    setFormData({
-      id:initialData._id || "",
-      productName: initialData.product_name || "",
-      category: initialData.product_category?._id || "",
-      subCategory: initialData.product_subCategory?._id || "",
-      description: initialData.description || "",
-      features:
-        initialData.features?.length > 0
-          ? initialData.features
-          : [""],
-      specifications:
-        initialData.specifications?.length > 0
-          ? initialData.specifications.map(item => ({
-              key: item.key || "",
-              value: item.value || "",
-            }))
-          : [{ key: "", value: "" }],
-      images: initialData.images || [],
-    });
+    if (mode === "update" && initialData) {
+      setFormData({
+        id: initialData._id || "",
+        productName: initialData.product_name || "",
+        category: initialData.product_category?._id || "",
+        subCategory: initialData.product_subCategory?._id || "",
+        description: initialData.description || "",
+        features:
+          initialData.features?.length > 0 ? initialData.features : [""],
+        specifications:
+          initialData.specifications?.length > 0
+            ? initialData.specifications.map((item) => ({
+                key: item.key || "",
+                value: item.value || "",
+              }))
+            : [{ key: "", value: "" }],
+        images: initialData.images || [],
+      });
 
-    setCategorySearch(
-      initialData.product_category?.categories_name || ""
-    );
+      setCategorySearch(initialData.product_category?.categories_name || "");
 
-    setSubCategorySearch(
-      initialData.product_subCategory?.name || ""
-    );
-  }
+      setSubCategorySearch(initialData.product_subCategory?.name || "");
+    }
 
-  if (mode === "create") {
-    setFormData(initialFormState);
-    setCategorySearch("");
-    setSubCategorySearch("");
-  }
-}, [mode, initialData]);
+    if (mode === "create") {
+      setFormData(initialFormState);
+      setCategorySearch("");
+      setSubCategorySearch("");
+    }
+  }, [mode, initialData]);
 
   const filteredCategories = useMemo(() => {
-  return categoryOptions.filter(item =>
-    item.categories_name
-      .toLowerCase()
-      .includes(categorySearch.toLowerCase())
-  );
-}, [categoryOptions, categorySearch]);
+    return categoryOptions.filter((item) =>
+      item.categories_name.toLowerCase().includes(categorySearch.toLowerCase()),
+    );
+  }, [categoryOptions, categorySearch]);
 
   const availableSubCategories = useMemo(() => {
-  const selectedCategory = categoryOptions.find(
-    item => item._id === formData.category
-  );
+    const selectedCategory = categoryOptions.find(
+      (item) => item._id === formData.category,
+    );
 
-  return selectedCategory?.subCategories || [];
-}, [categoryOptions, formData.category]);
+    return selectedCategory?.subCategories || [];
+  }, [categoryOptions, formData.category]);
 
   const filteredSubCategories = useMemo(() => {
-  return availableSubCategories.filter(item =>
-    item.name.toLowerCase().includes(subCategorySearch.toLowerCase())
-  );
-}, [availableSubCategories, subCategorySearch]);
+    return availableSubCategories.filter((item) =>
+      item.name.toLowerCase().includes(subCategorySearch.toLowerCase()),
+    );
+  }, [availableSubCategories, subCategorySearch]);
 
   const canAddFeature = useMemo(
     () => formData.features.every((item) => item.trim() !== ""),
-    [formData.features]
+    [formData.features],
   );
 
   const canAddSpecification = useMemo(
     () =>
       formData.specifications.every(
-        (item) => item.key.trim() !== "" && item.value.trim() !== ""
+        (item) => item.key.trim() !== "" && item.value.trim() !== "",
       ),
-    [formData.specifications]
+    [formData.specifications],
   );
 
   const updateField = (field, value) => {
@@ -113,32 +109,32 @@ function CreateProduct({
   };
 
   const handleCategorySelect = (item) => {
-  setFormData(current => ({
-    ...current,
-    category: item._id,
-    subCategory: ""
-  }));
+    setFormData((current) => ({
+      ...current,
+      category: item._id,
+      subCategory: "",
+    }));
 
-  setCategorySearch(item.categories_name);
-  setSubCategorySearch("");
-  setIsCategoryOpen(false);
-};
+    setCategorySearch(item.categories_name);
+    setSubCategorySearch("");
+    setIsCategoryOpen(false);
+  };
 
   const handleSubCategorySelect = (item) => {
-  setFormData(current => ({
-    ...current,
-    subCategory: item._id
-  }));
+    setFormData((current) => ({
+      ...current,
+      subCategory: item._id,
+    }));
 
-  setSubCategorySearch(item.name);
-  setIsSubCategoryOpen(false);
-};
+    setSubCategorySearch(item.name);
+    setIsSubCategoryOpen(false);
+  };
 
   const handleFeatureChange = (index, value) => {
     setFormData((current) => ({
       ...current,
       features: current.features.map((item, itemIndex) =>
-        itemIndex === index ? value : item
+        itemIndex === index ? value : item,
       ),
     }));
   };
@@ -168,7 +164,7 @@ function CreateProduct({
     setFormData((current) => ({
       ...current,
       specifications: current.specifications.map((item, itemIndex) =>
-        itemIndex === index ? { ...item, [field]: value } : item
+        itemIndex === index ? { ...item, [field]: value } : item,
       ),
     }));
   };
@@ -191,7 +187,7 @@ function CreateProduct({
         current.specifications.length === 1
           ? [{ key: "", value: "" }]
           : current.specifications.filter(
-              (_, index) => index !== indexToRemove
+              (_, index) => index !== indexToRemove,
             ),
     }));
   };
@@ -202,64 +198,63 @@ function CreateProduct({
   };
 
   const handleSubmit = async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  try {
-    const payload = new FormData();
+    try {
+      const payload = new FormData();
 
-    payload.append("product_name", formData.productName.trim());
-    payload.append("product_category", formData.category);
-    payload.append("product_subCategory", formData.subCategory);
-    payload.append("description", formData.description.trim());
+      payload.append("product_name", formData.productName.trim());
+      payload.append("product_category", formData.category);
+      payload.append("product_subCategory", formData.subCategory);
+      payload.append("description", formData.description.trim());
 
-    // features
-    formData.features
-      .map(item => item.trim())
-      .filter(Boolean)
-      .forEach(item => {
-        payload.append("features[]", item);
+      // features
+      formData.features
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .forEach((item) => {
+          payload.append("features[]", item);
+        });
+
+      // specifications
+      formData.specifications
+        .filter((item) => item.key.trim() && item.value.trim())
+        .forEach((item) => {
+          payload.append(
+            "specifications[]",
+            JSON.stringify({
+              key: item.key.trim(),
+              value: item.value.trim(),
+            }),
+          );
+        });
+
+      // images
+      formData.images.forEach((file) => {
+        payload.append("images", file);
       });
 
-    // specifications
-    formData.specifications
-      .filter(item => item.key.trim() && item.value.trim())
-      .forEach(item => {
-        payload.append(
-          "specifications[]",
-          JSON.stringify({
-            key: item.key.trim(),
-            value: item.value.trim()
-          })
-        );
-      });
+      // CREATE
+      if (mode === "create") {
+        const res = await addProduct(payload).unwrap();
+        console.log("Created:", res);
+      }
 
-    // images
-    formData.images.forEach(file => {
-      payload.append("images", file);
-    });
+      // UPDATE
+      if (mode === "update") {
+        const res = await updateProduct({
+          id: formData.id,
+          body: payload,
+        }).unwrap();
 
-    // CREATE
-    if (mode === "create") {
-      const res = await addProduct(payload).unwrap();
-      console.log("Created:", res);
+        console.log("Updated:", res);
+      }
+
+      onShowList();
+    } catch (error) {
+      console.log(error);
     }
-
-    // UPDATE
-    if (mode === "update") {
-      const res = await updateProduct({
-        id: formData.id,
-        data: payload
-      }).unwrap();
-
-      console.log("Updated:", res);
-    }
-
-    onShowList();
-
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
@@ -304,7 +299,9 @@ function CreateProduct({
               id="productName"
               type="text"
               value={formData.productName}
-              onChange={(event) => updateField("productName", event.target.value)}
+              onChange={(event) =>
+                updateField("productName", event.target.value)
+              }
               placeholder="e.g. iPhone 15 Pro"
               className="w-full rounded-2xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100"
             />
@@ -385,12 +382,13 @@ function CreateProduct({
 
             {formData.images.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-2">
-                {formData.images.map((file) => (
+                {formData.images.map((file, index) => (
                   <span
-                    key={`${file.name}-${file.lastModified}`}
+                    key={index}
                     className="rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700"
                   >
                     {file.name}
+                    {mode === "create" ? `${file.name}` : `${file.url}`}
                   </span>
                 ))}
               </div>
@@ -401,7 +399,7 @@ function CreateProduct({
         <FieldShell
           label="Description"
           htmlFor="productDescription"
-        //   helperText="Use this area for a longer and more detailed description."
+          //   helperText="Use this area for a longer and more detailed description."
         >
           <textarea
             id="productDescription"
@@ -415,7 +413,7 @@ function CreateProduct({
 
         <DynamicPanel
           title="Features"
-        //   description="Add multiple product features with the same smooth add/remove flow."
+          //   description="Add multiple product features with the same smooth add/remove flow."
           actionLabel="Add More"
           actionIcon={<PlusIcon className="h-4 w-4" />}
           onAction={addFeature}
@@ -459,7 +457,7 @@ function CreateProduct({
 
         <DynamicPanel
           title="Specifications"
-        //   description="Create key-value specification pairs for technical details."
+          //   description="Create key-value specification pairs for technical details."
           actionLabel="Add More"
           actionIcon={<PlusIcon className="h-4 w-4" />}
           onAction={addSpecification}
@@ -487,7 +485,7 @@ function CreateProduct({
                         handleSpecificationChange(
                           index,
                           "key",
-                          event.target.value
+                          event.target.value,
                         )
                       }
                       placeholder="e.g. Display"
@@ -510,7 +508,7 @@ function CreateProduct({
                         handleSpecificationChange(
                           index,
                           "value",
-                          event.target.value
+                          event.target.value,
                         )
                       }
                       placeholder="e.g. 6.1 inch OLED"
@@ -596,7 +594,12 @@ function SearchableSelect({
             onClick={() => setIsOpen((current) => !current)}
             className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-xl p-2 text-slate-400 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed"
           >
-            <ChevronIcon className={["h-4 w-4 transition", isOpen ? "rotate-180" : ""].join(" ")} />
+            <ChevronIcon
+              className={[
+                "h-4 w-4 transition",
+                isOpen ? "rotate-180" : "",
+              ].join(" ")}
+            />
           </button>
         </div>
 
@@ -604,7 +607,7 @@ function SearchableSelect({
           <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-20 max-h-64 overflow-y-auto rounded-3xl border border-blue-100 bg-white p-2 shadow-[0_18px_50px_rgba(148,163,184,0.22)]">
             {options.length > 0 ? (
               options.map((item) => {
-                const isSelected = selectedValue === item._id ;
+                const isSelected = selectedValue === item._id;
 
                 return (
                   <button
@@ -624,7 +627,9 @@ function SearchableSelect({
                 );
               })
             ) : (
-              <div className="px-4 py-3 text-sm text-slate-400">{emptyLabel}</div>
+              <div className="px-4 py-3 text-sm text-slate-400">
+                {emptyLabel}
+              </div>
             )}
           </div>
         ) : null}

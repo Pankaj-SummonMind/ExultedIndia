@@ -10,7 +10,7 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
   }),     
   
-  tagTypes : ["Category","CategoryById","Product","ProductById","User","UserById"] ,
+  tagTypes : ["Category","CategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById"] ,
   
   endpoints: (builder) => ({
 
@@ -129,6 +129,42 @@ export const api = createApi({
         }),
         providesTags:[{type:"UserById"}]
     }),
+
+    // social Medial api services
+
+    createSocialMedia : builder.mutation({
+        query: (body) => ({
+            url:"api/socialMedia/createSocialMedia",
+            method:"POST",
+            body
+        }),
+        invalidatesTags: ['SocialMedia'],
+    }),
+
+    getAllSocialMedia: builder.query({
+        query: () => ({
+            url:"api/socialMedia/getAllSocialMedia",
+            method:"GET"
+        }),
+        providesTags: [{type:'SocialMediaById'}]
+    }),
+
+    getSocialMediaById : builder.query({
+        query: (id) => ({
+            url:`api/socialMedia/${id}`,
+            method:"GET",
+        }),
+        providesTags:[{type:"SocialMediaById"}]
+    }),
+
+    deleteSocailMedia : builder.mutation({
+        query: (id) => ({
+            url:`api/socialMedia/${id}`,
+            method:"DELETE",
+        }),
+        invalidatesTags:['SocialMedia']
+    }),
+
   })
 });
 
@@ -150,4 +186,6 @@ export const {
   useRegisterUserMutation,
   useGetAllUsersQuery,
   useGetUserByidQuery
+
+  //
 } = api;
