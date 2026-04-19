@@ -42,7 +42,7 @@ const sidebarItems = [
     label: "Social Media",
     to: "/admin/socialmedia",
     Icon: UsersIcon,
-    available: false,
+    available: true,
   },
   {
     id: "certificate",
@@ -56,10 +56,10 @@ const sidebarItems = [
 function AdminLayout() {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(() =>
-    typeof window === "undefined" ? false : window.innerWidth < 1024
+    typeof window === "undefined" ? false : window.innerWidth < 1024,
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(() =>
-    typeof window === "undefined" ? true : window.innerWidth >= 1024
+    typeof window === "undefined" ? true : window.innerWidth >= 1024,
   );
   const [selectedTab, setSelectedTab] = useState("dashboard");
 
@@ -78,7 +78,7 @@ function AdminLayout() {
 
   useEffect(() => {
     const activeItem = sidebarItems.find(
-      (item) => item.available && location.pathname.startsWith(item.to)
+      (item) => item.available && location.pathname.startsWith(item.to),
     );
 
     if (activeItem) {
@@ -231,12 +231,10 @@ function AdminLayout() {
                   </h2>
                 </div>
               </div>
-
             </div>
           </header>
 
-          <main className="flex-1"
-          >
+          <main className="flex-1">
             {/* p-4 sm:p-6 lg:p-4 */}
             <div className="min-h-[calc(100vh-112px)] rounded-[28px] border border-white/80 bg-white/80 p-4 shadow-[0_20px_60px_rgba(148,163,184,0.14)] backdrop-blur sm:p-6">
               <Outlet />
