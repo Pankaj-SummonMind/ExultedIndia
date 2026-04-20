@@ -5,8 +5,8 @@ const router = Router()
 
 router.post("/createSocialMedia",createSocialMedia)
 router.get("/getAllSocialMedia",getAllSocialMedia)
-router.put("/:id",updateSocialMedia)
-router.delete("/:id",deleteSocialMedia)
+router.put("/updateSocialMedia",updateSocialMedia)
+router.delete("/deleteSocialMedia",deleteSocialMedia)
 router.get("/:id",getSocialMediaById)
 
 export default router;

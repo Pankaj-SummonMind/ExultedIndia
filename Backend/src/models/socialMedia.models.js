@@ -12,6 +12,10 @@ const socialMediaSchema = new Schema(
       required: true,
       trim: true,
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

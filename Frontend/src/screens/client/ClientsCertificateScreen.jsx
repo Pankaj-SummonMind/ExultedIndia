@@ -1,0 +1,274 @@
+import { useEffect, useMemo, useState } from "react";
+
+const fallbackCertificates = [
+  {
+    id: "iso-quality",
+    title: "ISO Quality Management",
+    image:
+      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: "manufacturing-standard",
+    title: "Manufacturing Standard",
+    image:
+      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: "safety-compliance",
+    title: "Safety Compliance",
+    image:
+      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: "environment-standard",
+    title: "Environment Standard",
+    image:
+      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: "product-testing",
+    title: "Product Testing",
+    image:
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    id: "customer-assurance",
+    title: "Customer Assurance",
+    image:
+      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=900&q=80",
+  },
+];
+
+const collageClasses = [
+  "sm:col-span-2 lg:col-span-2 lg:row-span-2",
+  "",
+  "",
+  "lg:col-span-2",
+  "",
+  "",
+];
+
+function ClientsCertificateScreen({ certificates = [] }) {
+  const [activeCertificate, setActiveCertificate] = useState(null);
+
+  const certificateItems = useMemo(() => {
+    const normalized = normalizeCertificates(certificates);
+    return normalized.length > 0 ? normalized : fallbackCertificates;
+  }, [certificates]);
+
+  useEffect(() => {
+    if (!activeCertificate) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setActiveCertificate(null);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeCertificate]);
+
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-[#F8FAFC] text-[#111827]">
+      <CertificateBackground />
+
+      <section className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="inline-flex rounded-full border border-blue-200 bg-white/85 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-blue-500 shadow-sm backdrop-blur">
+            Exulted India
+          </p>
+          <h1 className="mt-5 text-4xl font-black leading-tight text-[#111827] sm:text-5xl lg:text-6xl">
+            Certificate
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base font-semibold leading-7 text-slate-600 sm:text-lg">
+            Certified Excellence: Our Standards, Your Satisfaction
+          </p>
+        </div>
+
+        <div className="mt-12 grid auto-rows-[230px] grid-cols-1 gap-5 sm:grid-cols-2 lg:auto-rows-[260px] lg:grid-cols-4">
+          {certificateItems.map((certificate, index) => (
+            <CertificateCard
+              key={certificate.id || `${certificate.title}-${index}`}
+              certificate={certificate}
+              index={index}
+              onOpen={setActiveCertificate}
+            />
+          ))}
+        </div>
+      </section>
+
+      {activeCertificate ? (
+        <CertificatePreview
+          certificate={activeCertificate}
+          onClose={() => setActiveCertificate(null)}
+        />
+      ) : null}
+    </main>
+  );
+}
+
+function CertificateCard({ certificate, index, onOpen }) {
+  const spanClass = collageClasses[index % collageClasses.length];
+  const isLarge = spanClass.includes("row-span-2");
+
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(certificate)}
+      className={[
+        "group relative `min-h-57.5 overflow-hidden rounded-[28px] border border-white/80 bg-white text-left shadow-[0_24px_80px_rgba(15,91,191,0.12)] transition duration-500 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_34px_100px_rgba(15,91,191,0.2)] focus:outline-none focus:ring-4 focus:ring-blue-200",
+        spanClass,
+      ].join(" ")}
+      aria-label={`Open ${certificate.title || "certificate"} preview`}
+    >
+      <img
+        src={certificate.image}
+        alt={certificate.title || "Certificate"}
+        loading={index < 3 ? "eager" : "lazy"}
+        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-linear-to-t from-[#111827]/78 via-[#111827]/16 to-transparent opacity-90 transition group-hover:opacity-80" />
+      <div className="absolute left-4 top-4 grid h-11 w-11 place-items-center rounded-2xl border border-white/30 bg-white/20 text-white shadow-xl backdrop-blur-md sm:left-5 sm:top-5">
+        <AwardIcon className="h-5 w-5" />
+      </div>
+      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-100">
+          Certificate
+        </p>
+        <h2
+          className={[
+            "mt-2 font-black leading-tight text-white",
+            isLarge ? "text-2xl sm:text-3xl" : "text-xl",
+          ].join(" ")}
+        >
+          {certificate.title || "Certified Standard"}
+        </h2>
+      </div>
+    </button>
+  );
+}
+
+function CertificatePreview({ certificate, onClose }) {
+  return (
+    <div className="fixed inset-0 z-90 flex items-center justify-center bg-[#111827]/86 px-4 py-6 backdrop-blur-md">
+      <button
+        type="button"
+        aria-label="Close certificate preview"
+        className="absolute inset-0 cursor-default"
+        onClick={onClose}
+      />
+
+      <div className="relative z-10 flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-[30px] border border-white/20 bg-white shadow-[0_35px_120px_rgba(0,0,0,0.38)]">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3 sm:px-5">
+          <div className="min-w-0">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-500">
+              Certificate Preview
+            </p>
+            <h3 className="truncate text-base font-black text-[#111827] sm:text-lg">
+              {certificate.title || "Certificate"}
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-100"
+            aria-label="Close"
+          >
+            <XIcon className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex min-h-0 flex-1 items-center justify-center bg-slate-950 p-3 sm:p-5">
+          <img
+            src={certificate.image}
+            alt={certificate.title || "Certificate full preview"}
+            className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CertificateBackground() {
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(96,165,250,0.2),transparent_30%),radial-gradient(circle_at_86%_12%,rgba(34,197,94,0.14),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,250,252,1))]" />
+      <div className="absolute left-0 top-32 h-px w-full bg-linear-to-r from-transparent via-blue-200 to-transparent" />
+      <div className="absolute bottom-20 left-0 h-px w-full bg-linear-to-r from-transparent via-emerald-200 to-transparent" />
+    </div>
+  );
+}
+
+function normalizeCertificates(value) {
+  const list = Array.isArray(value?.data)
+    ? value.data
+    : Array.isArray(value?.certificates)
+      ? value.certificates
+      : Array.isArray(value)
+        ? value
+        : [];
+
+  return list
+    .map((item, index) => {
+      const image =
+        item?.image ||
+        item?.certificate_image ||
+        item?.certificateImage ||
+        item?.imageUrl ||
+        item?.url ||
+        item?.file;
+
+      if (!image) return null;
+
+      return {
+        id: item?._id || item?.id || `certificate-${index}`,
+        title: item?.title || item?.name || item?.certificate_name || `Certificate ${index + 1}`,
+        image,
+      };
+    })
+    .filter(Boolean);
+}
+
+function IconShell({ className, children }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+function AwardIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <circle cx="12" cy="8" r="5" />
+      <path d="m8.5 12.5-1.5 8 5-3 5 3-1.5-8" />
+    </IconShell>
+  );
+}
+
+function XIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </IconShell>
+  );
+}
+
+export default ClientsCertificateScreen;

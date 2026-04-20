@@ -32,7 +32,7 @@ async function createSocialMedia(req, res) {
 
 async function getAllSocialMedia(req, res) {
   try {
-    const socialMediaList = await SocialMedia.find().select("-__v -updatedAt");
+    const socialMediaList = await SocialMedia.find({ deletedAt: null }).select("-__v -updatedAt");
 
     if (socialMediaList.length === 0) {
       throw new ApiError(404, "No social media links found");
@@ -82,8 +82,7 @@ async function getSocialMediaById(req, res) {
 
 async function updateSocialMedia(req, res) {
   try {
-    const { id } = req.params;
-    const { key, value } = req.body;
+    const { id , key, value } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError(400, "Invalid social media id");
@@ -119,13 +118,19 @@ async function updateSocialMedia(req, res) {
 
 async function deleteSocialMedia(req, res) {
   try {
-    const { id } = req.params;
+    const { id } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError(400, "Invalid social media id");
     }
 
-    const deletedSocialMedia = await SocialMedia.findByIdAndDelete(id);
+    // const deletedSocialMedia = await SocialMedia.findByIdAndDelete(id);
+
+    const deletedSocialMedia = await SocialMedia.findByIdAndUpdate(
+          id,
+          { deletedAt: new Date() },
+          { returnDocument: "after", }
+        );
 
     if (!deletedSocialMedia) {
       throw new ApiError(404, "No social media found with this id");

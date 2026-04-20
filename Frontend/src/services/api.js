@@ -146,7 +146,7 @@ export const api = createApi({
             url:"api/socialMedia/getAllSocialMedia",
             method:"GET"
         }),
-        providesTags: [{type:'SocialMediaById'}]
+        providesTags: [{type:'SocialMedia'}]
     }),
 
     getSocialMediaById : builder.query({
@@ -157,13 +157,24 @@ export const api = createApi({
         providesTags:[{type:"SocialMediaById"}]
     }),
 
-    deleteSocailMedia : builder.mutation({
-        query: (id) => ({
-            url:`api/socialMedia/${id}`,
+    updateSocialMedia : builder.mutation({
+        query: (body) => ({
+            url:`api/socialMedia/updateSocialMedia`,
+            method:"PUT",
+            body
+        }),
+        invalidatesTags:["SocialMedia","SocialMediaById"]
+    }),
+    
+    deleteSocialMedia : builder.mutation({
+        query: (body) => ({
+            url:`api/socialMedia/deleteSocialMedia`,
             method:"DELETE",
+            body
         }),
         invalidatesTags:['SocialMedia']
     }),
+
 
   })
 });
@@ -185,7 +196,12 @@ export const {
   // user
   useRegisterUserMutation,
   useGetAllUsersQuery,
-  useGetUserByidQuery
+  useGetUserByidQuery,
 
-  //
+  // social media
+  useCreateSocialMediaMutation,
+  useGetAllSocialMediaQuery,
+  useGetSocialMediaByIdQuery,
+  useDeleteSocialMediaMutation,
+  useUpdateSocialMediaMutation,
 } = api;
