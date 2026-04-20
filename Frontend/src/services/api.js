@@ -10,7 +10,7 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
   }),     
   
-  tagTypes : ["Category","CategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById"] ,
+  tagTypes : ["Category","CategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById","Certificate","CertificateById"] ,
   
   endpoints: (builder) => ({
 
@@ -175,6 +175,50 @@ export const api = createApi({
         invalidatesTags:['SocialMedia']
     }),
 
+    // Certificate api services
+
+    createCertificate : builder.mutation({
+        query: (body) => ({
+            url:"api/certificate/createCertificate  ",
+            method:"POST",
+            body
+        }),
+        invalidatesTags: ['Certificate'],
+    }),
+
+    getAllCertificates: builder.query({
+        query: () => ({
+            url:"api/certificate/getAllCertificates",
+            method:"GET"
+        }),
+        providesTags: [{type:'Certificate'}]
+    }),
+
+    getCertificateById : builder.query({
+        query: (id) => ({
+            url:`api/certificate/getCertificate/${id}`,
+            method:"GET",
+        }),
+        providesTags:[{type:"CertificateById"}]
+    }),
+
+    updateCertificate : builder.mutation({
+        query: (body) => ({
+            url:`api/certificate/updateCertificate`,
+            method:"PUT",
+            body
+        }),
+        invalidatesTags:["Certificate","CertificateById"]
+    }),
+    
+    deleteCertificate : builder.mutation({
+        query: (id) => ({
+            url:`api/certificate/deleteCertificate`,
+            method:"DELETE",
+        }),
+        invalidatesTags:['Certificate']
+    }),
+
 
   })
 });
@@ -204,4 +248,10 @@ export const {
   useGetSocialMediaByIdQuery,
   useDeleteSocialMediaMutation,
   useUpdateSocialMediaMutation,
+
+  // certqificate
+    useCreateCertificateMutation,   
+    useGetAllCertificatesQuery,
+    useDeleteCertificateMutation,
+    useUpdateCertificateMutation
 } = api;

@@ -49,7 +49,7 @@ const sidebarItems = [
     label: "Certificates",
     to: "/admin/certificate",
     Icon: UsersIcon,
-    available: false,
+    available: true,
   },
 ];
 

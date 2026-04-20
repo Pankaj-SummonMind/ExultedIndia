@@ -14,6 +14,7 @@ import ClientsProductScreen from "./screens/client/ClientsProductScreen";
 import AboutUs from "./screens/client/AboutUs";
 import ContactUsScreen from "./screens/client/ContactUsScreen";
 import ClientsCertificateScreen from "./screens/client/ClientsCertificateScreen";
+import CertificateScreen from "./screens/admin/CertificateScreen";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="product" element={<ProductScreen />} />
           <Route path="user" element={<UserScreen />} />
           <Route path="socialmedia" element={<SocialMediaScreen />} />
+          <Route path="certificate" element={<CertificateScreen />} />
         </Route>
 
         {/* client */}
@@ -38,7 +40,10 @@ function App() {
           <Route index element={<ClientHomeScreen />} />
           <Route path="products" element={<ClientsProductScreen />} />
           <Route path="products/category/:id" element={<ClientHomeScreen />} />
-          <Route path="products/subcategory/:id" element={<ClientHomeScreen />} />
+          <Route
+            path="products/subcategory/:id"
+            element={<ClientHomeScreen />}
+          />
           <Route path="aboutus" element={<AboutUs />} />
           <Route path="certificates" element={<ClientsCertificateScreen />} />
           <Route path="contact" element={<ContactUsScreen />} />

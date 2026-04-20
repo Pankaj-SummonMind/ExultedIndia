@@ -39,10 +39,12 @@ import categoriesRoutes from "./routes/categories.routes.js"
 import productsRoutes from "./routes/product.routes.js"
 import userRoutes from "./routes/user.routes.js"
 import socialMedia from "./routes/socialMedia.Routes.js"
+import certificateRoutes from "./routes/certificate.routes.js"
 // routes declaration
 app.use("/api/categories",categoriesRoutes)
 app.use("/api/products",productsRoutes)
 app.use("/api/user",userRoutes)
 app.use("/api/socialMedia",socialMedia)
+app.use("/api/certificate",certificateRoutes)
 
 export default app;
