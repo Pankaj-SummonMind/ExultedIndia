@@ -212,9 +212,10 @@ export const api = createApi({
     }),
     
     deleteCertificate : builder.mutation({
-        query: (id) => ({
+        query: (body) => ({
             url:`api/certificate/deleteCertificate`,
             method:"DELETE",
+            body
         }),
         invalidatesTags:['Certificate']
     }),

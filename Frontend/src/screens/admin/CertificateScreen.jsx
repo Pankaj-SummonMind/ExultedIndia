@@ -4,6 +4,10 @@ import {
   useDeleteCertificateMutation,
   useGetAllCertificatesQuery,
 } from "../../services/api";
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
+// import {trash} from "lucide-react"
 // import {
 //   useDeleteCertificateMutation,
 //   useGetAllCertificateQuery,
@@ -18,16 +22,17 @@ function CertificateScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [activeCertificate, setActiveCertificate] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const certificates = useMemo(() => {
     return Array.isArray(data?.data) ? data.data : [];
   }, [data]);
 
-  const filteredCertificates = useMemo(() => {
-    return certificates.filter((item) =>
-      item.certificate_name?.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [certificates, searchTerm]);
+  // const filteredCertificates = useMemo(() => {
+  //   return certificates.filter((item) =>
+  //     item.certificate_name?.toLowerCase().includes(searchTerm.toLowerCase()),
+  //   );
+  // }, [certificates, searchTerm]);
 
   const openCreate = () => {
     setActiveCertificate(null);
@@ -37,16 +42,16 @@ function CertificateScreen() {
   const openEdit = (item) => {
     setActiveCertificate({
       id: item._id,
-      name: item.name,
+      name: item.certificate_name,
       image: item.image, // Assuming the API returns the image URL here
     });
     setIsOpen(true);
   };
 
   const onDelete = async (item) => {
-    if (!window.confirm("Are you sure you want to delete this certificate?"))
-      return;
-
+    // if (!window.confirm("Are you sure you want to delete this certificate?"))
+    //   return;
+    console.log(item)
     try {
       const res = await deleteCertificate({
         id: item._id,
@@ -71,13 +76,13 @@ function CertificateScreen() {
           </div>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-            <input
+            {/* <input
               type="text"
               placeholder="Search certificate..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-12 w-full rounded-2xl border border-blue-100 bg-white px-4 text-sm font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 sm:w-72"
-            />
+            /> */}
 
             <button
               onClick={openCreate}
@@ -101,9 +106,9 @@ function CertificateScreen() {
             </p>
           </div>
 
-          {filteredCertificates.length > 0 ? (
+          {certificates.length > 0 ? (
             <div className="divide-y divide-blue-50">
-              {filteredCertificates.map((item) => (
+              {certificates.map((item, index) => (
                 <div
                   key={item._id}
                   className="flex flex-col gap-4 px-5 py-4 transition hover:bg-blue-50/50 sm:flex-row sm:items-center sm:justify-between sm:px-6"
@@ -112,10 +117,11 @@ function CertificateScreen() {
                     <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-blue-100 bg-slate-50">
                       {item.image?.url ? (
                         <img
-                          src={item.image.url}
-                          alt={item.certificate_name}
-                          className="h-full w-full object-cover"
-                        />
+                            src={item.image.url}
+                            alt={item.certificate_name}
+                            onClick={() => setActiveIndex(index)}
+                            className="h-full w-full cursor-pointer object-cover"
+                          />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
                           No Img
@@ -135,7 +141,7 @@ function CertificateScreen() {
                       onClick={() => onDelete(item)}
                       className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-red-200 bg-white text-red-600 transition hover:bg-red-50"
                     >
-                      Delete
+                      <DeleteIcon className="h-5 w-5"/>
                     </button>
 
                     <button
@@ -155,6 +161,22 @@ function CertificateScreen() {
           )}
         </div>
       )}
+      <Lightbox
+          open={activeIndex >= 0}
+          close={() => setActiveIndex(-1)}
+          index={activeIndex}
+          slides={certificates.map((item) => ({
+            src: item.image?.url,
+            title: item.certificate_name,
+          }))}
+          plugins={[Zoom]}
+          carousel={{ finite: false }}
+          zoom={{
+            maxZoomPixelRatio: 3,
+            doubleTapDelay: 300,
+            doubleClickDelay: 300,
+          }}
+        />
 
       <CreateCertificate
         isOpen={isOpen}
@@ -166,3 +188,32 @@ function CertificateScreen() {
 }
 
 export default CertificateScreen;
+
+function IconShell({ className, children }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+function DeleteIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+    </IconShell>
+  );
+}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useGetAllCertificatesQuery, useGetCategoriesQuery } from "../../services/api";
 
 const heroImage =
   "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=80";
@@ -99,6 +100,9 @@ const certificates = [
 const quickLinks = ["Products", "About", "Certificates", "Contact"];
 
 function ClientHomeScreen() {
+  // const{data:categories,isLoading:isCategoriesLoading} = useGetCategoriesQuery()
+  // const {data: certificates,isLoading:isCertificateLoading } = useGetAllCertificatesQuery()
+  // console.log("Categories:", categories,"certificates:",certificates);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [previewCertificate, setPreviewCertificate] = useState(null);
 
@@ -106,7 +110,7 @@ function ClientHomeScreen() {
     <div className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
       <SeoBlock />
       <LocalAnimationStyles />
-      <LoadingScreen />
+      {/* <LoadingScreen /> */}
 
       <FloatingParticles />
       <HeroSection />

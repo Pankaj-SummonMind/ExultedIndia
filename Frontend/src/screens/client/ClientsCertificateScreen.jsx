@@ -1,4 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import Lightbox from "yet-another-react-lightbox"
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+
+import "yet-another-react-lightbox/styles.css";
+import { useGetAllCertificatesQuery } from "../../services/api";
 
 const fallbackCertificates = [
   {
@@ -48,12 +53,15 @@ const collageClasses = [
   "",
 ];
 
-function ClientsCertificateScreen({ certificates = [] }) {
+function ClientsCertificateScreen() {
   const [activeCertificate, setActiveCertificate] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const {data:certificates,isLoading} = useGetAllCertificatesQuery()
+  console.log("certificates from api : ", certificates)
 
   const certificateItems = useMemo(() => {
     const normalized = normalizeCertificates(certificates);
-    return normalized.length > 0 ? normalized : fallbackCertificates;
+    return  normalized;
   }, [certificates]);
 
   useEffect(() => {
@@ -92,23 +100,41 @@ function ClientsCertificateScreen({ certificates = [] }) {
         </div>
 
         <div className="mt-12 grid auto-rows-[230px] grid-cols-1 gap-5 sm:grid-cols-2 lg:auto-rows-[260px] lg:grid-cols-4">
-          {certificateItems.map((certificate, index) => (
-            <CertificateCard
-              key={certificate.id || `${certificate.title}-${index}`}
-              certificate={certificate}
-              index={index}
-              onOpen={setActiveCertificate}
-            />
-          ))}
-        </div>
+  {certificateItems.map((certificate, index) => (
+    <CertificateCard
+      key={certificate.id}
+      certificate={certificate}
+      index={index}
+      onOpen={() => setActiveIndex(index)}
+      // onClick={onOpen}
+    />
+  ))}
+</div>
+
+<Lightbox
+  open={activeIndex >= 0}
+  close={() => setActiveIndex(-1)}
+  index={activeIndex}
+  slides={certificateItems.map((item) => ({
+    src: item.image,
+    title: item.title,
+  }))}
+  plugins={[Zoom]}
+  carousel={{ finite: false }}
+  zoom={{
+    maxZoomPixelRatio: 3,
+    doubleTapDelay: 300,
+    doubleClickDelay: 300,
+  }}
+/>
       </section>
 
-      {activeCertificate ? (
+      {/* {activeCertificate ? (
         <CertificatePreview
           certificate={activeCertificate}
           onClose={() => setActiveCertificate(null)}
         />
-      ) : null}
+      ) : null} */}
     </main>
   );
 }
@@ -154,47 +180,47 @@ function CertificateCard({ certificate, index, onOpen }) {
   );
 }
 
-function CertificatePreview({ certificate, onClose }) {
-  return (
-    <div className="fixed inset-0 z-90 flex items-center justify-center bg-[#111827]/86 px-4 py-6 backdrop-blur-md">
-      <button
-        type="button"
-        aria-label="Close certificate preview"
-        className="absolute inset-0 cursor-default"
-        onClick={onClose}
-      />
+// function CertificatePreview({ certificate, onClose }) {
+//   return (
+//     <div className="fixed inset-0 z-90 flex items-center justify-center bg-[#111827]/86 px-4 py-6 backdrop-blur-md">
+//       <button
+//         type="button"
+//         aria-label="Close certificate preview"
+//         className="absolute inset-0 cursor-default"
+//         onClick={onClose}
+//       />
 
-      <div className="relative z-10 flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-[30px] border border-white/20 bg-white shadow-[0_35px_120px_rgba(0,0,0,0.38)]">
-        <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3 sm:px-5">
-          <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-500">
-              Certificate Preview
-            </p>
-            <h3 className="truncate text-base font-black text-[#111827] sm:text-lg">
-              {certificate.title || "Certificate"}
-            </h3>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-100"
-            aria-label="Close"
-          >
-            <XIcon className="h-5 w-5" />
-          </button>
-        </div>
+//       <div className="relative z-10 flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-[30px] border border-white/20 bg-white shadow-[0_35px_120px_rgba(0,0,0,0.38)]">
+//         <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3 sm:px-5">
+//           <div className="min-w-0">
+//             <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-500">
+//               Certificate Preview
+//             </p>
+//             <h3 className="truncate text-base font-black text-[#111827] sm:text-lg">
+//               {certificate.title || "Certificate"}
+//             </h3>
+//           </div>
+//           <button
+//             type="button"
+//             onClick={onClose}
+//             className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-100"
+//             aria-label="Close"
+//           >
+//             <XIcon className="h-5 w-5" />
+//           </button>
+//         </div>
 
-        <div className="flex min-h-0 flex-1 items-center justify-center bg-slate-950 p-3 sm:p-5">
-          <img
-            src={certificate.image}
-            alt={certificate.title || "Certificate full preview"}
-            className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
+//         <div className="flex min-h-0 flex-1 items-center justify-center bg-slate-950 p-3 sm:p-5">
+//           <img
+//             src={certificate.image}
+//             alt={certificate.title || "Certificate full preview"}
+//             className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
+//           />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 function CertificateBackground() {
   return (
@@ -210,26 +236,24 @@ function normalizeCertificates(value) {
   const list = Array.isArray(value?.data)
     ? value.data
     : Array.isArray(value?.certificates)
-      ? value.certificates
-      : Array.isArray(value)
-        ? value
-        : [];
+    ? value.certificates
+    : Array.isArray(value)
+    ? value
+    : [];
 
   return list
     .map((item, index) => {
-      const image =
-        item?.image ||
-        item?.certificate_image ||
-        item?.certificateImage ||
-        item?.imageUrl ||
-        item?.url ||
-        item?.file;
+      const rawImage =
+        item?.image
+
+      const image = rawImage?.url;
 
       if (!image) return null;
 
       return {
-        id: item?._id || item?.id || `certificate-${index}`,
-        title: item?.title || item?.name || item?.certificate_name || `Certificate ${index + 1}`,
+        id: item?._id,
+        title:
+          item?.certificate_name,
         image,
       };
     })

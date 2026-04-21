@@ -94,7 +94,7 @@ async function getCertificateById(req, res) {
 
 async function updateCertificate(req, res) {
   try {
-    const { id } = req.params;
+    const { id } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError(400, "Invalid certificate id");
@@ -146,7 +146,8 @@ async function updateCertificate(req, res) {
 
 async function deleteCertificate(req, res) {
   try {
-    const { id } = req.params;
+    console.log("deleteCertificate controller called with body:", req.body);
+    const { id } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError(400, "Invalid certificate id");
@@ -163,7 +164,7 @@ async function deleteCertificate(req, res) {
       new ApiResponse(200, null, "Certificate deleted successfully")
     );
 
-  } catch (error) {
+  } catch (error) { 
     return res.status(error.statusCode || 500).json({
       success: false,
       message: error.message || "Internal Server Error"

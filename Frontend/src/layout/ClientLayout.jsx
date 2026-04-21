@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useGetCategoriesQuery } from "../services/api";
+import { useGetAllSocialMediaQuery, useGetCategoriesQuery } from "../services/api";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -12,6 +12,7 @@ const navItems = [
 function ClientLayout() {
   const navigate = useNavigate();
   const { data: categoriesResponse, isLoading } = useGetCategoriesQuery();
+  const {data: SocialMediaAccounts} = useGetAllSocialMediaQuery()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
   const [activeCategoryId, setActiveCategoryId] = useState(null);
@@ -272,7 +273,165 @@ function ClientLayout() {
       <main>
         <Outlet />
       </main>
-      <Footer />
+      
+      {/* <Footer /> */}
+      <footer className="relative overflow-hidden bg-[#0f172a] text-white">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src="/footer-bg.jpg"
+          alt="Footer Background"
+          className="h-full w-full object-cover opacity-10"
+        />
+        <div className="absolute inset-0 bg-linear-to-r from-[#020617]/95 via-[#0f172a]/92 to-[#111827]/95" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+          
+          {/* Company Info */}
+          <div>
+            <div className="flex items-center gap-4">
+              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/30">
+                <BoltIcon className="h-7 w-7 text-white" />
+              </div>
+
+              <div>
+                <h3 className="text-xl font-black tracking-wide">
+                  Exaulted India
+                </h3>
+                <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-300">
+                  Future Power Systems
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-5 text-sm leading-7 text-slate-300">
+              Leading manufacturer of Battery, Inverter, Transformer,
+              Online UPS, Gensets and EV Chargers with trusted Pan India support.
+            </p>
+
+            {/* Social */}
+            <div className="mt-6 flex gap-3">
+  {(SocialMediaAccounts?.data || []).filter((item) => ["instagram", "facebook", "twitter", "youtube", "linkedin"].includes(item.key?.toLowerCase())).map((item) => (
+    <a
+      key={item._id}
+      href={item.value}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/5 text-sm font-black text-white transition hover:bg-blue-500 hover:scale-110"
+    >
+      {item.key === "instagram" && "in"}
+      {item.key === "facebook" && "f"}
+      {item.key === "twitter" && "x"}
+      {item.key === "youtube" && "yt"}
+      {item.key === "linkedin" && "li"}
+    </a>
+  ))}
+</div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-lg font-black text-white">
+              Quick Links
+            </h4>
+
+            <div className="mt-5 grid gap-3">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.label}
+                  to={item.to}
+                  className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-blue-400"
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+
+          {/* Products */}
+          <div>
+            <h4 className="text-lg font-black text-white">
+              Products
+            </h4>
+
+            <div className="mt-5 grid gap-3">
+              {categories.map((category) => (
+                <a
+                  key={category._id}
+                  href={`/products/category/${category._id}`}
+                  className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-emerald-400"
+                >
+                  {category.categories_name}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="text-lg font-black text-white">
+              Contact
+            </h4>
+
+            <p className="mt-4 text-sm leading-7 text-slate-300">
+              If you have any questions or need help, feel free to
+              contact with our team.
+            </p>
+
+            <div className="mt-6 space-y-4">
+  {(SocialMediaAccounts?.data || [])
+    .filter((item) =>
+      ["phone", "mail", "whatsapp"].includes(item.key?.toLowerCase())
+    )
+    .map((item) => (
+      <div key={item._id} className="flex items-start gap-3">
+        <div
+          className={`grid h-10 w-10 place-items-center rounded-xl ${
+            item.key?.toLowerCase() === "phone"
+              ? "bg-blue-500/20 text-blue-400"
+              : item.key?.toLowerCase() === "email"
+              ? "bg-emerald-500/20 text-emerald-400"
+              : "bg-green-500/20 text-green-400"
+          }`}
+        >
+          {/* Icon */}
+        </div>
+
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            {item.key}
+          </p>
+
+          <p className="text-sm font-semibold text-white">
+            {item.value}
+          </p>
+        </div>
+      </div>
+    ))}
+</div>
+          </div>
+
+        </div>
+
+        {/* Bottom */}
+        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © 2026 Exaulted India. All rights reserved.
+          </p>
+
+          <div className="flex gap-6">
+            <a href="/" className="hover:text-white transition">
+              Privacy Policy
+            </a>
+            <a href="/" className="hover:text-white transition">
+              Terms of Use
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
     </div>
   );
 }
@@ -466,13 +625,13 @@ function Footer() {
             </h4>
 
             <div className="mt-5 grid gap-3">
-              {quickLinks.map((item) => (
+              {navItems.map((item) => (
                 <NavLink
-                  key={item}
-                  to={`/${item.toLowerCase() === "home" ? "" : item.toLowerCase()}`}
+                  key={item.label}
+                  to={item.to}
                   className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-blue-400"
                 >
-                  {item}
+                  {item.label}
                 </NavLink>
               ))}
             </div>
@@ -485,13 +644,13 @@ function Footer() {
             </h4>
 
             <div className="mt-5 grid gap-3">
-              {products.map((item) => (
+              {categories.map((category) => (
                 <a
-                  key={item}
-                  href="/products"
+                  key={category._id}
+                  href={`/products/category/${category._id}`}
                   className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-emerald-400"
                 >
-                  {item}
+                  {category.name}
                 </a>
               ))}
             </div>

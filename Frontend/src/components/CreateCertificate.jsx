@@ -31,9 +31,9 @@ function CreateCertificate({ isOpen, onClose, activeCertificate }) {
     if (activeCertificate) {
       setFormData({
         id: activeCertificate.id,
-        certificate_name: activeCertificate.name,
+        name: activeCertificate.name,
         image: null, // Don't set File object, we only have URL initially
-        previewUrl: activeCertificate.image || "",
+        previewUrl: activeCertificate.image.url || "",
       });
     } else {
       setFormData(EMPTY_FORM);
