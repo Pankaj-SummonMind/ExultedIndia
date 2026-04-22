@@ -35,7 +35,7 @@ const sidebarItems = [
     label: "Pages",
     to: "/admin/pages",
     Icon: UsersIcon,
-    available: false,
+    available: true,
   },
   {
     id: "Social Media",

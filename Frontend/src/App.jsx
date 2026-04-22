@@ -18,6 +18,7 @@ import CertificateScreen from "./screens/admin/CertificateScreen";
 import ClientCategoryProduct from "./screens/client/furtherScreen/ClientCategoryProduct";
 import ClientsSubCategory from "./screens/client/furtherScreen/ClientsSubCategory";
 import ClientProductDetailScreen from "./screens/client/furtherScreen/ClientProductDetailScreen";
+import PagesScreen from "./screens/admin/PagesScreen";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="product/:id" element={<ProductById />} />
           <Route path="user/:id" element={<UserById />} />
           <Route path="product" element={<ProductScreen />} />
+          <Route path="pages" element={<PagesScreen />} />
           <Route path="user" element={<UserScreen />} />
           <Route path="socialmedia" element={<SocialMediaScreen />} />
           <Route path="certificate" element={<CertificateScreen />} />
