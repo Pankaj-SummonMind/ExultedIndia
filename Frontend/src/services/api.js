@@ -220,6 +220,34 @@ export const api = createApi({
         invalidatesTags:['Certificate']
     }),
 
+    // Certificate api services
+
+    createHomePage : builder.mutation({
+        query: (body) => ({
+            url:"api/HomePage/createHomePage  ",
+            method:"POST",
+            body
+        }),
+        invalidatesTags: ['HomePage'],
+    }),
+
+    getHomePage: builder.query({
+        query: () => ({
+            url:"api/HomePage/getHomePage",
+            method:"GET"
+        }),
+        providesTags: [{type:'HomePage'}]
+    }),
+
+    updateHomePage : builder.mutation({
+        query: (body) => ({
+            url:`api/HomePage/updateHomePage`,
+            method:"PUT",
+            body
+        }),
+        invalidatesTags:["HomePage"]
+    }),
+
 
   })
 });
@@ -254,5 +282,11 @@ export const {
     useCreateCertificateMutation,   
     useGetAllCertificatesQuery,
     useDeleteCertificateMutation,
-    useUpdateCertificateMutation
+    useUpdateCertificateMutation,
+
+  // HomePage
+    useGetHomePageQuery,
+    useCreateHomePageMutation,
+    useUpdateHomePageMutation,
+
 } = api;

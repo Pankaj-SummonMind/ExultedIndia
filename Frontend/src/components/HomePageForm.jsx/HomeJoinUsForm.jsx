@@ -1,24 +1,25 @@
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
-function HomeJoinUsForm({
-  isOpen,
-  onClose,
-  activeJoinUs,
-  onSubmit,
-}) {
-  const [formData, setFormData] = useState<HomeJoinUsFormValues>(EMPTY_FORM);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+const EMPTY_FORM = {
+  id: "",
+  title: "",
+  detail: "",
+};
+
+function HomeJoinUsForm({ isOpen, onClose, activeJoinUs, onSubmit }) {
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
-      return;
+      return undefined;
     }
 
     if (activeJoinUs) {
       setFormData({
-        id: activeJoinUs.id || "",
+        id: activeJoinUs.id || activeJoinUs._id || "",
         title: activeJoinUs.title || "",
         detail: activeJoinUs.detail || "",
       });
@@ -28,15 +29,17 @@ function HomeJoinUsForm({
 
     setFieldErrors({});
     setFormError("");
+
+    return undefined;
   }, [activeJoinUs, isOpen]);
 
-  const updateField = (field) => {
+  const updateField = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
 
-    if (fieldErrors[field ]) {
+    if (fieldErrors[field]) {
       setFieldErrors((prev) => ({
         ...prev,
         [field]: "",
@@ -98,12 +101,8 @@ function HomeJoinUsForm({
 
       onClose();
     } catch (error) {
-      const submitError = error ;
-
       setFormError(
-        submitError?.data?.message ||
-          submitError?.message ||
-          "Something went wrong.",
+        error?.data?.message || error?.message || "Something went wrong.",
       );
     } finally {
       setIsSubmitting(false);
@@ -198,7 +197,6 @@ function HomeJoinUsForm({
     </div>
   );
 }
-
 
 function FormField({ label, htmlFor, error, children }) {
   return (
