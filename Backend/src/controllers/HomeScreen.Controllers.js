@@ -10,6 +10,7 @@ import { ApiResponse } from "../utils.js/ApiResponse.js";
    CREATE HOMEPAGE
 ---------------------------------------- */
 const createHomePage = async (req, res) => {
+
   try {
     const {
       hero,
@@ -20,6 +21,15 @@ const createHomePage = async (req, res) => {
       testimonials,
       joinUs,
     } = req.body;
+    console.log("Received data:", {
+      hero,
+      heroDetail,
+      homeCategory,
+      whyChooseUs,
+      locations,
+      testimonials,
+      joinUs,
+    }); 
 
     const alreadyExist = await HomePage.findOne();
 

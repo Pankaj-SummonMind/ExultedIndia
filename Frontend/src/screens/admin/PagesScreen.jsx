@@ -13,10 +13,10 @@ const PAGE_TABS = [
     label: "About Us",
     component: <AboutUsPageScreen />,
   },
-  {
-    id: "contact",
-    label: "Contact",
-  },
+  // {
+  //   id: "contact",
+  //   label: "Contact",
+  // },
 ];
 
 function PagesScreen() {

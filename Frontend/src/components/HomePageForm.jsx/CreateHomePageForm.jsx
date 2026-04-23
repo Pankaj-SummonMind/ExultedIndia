@@ -664,8 +664,8 @@ function CreateHomePageForm({setShowCreateForm}) {
       "hero",
       JSON.stringify({
         title: normalizedData.heroCard.title,
-        sub_heading: normalizedData.heroCard.subHeading,
-        description: normalizedData.heroCard.description,
+        subTitle: normalizedData.heroCard.subHeading,
+        detail: normalizedData.heroCard.description,
       }),
     );
     payload.append("heroImage", normalizedData.heroCard.image);
@@ -674,7 +674,10 @@ function CreateHomePageForm({setShowCreateForm}) {
       "heroDetail",
       JSON.stringify({
         title: normalizedData.heroDetail.title,
-        stats: normalizedData.heroDetail.stats,
+        stats: normalizedData.heroDetail.stats.map(item => ({
+          label: item.key,
+          value: item.value
+        }))
       }),
     );
     payload.append("heroDetailImage", normalizedData.heroDetail.image);
@@ -692,11 +695,19 @@ function CreateHomePageForm({setShowCreateForm}) {
       JSON.stringify(normalizedData.whyChooseUs),
     );
     payload.append("locations", JSON.stringify(normalizedData.locations));
-    payload.append("testimonials", JSON.stringify(normalizedData.testimonials));
+    payload.append("testimonials", JSON.stringify(
+      normalizedData.testimonials.testimonials.map(item => ({
+        title: normalizedData.testimonials.title,
+        name: item.name,
+        designation: item.role,
+        message: item.message
+      }))
+    ));
     payload.append("joinUs", JSON.stringify(normalizedData.joinUs));
 
     try {
       setIsSubmitting(true);
+      console.log("payload to create home data:", payload);
       const res = await createHomePage(payload).unwrap()
 
       console.log("response after creating home page :",res)
@@ -1427,10 +1438,10 @@ function CreateHomePageForm({setShowCreateForm}) {
                   <p className="text-sm font-semibold text-slate-800">
                     Ready to create the home page content?
                   </p>
-                  <p className="mt-1 text-sm text-slate-500">
+                  {/* <p className="mt-1 text-sm text-slate-500">
                     All sections will be validated together and submitted in one
                     structured payload.
-                  </p>
+                  </p> */}
                 </div>
 
                 <button
