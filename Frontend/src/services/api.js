@@ -10,7 +10,7 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
   }),     
   
-  tagTypes : ["Category","CategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById","Certificate","CertificateById","HomePage","AboutUs"] ,
+  tagTypes : ["Category","CategoryById","SubCategory","SubCategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById","Certificate","CertificateById","HomePage","AboutUs"] ,
   
   endpoints: (builder) => ({
 
@@ -56,6 +56,50 @@ export const api = createApi({
             method:"DELETE", 
         }),
         invalidatesTags:['Category']
+    }),
+
+    // sub categories api services
+
+    createSubCategories : builder.mutation({
+        query: (body) => ({
+            url:"api/subCategories/createSubCategories",
+            method:"POST",
+            body
+        }),
+        invalidatesTags:["SubCategory"],
+    }),
+
+    getSubCategories: builder.query({
+        query: () => ({
+            url:"api/subCategories/getSubCategories",
+            method:"GET"
+        }),
+        providesTags:[{type:"SubCategory"}]
+    }),
+
+    updateSubCategories : builder.mutation({
+        query: ({id, body}) => ({
+            url:`api/subCategories/${id}`,
+            method:"PUT",
+            body
+        }),
+        invalidatesTags:["SubCategory","SubCategoryById"]
+    }),
+
+    getSubCategoryById : builder.query({
+        query: (id) => ({
+            url:`api/subCategories/${id}`,
+            method:"GET",
+        }),
+        providesTags:[{type:"SubCategoryById"}]
+    }),
+
+    deleteSubCategories : builder.mutation({
+        query: (id) => ({
+            url:`api/subCategories/${id}`,
+            method:"DELETE",
+        }),
+        invalidatesTags:["SubCategory"]
     }),
 
     // products api servies 
@@ -286,6 +330,13 @@ export const {
   useGetCategoriesByIdQuery,
   useUpdateCategoriesMutation,
   useDeleteCategoriesMutation,
+
+  // sub category
+  useCreateSubCategoriesMutation,
+  useGetSubCategoriesQuery,
+  useUpdateSubCategoriesMutation,
+  useGetSubCategoryByIdQuery,
+  useDeleteSubCategoriesMutation,
 
   // product
   useAddProductMutation,

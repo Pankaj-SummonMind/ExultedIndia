@@ -1,84 +1,44 @@
-import { useEffect, useMemo, useState } from "react";
-import { data, useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CreateCategory from "../../components/CreateCategory";
-import { createCategory, getCategories } from "../../data/categoryStore";
-import { useCreateCategoriesMutation, useGetCategoriesQuery, } from "../../services/api";
+import { useGetCategoriesQuery } from "../../services/api";
 
 function CategoryScreen() {
   const navigate = useNavigate();
-  const [createCategory,{isLoading:isCreateLoading}] = useCreateCategoriesMutation()
-  const {data:allCategories} = useGetCategoriesQuery()
+  const { data: allCategories } = useGetCategoriesQuery();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [createdCategoryForm, setCreatedCategoryForm] = useState({
-    categoryName: "",
-    subCategory: [],
-  });
-  const categoryRows = allCategories?.data?.map((item) => ({
-  id: item._id,
-  name: item.categories_name,
-  subCategory: item.subCategories.map((sub) => sub.name),
-  createdAt: new Date(item.createdAt).toLocaleDateString(),
-})) || [];
-console.log("datA OF ALL CATEGORRIES: ",allCategories)
-//   const [categoryRows, setCategoryRows] = useState([]);
 
-// useEffect(() => {
-//   if (allCategories?.data) {
-//     setCategoryRows(
-//       allCategories.data.map((item) => ({
-//         id: item._id,
-//         name: item.categories_name,
-//         subCategory: item.subCategories.map((sub) => sub.name),
-//         createdAt: new Date(item.createdAt).toLocaleDateString(),
-//       }))
-//     );
-//   }
-// }, [allCategories]);
+  const categoryRows =
+    allCategories?.data?.map((item) => ({
+      id: item._id,
+      name: item.categories_name,
+      description: item.categories_description,
+      image: item.image?.url || "",
+      createdAt: new Date(item.createdAt).toLocaleDateString(),
+    })) || [];
 
   const stats = useMemo(
     () => [
       { label: "Total Categories", value: String(categoryRows.length) },
       {
-        label: "Sub Categories",
+        label: "With Images",
         value: String(
-          categoryRows.reduce(
-            (total, item) => total + (item.subCategory?.length ?? 0),
-            0
-          )
+          categoryRows.filter((item) => Boolean(item.image)).length,
         ),
       },
       {
         label: "Updated Today",
         value: String(
-          categoryRows.filter((item) => item.createdAt === "16 Apr 2026").length
+          categoryRows.filter((item) => item.createdAt === "16 Apr 2026")
+            .length,
         ).padStart(2, "0"),
       },
     ],
-    [categoryRows]
+    [categoryRows],
   );
-
-  // const handleCreateCategory = async (payload,mode) => {
-  //   console.log("data before submit to backend:",payload,mode)
-  //   if(mode === "create"){
-
-  //   }
-  //   try {
-  //     const res = await createCategory({
-  //       categories_name:payload.categoryName,
-  //       subCategories:payload.subCategory
-  //     }).unwrap()
-  //     console.log("res after create category: ",res)
-  //     // setCreatedCategoryForm(formData);
-  //     // setCategoryRows(getCategories());
-  //     setIsCreateModalOpen(false);
-  //   } catch (error) {
-  //     console.log("error: ",error)
-  //   }    
-  // };
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
-
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
         <div className="flex flex-col gap-4 border-b border-blue-100 px-4 py-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -88,7 +48,6 @@ console.log("datA OF ALL CATEGORRIES: ",allCategories)
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-
             <button
               type="button"
               onClick={() => setIsCreateModalOpen(true)}
@@ -109,8 +68,9 @@ console.log("datA OF ALL CATEGORRIES: ",allCategories)
                     <TableHeading className="rounded-tl-3xl">
                       Serial Number
                     </TableHeading>
+                    <TableHeading>Image</TableHeading>
                     <TableHeading>Category Name</TableHeading>
-                    <TableHeading>Sub-Category</TableHeading>
+                    <TableHeading>Description</TableHeading>
                     <TableHeading className="rounded-tr-3xl">
                       Created At
                     </TableHeading>
@@ -138,6 +98,22 @@ console.log("datA OF ALL CATEGORRIES: ",allCategories)
                       </TableCell>
 
                       <TableCell>
+                        <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-white">
+                          {row.image ? (
+                            <img
+                              src={row.image}
+                              alt={row.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xs font-semibold text-slate-400">
+                              N/A
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
                         <div>
                           <p className="font-semibold text-slate-700">
                             {row.name}
@@ -147,7 +123,7 @@ console.log("datA OF ALL CATEGORRIES: ",allCategories)
 
                       <TableCell>
                         <p className="max-w-xs text-sm leading-6 text-slate-500">
-                          {row.subCategory.join(", ")}
+                          {row.description || "No description available"}
                         </p>
                       </TableCell>
 
@@ -169,7 +145,6 @@ console.log("datA OF ALL CATEGORRIES: ",allCategories)
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         setIsCreateModalOpen={setIsCreateModalOpen}
-        // onSubmit={handleCreateCategory}
         mode="create"
       />
     </section>

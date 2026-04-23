@@ -5,7 +5,7 @@ import SubCategories from "../models/subCategories.modal.js"
 import mongoose from "mongoose"
 
 
-async function subCategories(req, res) {
+async function CreateSubCategories(req, res) {
   try {
     const { subCategories_Name, subCategories_Description, category_Id } = req.body;
 
@@ -218,7 +218,7 @@ async function deleteSubCategory(req, res) {
 }
 
 export {
-    createdSubCategory,
+    CreateSubCategories,
     getSubCategories,
     getSubCategoryById,
     updateSubCategory,

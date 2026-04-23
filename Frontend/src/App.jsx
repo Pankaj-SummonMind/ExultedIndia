@@ -19,6 +19,8 @@ import ClientCategoryProduct from "./screens/client/furtherScreen/ClientCategory
 import ClientsSubCategory from "./screens/client/furtherScreen/ClientsSubCategory";
 import ClientProductDetailScreen from "./screens/client/furtherScreen/ClientProductDetailScreen";
 import PagesScreen from "./screens/admin/PagesScreen";
+import SubCategoryScreen from "./screens/admin/SubCategoryScreen";
+import SubCategoryById from "./screens/admin/furtherScreen/SubCategoryById";
 
 function App() {
   return (
@@ -30,7 +32,9 @@ function App() {
           <Route index element={<DashboardScreen />} />
           <Route path="dashboard" element={<DashboardScreen />} />
           <Route path="category" element={<CategoryScreen />} />
+          <Route path="subcategory" element={<SubCategoryScreen />} />
           <Route path="category/:id" element={<CategoryById />} />
+          <Route path="subcategory/:id" element={<SubCategoryById />} />
           <Route path="product/:id" element={<ProductById />} />
           <Route path="user/:id" element={<UserById />} />
           <Route path="product" element={<ProductScreen />} />
@@ -44,12 +48,18 @@ function App() {
         <Route path="/" element={<ClientLayout />}>
           <Route index element={<ClientHomeScreen />} />
           <Route path="products" element={<ClientsProductScreen />} />
-          <Route path="products/category/:id" element={<ClientCategoryProduct />} />
+          <Route
+            path="products/category/:id"
+            element={<ClientCategoryProduct />}
+          />
           <Route
             path="products/subcategory/:id"
             element={<ClientsSubCategory />}
           />
-          <Route path="products/product/:id" element={<ClientProductDetailScreen />} />
+          <Route
+            path="products/product/:id"
+            element={<ClientProductDetailScreen />}
+          />
           <Route path="aboutus" element={<AboutUs />} />
           <Route path="certificates" element={<ClientsCertificateScreen />} />
           <Route path="contact" element={<ContactUsScreen />} />

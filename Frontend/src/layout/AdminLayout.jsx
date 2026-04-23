@@ -17,6 +17,13 @@ const sidebarItems = [
     available: true,
   },
   {
+    id: "subcategory",
+    label: "Sub Category",
+    to: "/admin/subcategory",
+    Icon: FolderTreeIcon,
+    available: true,
+  },
+  {
     id: "product",
     label: "Product",
     to: "/admin/product",

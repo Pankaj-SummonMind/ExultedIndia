@@ -7,32 +7,57 @@ import mongoose from "mongoose"
 
 async function createCategories(req, res) {
   try {
-    const { categories_name, subCategories } = req.body;
+    const { categories_name, categories_description, } = req.body;
 
-    if (!categories_name || !subCategories?.length) {
-      throw new ApiError(400, "Category and SubCategory are required");
+    if (!categories_name || !categories_description) {
+      throw new ApiError(400, "Category and Description are required");
     }
 
-    // create subcategories
-    const createdSubs = await SubCategories.insertMany(
-      subCategories.map((item) => ({
-        name: item.name.trim()
-      }))
-    );
+    // Since a certificate only has one image in the schema `image: { url, public_id }`
+    // We expect exactly one file.
+    const file = req.file || (req.files && req.files.length > 0 ? req.files[0] : null);
+    
+    if (!file) {
+      throw new ApiError(400, "Category image is required");
+    }
 
-    const subIds = createdSubs.map((sub) => sub._id);
+    const filePath = file.path.replace(/\\/g, "/");
+    const image = {
+      url: `${req.protocol}://${req.get("host")}/${filePath}`,
+      public_id: "" // To be updated if using Cloudinary
+    };
+
+
+    // create subcategories
+    // const createdSubs = await SubCategories.insertMany(
+    //   subCategories.map((item) => ({
+    //     name: item.name.trim()
+    //   }))
+    // );
+
+    // const subIds = createdSubs.map((sub) => sub._id);
+
+    const existing = await Categories.findOne({
+      categories_name: categories_name.trim(),
+      deletedAt:null
+      });
+
+      if(existing){
+      throw new ApiError(400,"Category already exists");
+      }
 
     const category = await Categories.create({
       categories_name: categories_name.trim(),
-      subCategories: subIds
+      categories_description: categories_description.trim(),
+      image
     });
 
-    const createdCategory = await Categories.findById(category._id)
-      .populate("subCategories", "name")
-      .select("-__v -updatedAt");
+    // const createdCategory = await Categories.findById(category._id)
+    //   .populate("subCategories", "name")
+    //   .select("-__v -updatedAt");
 
     return res.status(201).json(
-      new ApiResponse(201, createdCategory, "Category created successfully")
+      new ApiResponse(201, category, "Category created successfully")
     );
 
   } catch (error) {
@@ -51,12 +76,7 @@ async function getCategories(req, res) {
     const categories = await Categories.find({
       deletedAt: null
     })
-      .populate({
-        path: "subCategories",
-        match: { deletedAt: null }, // optional for subcategories too
-        select: "name"
-      })
-      .select("-__v -updatedAt");
+      .select("-__v ");
 
     if (categories.length === 0) {
       throw new ApiError(404, "No categories found");
@@ -81,11 +101,14 @@ async function getCategoryById(req, res) {
   try {
     const { id } = req.params;
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new ApiError(400, "Invalid category id");
+    }
+
     const category = await Categories.findOne({
       _id: id,
       deletedAt: null
     })
-      .populate("subCategories", "name")
       .select("-__v -updatedAt");
 
     if (!category) {
@@ -109,8 +132,9 @@ async function getCategoryById(req, res) {
 
 async function updateCategory(req, res) {
   try {
+    console.log("req.body in update category: ", req.body);
     const { id } = req.params;
-    const { categories_name, subCategories } = req.body;
+    const { categories_name, categories_description } = req.body;
 
     // validate category id
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -128,55 +152,24 @@ async function updateCategory(req, res) {
       category.categories_name = categories_name.trim();
     }
 
-    let finalSubIds = [];
-
-    if (Array.isArray(subCategories)) {
-      for (const item of subCategories) {
-        const name = item?.name?.trim();
-
-        if (!name) continue;
-
-        if (item._id && mongoose.Types.ObjectId.isValid(item._id)) {
-          // update existing
-          await SubCategories.findByIdAndUpdate(item._id, {
-            name
-          });
-
-          finalSubIds.push(item._id);
-
-        } else {
-          // create new
-          const newSub = await SubCategories.create({
-            name
-          });
-
-          finalSubIds.push(newSub._id);
-        }
-      }
-
-      // optional: delete removed old refs
-      const removedIds = category.subCategories.filter(
-        (oldId) => !finalSubIds.some((newId) => newId.toString() === oldId.toString())
-      );
-
-      if (removedIds.length > 0) {
-        await SubCategories.updateMany(
-          { _id: { $in: removedIds } },
-          { deletedAt: new Date() }
-        );
-      }
-
-      category.subCategories = finalSubIds;
+    if (categories_description?.trim()) {
+      category.categories_description = categories_description.trim();
     }
 
-    await category.save();
+    const file = req.file || (req.files && req.files.length > 0 ? req.files[0] : null);
+
+    if (file) {
+          const filePath = file.path.replace(/\\/g, "/");
+          updateData.image = {
+            url: `${req.protocol}://${req.get("host")}/${filePath}`,
+            public_id: "" // To be updated if using Cloudinary
+          };
+        }
+
+
+        await category.save();
 
     const updatedCategory = await Categories.findById(id)
-      .populate({
-        path: "subCategories",
-        match: { deletedAt: null },
-        select: "name"
-      })
       .select("-__v -updatedAt");
 
     return res.status(200).json(
@@ -214,10 +207,10 @@ async function deleteCategory(req, res) {
     await category.save();
 
     // optional: soft delete all subcategories too
-    await SubCategories.updateMany(
-      { _id: { $in: category.subCategories } },
-      { deletedAt: new Date() }
-    );
+    // await SubCategories.updateMany(
+    //   { _id: { $in: category.subCategories } },
+    //   { deletedAt: new Date() }
+    // );
 
     return res.status(200).json(
       new ApiResponse(200, null, "Category deleted successfully")

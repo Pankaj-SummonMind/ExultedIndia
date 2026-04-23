@@ -36,6 +36,7 @@ app.use("/public", express.static(path.join(process.cwd(), "public")));
 
 //routes import 
 import categoriesRoutes from "./routes/categories.routes.js"
+import subCategoriesRoutes from "./routes/subCategories.router.js"
 import productsRoutes from "./routes/product.routes.js"
 import userRoutes from "./routes/user.routes.js"
 import socialMedia from "./routes/socialMedia.Routes.js"
@@ -44,6 +45,7 @@ import HomePageRoutes from "./routes/HomePage.routes.js"
 import aboutusRoutes from "./routes/aboutus.routes.js"
 // routes declaration
 app.use("/api/categories",categoriesRoutes)
+app.use("/api/subCategories",subCategoriesRoutes)
 app.use("/api/products",productsRoutes)
 app.use("/api/user",userRoutes)
 app.use("/api/socialMedia",socialMedia)

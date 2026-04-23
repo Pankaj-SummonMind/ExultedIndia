@@ -1,57 +1,68 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import CreateCategory from "../../../components/CreateCategory";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import CreateSubCategory from "../../../components/createSubCategory";
 import {
-  useDeleteCategoriesMutation,
-  useGetCategoriesByIdQuery,
+  useDeleteSubCategoriesMutation,
+  useGetSubCategoriesQuery,
 } from "../../../services/api";
 
-function CategoryById() {
+function SubCategoryById() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
-  const { data, isLoading, error } = useGetCategoriesByIdQuery(id);
-  const [deleteCategories, { isLoading: isDeleteLoading }] =
-    useDeleteCategoriesMutation();
+  const { data, isLoading } = useGetSubCategoriesQuery();
+  const [deleteSubCategories, { isLoading: isDeleteLoading }] =
+    useDeleteSubCategoriesMutation();
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
 
-  const category = data?.data;
+  const stateSubCategory = location.state?.subCategory;
+  const fetchedSubCategory = data?.data?.find((item) => item._id === id);
+  const subCategory = stateSubCategory || fetchedSubCategory;
+
+  const categoryName =
+    subCategory?.category_Id?.categories_name ||
+    subCategory?.category_Id?.name ||
+    "Unassigned Category";
 
   const summaryCards = useMemo(
     () => [
       {
-        label: "Category Name",
-        value: category?.categories_name || "N/A",
+        label: "Sub Category Name",
+        value: subCategory?.name || "N/A",
+      },
+      {
+        label: "Parent Category",
+        value: categoryName,
       },
       {
         label: "Created At",
-        value: formatDate(category?.createdAt),
+        value: formatDate(subCategory?.createdAt),
       },
       {
         label: "Image Status",
-        value: category?.image?.url ? "Available" : "Not Uploaded",
+        value: subCategory?.image?.url ? "Available" : "Not Uploaded",
       },
     ],
-    [category],
+    [categoryName, subCategory],
   );
 
   const handleDelete = async () => {
     try {
-      await deleteCategories(id).unwrap();
-      navigate("/admin/category");
+      await deleteSubCategories(id).unwrap();
+      navigate("/admin/subcategory");
     } catch (deleteError) {
-      console.log("error while deleting category:", deleteError);
+      console.log("error while deleting sub category:", deleteError);
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !subCategory) {
     return (
       <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
         <div className="rounded-[32px] border border-blue-100 bg-white p-6 shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
           <div className="animate-pulse space-y-5">
-            <div className="h-6 w-48 rounded-full bg-blue-100" />
+            <div className="h-6 w-56 rounded-full bg-blue-100" />
             <div className="h-64 rounded-[28px] bg-slate-100" />
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="h-28 rounded-[24px] bg-slate-100" />
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="h-28 rounded-[24px] bg-slate-100" />
               <div className="h-28 rounded-[24px] bg-slate-100" />
             </div>
@@ -61,20 +72,19 @@ function CategoryById() {
     );
   }
 
-  if (error || !category) {
+  if (!subCategory) {
     return (
       <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
         <div className="rounded-[32px] border border-red-100 bg-white p-6 shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
           <div className="rounded-[28px] border border-red-100 bg-red-50 px-5 py-6 text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-400">
-              Category Detail
+              Sub Category Detail
             </p>
             <h1 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
-              Unable to load category
+              Unable to load sub category
             </h1>
             <p className="mt-3 text-sm leading-6 text-slate-500">
-              {error?.data?.message ||
-                "This category could not be fetched right now."}
+              This sub category could not be fetched right now.
             </p>
           </div>
         </div>
@@ -89,13 +99,18 @@ function CategoryById() {
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-400">
-                Category Detail
+                Sub Category Detail
               </p>
               <h1 className="mt-3 text-2xl font-bold text-slate-800 sm:text-3xl">
-                {category.categories_name}
+                {subCategory.name}
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
-                {category.categories_description || "No description available."}
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <span className="inline-flex rounded-full bg-blue-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">
+                  {categoryName}
+                </span>
+              </div>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+                {subCategory.description || "No description available."}
               </p>
             </div>
 
@@ -125,21 +140,21 @@ function CategoryById() {
         <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
           <section className="overflow-hidden rounded-[30px] border border-blue-100 bg-linear-to-br from-slate-950 via-slate-900 to-blue-950 shadow-[0_18px_45px_rgba(15,23,42,0.18)]">
             <div className="flex h-full min-h-[320px] items-center justify-center bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.25),transparent_55%)] p-4 sm:p-6">
-              {category.image?.url ? (
+              {subCategory.image?.url ? (
                 <img
-                  src={category.image.url}
-                  alt={category.categories_name}
+                  src={subCategory.image.url}
+                  alt={subCategory.name}
                   className="max-h-[420px] w-full rounded-[24px] border border-white/10 bg-white/5 object-cover shadow-[0_20px_50px_rgba(15,23,42,0.35)]"
                 />
               ) : (
                 <div className="flex h-full min-h-[280px] w-full flex-col items-center justify-center rounded-[24px] border border-dashed border-white/15 bg-white/5 px-6 text-center">
                   <ImageIcon className="h-10 w-10 text-blue-200" />
                   <p className="mt-4 text-sm font-semibold text-white">
-                    No category image available
+                    No sub category image available
                   </p>
                   <p className="mt-2 max-w-sm text-sm leading-6 text-blue-100/70">
-                    Uploading a category image helps keep this section more
-                    informative and visually polished.
+                    Uploading an image makes this detail page more informative
+                    and visually complete.
                   </p>
                 </div>
               )}
@@ -157,7 +172,7 @@ function CategoryById() {
                     Overview
                   </p>
                   <h2 className="mt-1 text-lg font-bold text-slate-800">
-                    Category information
+                    Sub category information
                   </h2>
                 </div>
               </div>
@@ -196,8 +211,8 @@ function CategoryById() {
 
               <div className="mt-5 rounded-[24px] border border-slate-100 bg-slate-50 px-4 py-5">
                 <p className="text-sm leading-7 text-slate-600 sm:text-base">
-                  {category.categories_description ||
-                    "No description has been added for this category yet."}
+                  {subCategory.description ||
+                    "No description has been added for this sub category yet."}
                 </p>
               </div>
             </section>
@@ -205,16 +220,17 @@ function CategoryById() {
         </div>
       </div>
 
-      <CreateCategory
+      <CreateSubCategory
         isOpen={isUpdateOpen}
         onClose={() => setIsUpdateOpen(false)}
         setIsCreateModalOpen={setIsUpdateOpen}
         mode="update"
         initialData={{
-          id: category._id,
-          categories_name: category.categories_name,
-          categories_description: category.categories_description,
-          image: category.image,
+          id: subCategory._id,
+          name: subCategory.name,
+          category_Id: subCategory.category_Id,
+          description: subCategory.description,
+          image: subCategory.image,
         }}
       />
     </section>
@@ -303,4 +319,4 @@ function DescriptionIcon({ className }) {
   );
 }
 
-export default CategoryById;
+export default SubCategoryById;
