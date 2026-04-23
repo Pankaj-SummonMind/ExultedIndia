@@ -38,8 +38,8 @@ async function subCategories(req, res) {
     // const subIds = createdSubs.map((sub) => sub._id);
 
     const subCategory = await SubCategories.create({
-      subCategories_Name: subCategories_Name.trim(),
-      subCategories_Description: subCategories_Description.trim(),
+      name: subCategories_Name.trim(),
+      description: subCategories_Description.trim(),
       category_Id: category_Id,
       image
     });
@@ -139,11 +139,11 @@ async function updateSubCategory(req, res) {
 
     // update subcategory name
     if (subCategories_Name?.trim()) {
-      subCategory.subCategories_Name = subCategories_Name.trim();
+      subCategory.name = subCategories_Name.trim();
     }
 
     if (subCategories_Description?.trim()) {
-      subCategory.subCategories_Description = subCategories_Description.trim();
+      subCategory.description = subCategories_Description.trim();
     }
 
     const file = req.file || (req.files && req.files.length > 0 ? req.files[0] : null);
