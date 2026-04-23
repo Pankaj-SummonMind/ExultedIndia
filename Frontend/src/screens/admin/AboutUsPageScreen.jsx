@@ -1,149 +1,200 @@
 import { useMemo, useState } from "react";
-import { PencilLine, Plus } from "lucide-react";
-
-const INITIAL_ABOUT_US_DATA = {
-  hero: {
-    heading: "About Exulted India",
-    subHeading:
-      "A trusted power solutions company focused on dependable products, practical service, and long-term customer confidence.",
-    images: [
-      "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1581092162384-8987c1d64718?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
-    ],
-  },
-  companyOverview: {
-    heading: "Company Overview",
-    detail:
-      "Exulted India works across batteries, inverters, UPS systems, generators, transformers, EV charging, and allied power products. The company is built around consistent quality, reliable delivery, and responsive support for residential, commercial, and industrial customers.",
-  },
-  companyStats: [
-    { key: "Established", value: "2017" },
-    { key: "Product Categories", value: "Battery, UPS, Inverter, EV Charger" },
-    { key: "Service Focus", value: "Installation, support, and maintenance" },
-    { key: "Market Reach", value: "Growing Pan India network" },
-  ],
-  mission: {
-    heading: "Our Mission",
-    subHeading: "Deliver reliable energy solutions for everyday India.",
-    detail:
-      "Our mission is to make dependable power products accessible through strong engineering, honest guidance, and customer-first service that continues after every purchase.",
-    image:
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80",
-  },
-  research: {
-    heading: "Research & Development",
-    subHeading: "Focused on better performance, safety, and usability.",
-    detail:
-      "We study changing customer needs, Indian usage conditions, and new energy technologies to keep improving product efficiency, durability, and service readiness.",
-    image:
-      "https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?auto=format&fit=crop&w=1200&q=80",
-  },
-  vision: {
-    heading: "Our Vision",
-    subHeading: "Build a stronger and more future-ready power ecosystem.",
-    detail:
-      "Our vision is to become a preferred Indian power solutions brand known for quality, innovation, and reliable support across traditional and future energy needs.",
-    image:
-      "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1200&q=80",
-  },
-};
+import { PencilLine, Plus, RefreshCcw } from "lucide-react";
+import AboutUsPageForm from "../../components/HomePageForm.jsx/AboutUsPageForm/AboutUsPageForm";
+import { useGetAboutUsQuery } from "../../services/api";
 
 const cardBaseClass =
   "relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6";
 
 function AboutUsPageScreen() {
-  const [aboutUsData] = useState(INITIAL_ABOUT_US_DATA);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const {
+    data,
+    error,
+    isLoading,
+  } = useGetAboutUsQuery();
+  console.log("About Us API response:", data,"error:", error);  
 
+  const aboutUsData = data?.data || null;
   const hasAboutUsData = Boolean(aboutUsData);
+  // const isNotFound = error?.status === 404;
+  const mode = hasAboutUsData ? "update" : "create";
   const actionLabel = hasAboutUsData ? "Update About Us" : "Create About Us";
   const ActionIcon = hasAboutUsData ? PencilLine : Plus;
 
   const heroImages = useMemo(
-    () => aboutUsData?.hero?.images?.slice(0, 3) || [],
+    () =>
+      Array.isArray(aboutUsData?.hero?.images)
+        ? aboutUsData.hero.images
+            .map((item) => getImageUrl(item))
+            .filter(Boolean)
+            .slice(0, 3)
+        : [],
     [aboutUsData],
   );
+
+  if (isLoading) {
+    return (
+      <section className="flex min-h-[70vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-sky-100 border-t-sky-600" />
+          <p className="text-sm font-medium text-slate-500">
+            About Us content loading...
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  if (isFormVisible) {
+    return (
+      <AboutUsPageForm
+        mode={mode}
+        initialData={aboutUsData}
+        onCancel={() => setIsFormVisible(false)}
+        onSuccess={() => {
+          setIsFormVisible(false);
+        }}
+      />
+    );
+  }
+
+  if (!hasAboutUsData) {
+    return (
+      <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+        <div className="rounded-[34px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f8fafc_100%)] p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)] sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              {/* <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">
+                About Us Page
+              </p> */}
+              <h1 className="mt-3 text-3xl font-bold text-slate-900">
+                Create your About Us content
+              </h1>
+              <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
+                No About Us data found
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsFormVisible(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(2,132,199,0.25)] transition hover:-translate-y-0.5 hover:bg-sky-700"
+            >
+              <Plus className="h-4 w-4" />
+              Create About Us
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">
-            Admin Page Content
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">
+            Admin Preview
           </p>
           <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
-            About Us Page
+            About Us
           </h1>
         </div>
 
-        <button
-          type="button"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(2,132,199,0.25)] transition hover:-translate-y-0.5 hover:bg-sky-700 sm:w-auto"
-        >
-          <ActionIcon className="h-4 w-4" />
-          {actionLabel}
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {/* <button
+            type="button"
+            onClick={() => refetch()}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:text-sky-700"
+          >
+            <RefreshCcw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+            Refresh
+          </button> */}
+
+          <button
+            type="button"
+            onClick={() => setIsFormVisible(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(2,132,199,0.25)] transition hover:-translate-y-0.5 hover:bg-sky-700"
+          >
+            <ActionIcon className="h-4 w-4" />
+            {actionLabel}
+          </button>
+        </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-[34px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f8fafc_100%)] p-4 sm:p-5">
+      {/* {error && !isNotFound ? (
+        <div className="rounded-[24px] border border-red-100 bg-red-50 px-5 py-4 text-sm font-medium text-red-500">
+          {error?.data?.message || "Latest About Us data refresh nahi ho paya."}
+        </div>
+      ) : null} */}
+
+      <div className="relative overflow-hidden rounded-[34px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f8fafc_100%)] p-4 sm:p-5">
         <div className="grid gap-5 xl:grid-cols-2">
           <ContentCard heading="Heading & Images" className="xl:col-span-2">
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(320px,1.05fr)] lg:items-start">
-              <div className="space-y-5">
-                <DetailRow
-                  label="Heading"
-                  value={aboutUsData.hero.heading}
-                  valueClassName="text-2xl"
-                />
-                <DetailRow
-                  label="Sub-Heading"
-                  value={aboutUsData.hero.subHeading}
-                  isParagraph
-                />
-                <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-600">
-                    Image Input
-                  </p>
-                  <p className="mt-2 text-sm font-medium leading-6 text-slate-600">
-                    Multiple images supported for future integration. Maximum
-                    upload limit: 3 images.
-                  </p>
-                </div>
-              </div>
+  <div className="space-y-6">
+    {/* Content Vertically */}
+    <div className="space-y-5">
+      <DetailRow
+        label="Heading"
+        value={aboutUsData.hero?.heading}
+        valueClassName="text-2xl"
+      />
 
-              <div className="grid gap-3 sm:grid-cols-3 lg:min-h-80">
-                {heroImages.map((image, index) => (
-                  <ImagePreview
-                    key={`${image}-${index}`}
-                    src={image}
-                    alt={`About us hero preview ${index + 1}`}
-                    className={
-                      index === 0
-                        ? "min-h-64 sm:col-span-2 lg:col-span-2"
-                        : "min-h-40"
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          </ContentCard>
+      <DetailRow
+        label="Sub-Heading"
+        value={aboutUsData.hero?.subHeading}
+        isParagraph
+      />
 
+    </div>
+
+    {/* Images Last */}
+    <div className="grid gap-3 sm:grid-cols-3">
+      {heroImages.map((image, index) => (
+        <ImagePreview
+          key={`${image}-${index}`}
+          src={image}
+          alt={`About us hero preview ${index + 1}`}
+          className={
+            index === 0
+              ? "min-h-64 sm:col-span-2"
+              : "min-h-40"
+          }
+        />
+      ))}
+    </div>
+  </div>
+</ContentCard>
           <ContentCard heading="Company Overview">
-            <DetailRow
-              label="Heading"
-              value={aboutUsData.companyOverview.heading}
-            />
-            <DetailRow
-              label="Detail"
-              value={aboutUsData.companyOverview.detail}
-              isParagraph
-              className="mt-5"
-            />
-          </ContentCard>
+  <div className="space-y-5">
+    {/* Content Vertically */}
+    <div>
+      <DetailRow
+        label="Heading"
+        value={aboutUsData.companyOverview?.heading}
+      />
+
+      <DetailRow
+        label="Detail"
+        value={aboutUsData.companyOverview?.detail}
+        isParagraph
+        className="mt-5"
+      />
+    </div>
+
+    {/* Image Last */}
+    <ImagePreview
+      src={getImageUrl(aboutUsData.companyOverview?.image)}
+      alt="Company overview preview"
+      className="min-h-56"
+    />
+  </div>
+</ContentCard>
 
           <ContentCard heading="Company Stats">
             <div className="space-y-3">
-              {aboutUsData.companyStats.map((item, index) => (
+              {(aboutUsData.companyStats || []).map((item, index) => (
                 <KeyValueRow
                   key={`${item.key}-${index}`}
                   label={item.key}
@@ -194,25 +245,29 @@ function SectionWithImage({
 }) {
   return (
     <ContentCard heading={title} className={className}>
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(240px,0.85fr)] lg:items-start">
+      <div className="space-y-5">
+        {/* Content Vertically */}
         <div>
-          <DetailRow label="Heading" value={section.heading} />
+          <DetailRow label="Heading" value={section?.heading} />
+
           <DetailRow
             label="Sub-Heading"
-            value={section.subHeading}
+            value={section?.subHeading}
             isParagraph
             className="mt-5"
           />
+
           <DetailRow
             label="Detail"
-            value={section.detail}
+            value={section?.detail}
             isParagraph
             className="mt-5"
           />
         </div>
 
+        {/* Image Last */}
         <ImagePreview
-          src={section.image}
+          src={getImageUrl(section?.image)}
           alt={`${title} preview`}
           className={imageClassName}
         />
@@ -238,7 +293,7 @@ function DetailRow({
       <ValueTag
         className={`mt-2 text-base font-semibold leading-7 text-slate-800 ${valueClassName}`.trim()}
       >
-        {value}
+        {value || "Not available"}
       </ValueTag>
     </div>
   );
@@ -248,16 +303,26 @@ function KeyValueRow({ label, value }) {
   return (
     <div className="flex flex-col gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/85 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-        {label}
+        {label || "Key"}
       </p>
       <p className="text-sm font-semibold text-slate-700 sm:text-right">
-        {value}
+        {value || "Value"}
       </p>
     </div>
   );
 }
 
 function ImagePreview({ src, alt, className = "" }) {
+  if (!src) {
+    return (
+      <div
+        className={`flex items-center justify-center rounded-[26px] border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center text-sm font-medium text-slate-400 ${className}`.trim()}
+      >
+        No image available
+      </div>
+    );
+  }
+
   return (
     <div
       className={`overflow-hidden rounded-[26px] border border-slate-200 bg-slate-100 shadow-[0_16px_40px_rgba(148,163,184,0.16)] ${className}`.trim()}
@@ -265,6 +330,27 @@ function ImagePreview({ src, alt, className = "" }) {
       <img src={src} alt={alt} className="h-full w-full object-cover" />
     </div>
   );
+}
+
+function PreviewPoint({ title, detail }) {
+  return (
+    <div className="rounded-[24px] border border-slate-200/80 bg-slate-50/80 p-4">
+      <p className="text-sm font-semibold text-slate-800">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-500">{detail}</p>
+    </div>
+  );
+}
+
+function getImageUrl(image) {
+  if (typeof image === "string") {
+    return image;
+  }
+
+  if (typeof image?.url === "string") {
+    return image.url;
+  }
+
+  return "";
 }
 
 export default AboutUsPageScreen;

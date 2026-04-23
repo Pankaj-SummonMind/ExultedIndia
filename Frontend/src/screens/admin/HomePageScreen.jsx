@@ -116,8 +116,8 @@ const cardBaseClass =
   "relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6";
 
 function HomePageScreen() {
-  const {data:HomePageData,isLoading} = useGetHomePageQuery()
-  console.log("data of Home page :",HomePageData)
+  const {data:HomePageData,isLoading,error,} = useGetHomePageQuery()
+  console.log("data of Home page :",HomePageData,"error :",error)
   const [activeForm, setActiveForm] = useState(null);
   const [ShowCreateForm,setShowCreateForm] = useState(false)
   const [heroCard, setHeroCard] = useState(INITIAL_HERO_CARD);
@@ -200,73 +200,75 @@ function HomePageScreen() {
     }));
   };
 
-    // if (isLoading) {
-    //   return (
-    //     <section className="flex min-h-[70vh] items-center justify-center">
-    //       <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
-    //     </section>
-    //   );
-    // }
+    if (isLoading) {
+      return (
+        <section className="flex min-h-[70vh] items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
+        </section>
+      );
+    }
 
-    // if (!HomePageData?.data && ShowCreateForm) {
-    //   return (
-    //             <section className="flex min-h-[calc(100vh-160px)] flex-col gap-6">
-    //           {/* Top Left Title */}
-    //           {/* <div className="flex items-center justify-between">
-    //             <h1 className="text-2xl font-bold text-slate-800 sm:text-3xl">
-    //               Home Page
-    //             </h1>
-    //           </div> */}
+    if (!HomePageData?.data && !ShowCreateForm) {
+      return (
+                <section className="flex min-h-[calc(100vh-160px)] flex-col gap-6">
+              {/* Top Left Title */}
+              {/* <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-slate-800 sm:text-3xl">
+                  Home Page
+                </h1>
+              </div> */}
 
-    //           {/* Empty State UI */}
-    //           <div className="flex flex-1 items-center justify-center">
-    //             <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-lg sm:p-12">
-    //               {/* Icon */}
-    //               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
-    //                 <svg
-    //                   className="h-10 w-10 text-blue-600"
-    //                   fill="none"
-    //                   stroke="currentColor"
-    //                   strokeWidth="1.8"
-    //                   viewBox="0 0 24 24"
-    //                 >
-    //                   <path
-    //                     strokeLinecap="round"
-    //                     strokeLinejoin="round"
-    //                     d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-10.5z"
-    //                   />
-    //                 </svg>
-    //               </div>
+              {/* Empty State UI */}
+              <div className="flex  mt-5 justify-center">
+                <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-lg sm:p-8">
+                  {/* Icon */}
+                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
+                    <svg
+                      className="h-10 w-10 text-blue-600"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-10.5z"
+                      />
+                    </svg>
+                  </div>
 
-    //               {/* Text */}
-    //               <h2 className="mt-6 text-2xl font-bold text-slate-800">
-    //                 No Home Page Data Found
-    //               </h2>
+                  {/* Text */}
+                  <h2 className="mt-6 text-2xl font-bold text-slate-800">
+                    No Home Page Data Found
+                  </h2>
 
-    //               <p className="mt-3 text-sm leading-6 text-slate-500 sm:text-base">
-    //                 Looks like no content has been created for the Home Page yet.
-    //                 Create your first Home Page data to start managing website content.
-    //               </p>
+                  {/* <p className="mt-3 text-sm leading-6 text-slate-500 sm:text-base">
+                    Looks like no content has been created for the Home Page yet.
+                    Create your first Home Page data to start managing website content.
+                  </p> */}
 
-    //               {/* Button */}
-    //               <button
-    //                 type="button"
-    //                 onClick={() => setShowCreateForm(true)}
-    //                 className="mt-8 inline-flex items-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700"
-    //               >
-    //                 + Create Home Page
-    //               </button>
-    //             </div>
-    //           </div>
-    //         </section>
-    //   )
-    // }
+                  {/* Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateForm(true)}
+                    className="mt-8 inline-flex items-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700"
+                  >
+                    + Create Home Page
+                  </button>
+                </div>
+              </div>
+            </section>
+      )
+    }
 
-    // if(ShowCreateForm){
-    //   return (
-    //     <CreateHomePageForm />
-    //   )
-    // }
+    if(ShowCreateForm){
+      return (
+        <CreateHomePageForm 
+        setShowCreateForm = {setShowCreateForm}
+         />
+      )
+    }
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">

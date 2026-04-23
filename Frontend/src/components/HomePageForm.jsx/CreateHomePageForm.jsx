@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useGetCategoriesQuery } from "../../services/api";
+import { useCreateHomePageMutation, useGetCategoriesQuery } from "../../services/api";
 
 const EMPTY_HERO_CARD = {
   title: "",
@@ -80,9 +80,9 @@ function createInitialFormState() {
   };
 }
 
-function CreateHomePageForm({ onSubmit }) {
+function CreateHomePageForm({setShowCreateForm}) {
   const { data, isLoading: isCategoryLoading } = useGetCategoriesQuery();
-
+  const [createHomePage,{isLoading,error}]  = useCreateHomePageMutation()
   const [formData, setFormData] = useState(() => createInitialFormState());
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -661,26 +661,26 @@ function CreateHomePageForm({ onSubmit }) {
 
     const payload = new FormData();
     payload.append(
-      "hero_card",
+      "hero",
       JSON.stringify({
         title: normalizedData.heroCard.title,
         sub_heading: normalizedData.heroCard.subHeading,
         description: normalizedData.heroCard.description,
       }),
     );
-    payload.append("hero_card_image", normalizedData.heroCard.image);
+    payload.append("heroImage", normalizedData.heroCard.image);
 
     payload.append(
-      "hero_detail",
+      "heroDetail",
       JSON.stringify({
         title: normalizedData.heroDetail.title,
         stats: normalizedData.heroDetail.stats,
       }),
     );
-    payload.append("hero_detail_image", normalizedData.heroDetail.image);
+    payload.append("heroDetailImage", normalizedData.heroDetail.image);
 
     payload.append(
-      "home_category",
+      "homeCategory",
       JSON.stringify({
         title: normalizedData.homeCategory.title,
         categories: normalizedData.homeCategory.categories.map((item) => item.id),
@@ -688,25 +688,19 @@ function CreateHomePageForm({ onSubmit }) {
     );
 
     payload.append(
-      "why_choose_us",
+      "whyChooseUs",
       JSON.stringify(normalizedData.whyChooseUs),
     );
     payload.append("locations", JSON.stringify(normalizedData.locations));
     payload.append("testimonials", JSON.stringify(normalizedData.testimonials));
-    payload.append("join_us", JSON.stringify(normalizedData.joinUs));
+    payload.append("joinUs", JSON.stringify(normalizedData.joinUs));
 
     try {
       setIsSubmitting(true);
+      const res = await createHomePage(payload).unwrap()
 
-      if (onSubmit) {
-        await onSubmit(payload, normalizedData);
-      } else {
-        console.log("Create home page payload:");
-        for (const [key, value] of payload.entries()) {
-          console.log(key, value);
-        }
-      }
-
+      console.log("response after creating home page :",res)
+      setShowCreateForm(false);
       setSuccessMessage("Home page content created successfully.");
       setFormError("");
       setFieldErrors({});
@@ -718,6 +712,7 @@ function CreateHomePageForm({ onSubmit }) {
       setFormError(
         error?.data?.message || error?.message || "Something went wrong.",
       );
+      console.log("erorr whle creating home page :",error)
     } finally {
       setIsSubmitting(false);
     }
@@ -1479,7 +1474,7 @@ function PanelHeader({ title, detail, actionLabel, onAction }) {
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <p className="text-sm font-semibold text-slate-700">{title}</p>
-        <p className="mt-1 text-sm text-slate-500">{detail}</p>
+        {/* <p className="mt-1 text-sm text-slate-500">{detail}</p> */}
       </div>
 
       <button

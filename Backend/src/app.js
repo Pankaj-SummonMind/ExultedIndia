@@ -41,15 +41,15 @@ import userRoutes from "./routes/user.routes.js"
 import socialMedia from "./routes/socialMedia.Routes.js"
 import certificateRoutes from "./routes/certificate.routes.js"
 import HomePageRoutes from "./routes/HomePage.routes.js"
-import aboutus from "./routes/aboutus.routes.js"
+import aboutusRoutes from "./routes/aboutus.routes.js"
 // routes declaration
 app.use("/api/categories",categoriesRoutes)
 app.use("/api/products",productsRoutes)
 app.use("/api/user",userRoutes)
 app.use("/api/socialMedia",socialMedia)
 app.use("/api/certificate",certificateRoutes)
-app.use("/api/HomePage",HomePageRoutes)
-app.use("/api/aboutus",aboutus)
+app.use("/api/homepage",HomePageRoutes)
+app.use("/api/aboutus",aboutusRoutes)
 
 
 

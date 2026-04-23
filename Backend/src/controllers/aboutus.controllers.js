@@ -107,11 +107,12 @@ const createAboutUs = async (req, res) => {
    GET ABOUT US
 --------------------------------------- */
 const getAboutUs = async (req, res) => {
+  console.log("Fetching AboutUs");
   try {
     const data = await AboutUs.findOne();
 
     if (!data) {
-      throw new ApiError(404, "AboutUs not found");
+      throw new ApiError(404, "AboutUs Data not found");
     }
 
     return res.status(200).json(

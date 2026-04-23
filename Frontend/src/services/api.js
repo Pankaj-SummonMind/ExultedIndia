@@ -10,7 +10,7 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
   }),     
   
-  tagTypes : ["Category","CategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById","Certificate","CertificateById"] ,
+  tagTypes : ["Category","CategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById","Certificate","CertificateById","HomePage","AboutUs"] ,
   
   endpoints: (builder) => ({
 
@@ -224,7 +224,7 @@ export const api = createApi({
 
     createHomePage : builder.mutation({
         query: (body) => ({
-            url:"api/HomePage/createHomePage  ",
+            url:"api/homepage/createHomePage  ",
             method:"POST",
             body
         }),
@@ -233,7 +233,7 @@ export const api = createApi({
 
     getHomePage: builder.query({
         query: () => ({
-            url:"api/HomePage/getHomePage",
+            url:"api/homepage/getHomePage",
             method:"GET"
         }),
         providesTags: [{type:'HomePage'}]
@@ -241,11 +241,39 @@ export const api = createApi({
 
     updateHomePage : builder.mutation({
         query: (body) => ({
-            url:`api/HomePage/updateHomePage`,
+            url:`api/homepage/updateHomePage`,
             method:"PUT",
             body
         }),
         invalidatesTags:["HomePage"]
+    }),
+
+    // AboutUs api services
+
+    createAboutUs : builder.mutation({
+        query: (body) => ({
+            url:"api/aboutus/createAboutUs",
+            method:"POST",
+            body
+        }),
+        invalidatesTags: ["AboutUs"],
+    }),
+
+    getAboutUs: builder.query({
+        query: () => ({
+            url:"api/aboutus/getAboutUs",
+            method:"GET"
+        }),
+        providesTags: [{type:"AboutUs"}]
+    }),
+
+    updateAboutUs : builder.mutation({
+        query: (body) => ({
+            url:"api/aboutus/updateAboutUs",
+            method:"PUT",
+            body
+        }),
+        invalidatesTags:["AboutUs"]
     }),
 
 
@@ -288,5 +316,10 @@ export const {
     useGetHomePageQuery,
     useCreateHomePageMutation,
     useUpdateHomePageMutation,
+
+  // AboutUs
+    useGetAboutUsQuery,
+    useCreateAboutUsMutation,
+    useUpdateAboutUsMutation,
 
 } = api;

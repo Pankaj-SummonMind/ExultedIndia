@@ -11,9 +11,7 @@ const router = express.Router();
 /* -----------------------------------------
    CREATE ABOUT US
 ----------------------------------------- */
-router.post(
-  "/createAboutUs",
-  upload.fields([
+router.post("/createAboutUs",upload.fields([
     { name: "heroImages", maxCount: 3 },
 
     { name: "overviewImage", maxCount: 1 },
@@ -26,20 +24,8 @@ router.post(
   ]),
   createAboutUs
 );
-
-/* -----------------------------------------
-   GET ABOUT US
------------------------------------------ */
-router.get(
-  "/getAboutUs",
-  getAboutUs
-);
-
-/* -----------------------------------------
-   UPDATE ABOUT US
------------------------------------------ */
-router.put(
-  "/updateAboutUs",
+router.get("/getAboutUs",getAboutUs);
+router.put("/updateAboutUs",
   upload.fields([
     { name: "heroImages", maxCount: 3 },
 
