@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useGetAllCertificatesQuery, useGetCategoriesQuery } from "../../services/api";
+import { useGetAllCertificatesQuery, useGetCategoriesQuery, useGetHomePageQuery } from "../../services/api";
 
 const heroImage =
   "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=80";
@@ -100,9 +100,14 @@ const certificates = [
 const quickLinks = ["Products", "About", "Certificates", "Contact"];
 
 function ClientHomeScreen() {
-  // const{data:categories,isLoading:isCategoriesLoading} = useGetCategoriesQuery()
-  // const {data: certificates,isLoading:isCertificateLoading } = useGetAllCertificatesQuery()
-  // console.log("Categories:", categories,"certificates:",certificates);
+  const{data:categories} = useGetCategoriesQuery()
+  const {data: certificates } = useGetAllCertificatesQuery()
+  const {data:HomeScreenData} = useGetHomePageQuery()
+  console.log("Categories:", categories,"HomeScreenData:",HomeScreenData,
+    "certificates:",certificates
+  );
+
+  const home = HomeScreenData?.data;
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [previewCertificate, setPreviewCertificate] = useState(null);
 
@@ -113,17 +118,19 @@ function ClientHomeScreen() {
       {/* <LoadingScreen /> */}
 
       <FloatingParticles />
-      <HeroSection />
-      <ProductDetail />
+      <HeroSection data={home?.hero}/>
+      <ProductDetail data={home?.heroDetail}/>
       <StatsSection />
-      <ProductShowcase />
-      <WhyChooseUs />
-      <CoverageSection />
+      <ProductShowcase data={home?.homeCategory}/>
+      <WhyChooseUs data={home?.whyChooseUs}/>
+      <CoverageSection data={home?.locations}/>
       <Testimonials
         activeIndex={activeTestimonial}
         onChange={setActiveTestimonial}
+        data={home?.testimonials}
       />
-      <CertificatesSection onPreview={setPreviewCertificate} />
+      <CertificatesSection onPreview={setPreviewCertificate}
+      />
       <CtaBanner />
       {/* <Footer /> */}
 
@@ -152,11 +159,11 @@ function SeoBlock() {
   );
 }
 
-function HeroSection() {
+function HeroSection({data}) {
   return (
     <section className="relative min-h-[calc(100vh-72px)] overflow-hidden bg-slate-950">
       <img
-        src={heroImage}
+        src={data?.image?.url}
         alt="EV charging station with modern electric mobility infrastructure"
         className="absolute inset-0 h-full w-full object-cover opacity-52 motion-safe:animate-[heroZoom_18s_ease-in-out_infinite_alternate]"
       />
@@ -166,18 +173,17 @@ function HeroSection() {
         <div className="max-w-3xl motion-safe:animate-[slideUp_700ms_ease-out_both]">
           <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-cyan-100 shadow-2xl backdrop-blur-xl">
             <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.9)]" />
-            Exaulted India Since 2017
+            Exaulted India 
           </p>
 
           <h2 className="mt-7 max-w-3xl text-4xl font-black leading-[1.03] text-white sm:text-5xl lg:text-6xl">
-            Powering The Future of Energy
+            {data?.title}
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg">
-            Best Quality On Battery & Inverters and many more product
+            {data?.subTitle}
           </p>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            Premium manufacturing for batteries, inverters, transformers, online
-            UPS, gensService reach across high-demand power and EV mobility corridors.ets, and charger ecosystems built for modern India.
+            {data?.detail}
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -240,7 +246,7 @@ function HeroSection() {
   );
 }
 
-function ProductDetail() {
+function ProductDetail({data}) {
   return (
     <section className="relative min-h-[calc(100vh-72px)] overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center">
@@ -249,7 +255,7 @@ function ProductDetail() {
         <div className="relative z-10 shrink-0 lg:-mr-20">
           <div className="h-137.5 w-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
             <img
-              src="https://images.pexels.com/photos/15110872/pexels-photo-15110872.jpeg"
+              src={data?.image?.url}
               alt="Product Side"
               className="h-full w-full object-cover"
             />
@@ -271,7 +277,7 @@ function ProductDetail() {
                       DC Fast Charger
                     </p> */}
                     <h3 className="mt-2 text-2xl font-black">
-                      Your Power Partner for Tomorrow
+                      {data?.title}
                     </h3>
                   </div>
 
@@ -294,9 +300,9 @@ function ProductDetail() {
                   </div>
 
                   <div className="space-y-3 self-center">
-                    <HeroMetric label="Cost Effective" value="96%" />
-                    <HeroMetric label="Efficiency " value="98%" />
-                    <HeroMetric label="Protection" value="IP54" />
+                    <HeroMetric label={data?.stats[0]?.label} value={data?.stats[0]?.value} />
+                    <HeroMetric label={data?.stats[1]?.label} value={data?.stats[1]?.value} />
+                    <HeroMetric label={data?.stats[2]?.label} value={data?.stats[2]?.value} />
                   </div>
                 </div>
               </div>
@@ -343,35 +349,35 @@ function StatsSection() {
   );
 }
 
-function ProductShowcase() {
+function ProductShowcase({data}) {
   return (
     <SectionShell
       eyebrow="Product Showcase"
-      title="Power hardware for homes, enterprises, fleets, and industrial sites."
+      title={data?.title}
       action={<NavLinkButton to="/products" label="Explore Range" />}
     >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
-        {productVisuals.map((product, index) => (
+        {data?.categories.map((category, index) => (
           <article
-            key={product.title}
+            key={category._id}
             className="group overflow-hidden rounded-[26px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)] transition duration-500 hover:-translate-y-2 hover:border-blue-300 hover:shadow-[0_28px_90px_rgba(15,91,191,0.18)]"
             style={{ animationDelay: `${index * 90}ms` }}
           >
             <div className="relative h-48 overflow-hidden">
               <img
-                src={product.image}
-                alt={`${product.title} product by Exaulted India`}
+                src={category.image?.url}
+                alt={`${category.categories_name} product by Exaulted India`}
                 loading="lazy"
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-linear-to-t from-[#111827]/74 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 grid h-11 w-11 place-items-center rounded-xl bg-white/90 text-blue-500 shadow-lg backdrop-blur">
-                <product.Icon className="h-5 w-5" />
+                {/* <product.Icon className="h-5 w-5" /> */}
               </div>
             </div>
             <div className="p-5">
-              <h3 className="text-lg font-black text-[#111827]">{product.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{product.text}</p>
+              <h3 className="text-lg font-black text-[#111827]">{category.categories_name}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{category.categories_description}</p>
               <NavLink
                 to="/products"
                 className="mt-5 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-600 transition group-hover:bg-blue-400 group-hover:text-white"
@@ -387,24 +393,24 @@ function ProductShowcase() {
   );
 }
 
-function WhyChooseUs() {
+function WhyChooseUs({ data }) {
   return (
     <section className="bg-white">
       <SectionShell
         eyebrow="Exulted India"
-        title="Why choose us ."
+        title={data?.title}
       >
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {reasons.map((item) => (
+          {data?.points.map((item) => (
             <article
-              key={item.title}
+              key={item.label}
               className="group rounded-3xl border border-blue-100 bg-linear-to-br from-white to-blue-50/45 p-6 shadow-[0_18px_55px_rgba(15,91,191,0.08)] transition duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_24px_70px_rgba(16,185,129,0.12)]"
             >
               <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25 transition group-hover:bg-emerald-400">
-                <item.Icon className="h-6 w-6" />
+                {/* <item.Icon className="h-6 w-6" /> */}
               </div>
-              <h3 className="mt-5 text-lg font-black text-[#111827]">{item.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{item.text}</p>
+              <h3 className="mt-5 text-lg font-black text-[#111827]">{item.label}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{item.detail}</p>
             </article>
           ))}
         </div>
@@ -413,29 +419,27 @@ function WhyChooseUs() {
   );
 }
 
-function CoverageSection() {
+function CoverageSection({ data }) {
   return (
     <SectionShell
       eyebrow="Pan India Coverage"
-      title="Service reach across high-demand power and EV mobility corridors."
+      title={data?.title}
     >
       <div className="grid gap-8 rounded-[30px] border border-blue-100 bg-white/80 p-5 shadow-[0_24px_80px_rgba(15,91,191,0.1)] backdrop-blur-xl lg:grid-cols-[0.92fr_1.08fr] lg:p-8">
         
         {/* LEFT CONTENT */}
         <div className="self-center">
           <p className="text-sm leading-7 text-slate-600">
-            Our support coverage is designed for dealers, enterprise customers,
-            infrastructure partners, and field deployments that need fast response
-            across key Indian regions.
+            {data?.detail}
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {cities.map((city) => (
+            {data?.locations.map((city) => (
               <span
-                key={city.name}
+                key={city}
                 className="rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700"
               >
-                {city.name}
+                {city}
               </span>
             ))}
           </div>
@@ -453,7 +457,7 @@ function CoverageSection() {
             />
 
             {/* CITY POINTERS */}
-            {cities.map((city) => (
+            {/* {data?.locations.map((city) => (
               <button
                 key={city.name}
                 type="button"
@@ -463,18 +467,18 @@ function CoverageSection() {
                   top: city.y,
                 }}
               >
-                {/* Ping Effect */}
+                Ping Effect
                 <span className="absolute inset-0 h-5 w-5 rounded-full bg-emerald-400/40 animate-ping" />
 
-                {/* Dot */}
+                Dot
                 <span className="relative block h-4 w-4 rounded-full border-2 border-white bg-blue-600 shadow-lg" />
 
-                {/* Tooltip */}
+                Tooltip
                 <span className="pointer-events-none absolute left-1/2 top-6 z-10 w-max -translate-x-1/2 rounded-full bg-[#111827] px-3 py-1 text-xs font-bold text-white opacity-0 transition group-hover:opacity-100">
                   {city.name}
                 </span>
               </button>
-            ))}
+            ))} */}
 
           </div>
         </div>
@@ -484,30 +488,44 @@ function CoverageSection() {
   );
 }
 
-function Testimonials({ activeIndex, onChange }) {
-  const active = testimonials[activeIndex];
+function Testimonials({ activeIndex, onChange, data }) {
+  const testimonials = data || [];
+  const active = testimonials[activeIndex] || testimonials[0];
 
   return (
     <section className="bg-[#111827]">
       <SectionShell
         eyebrow="Customer Review"
-        title="Trusted by customers who need power systems that simply keep working."
+        title={active?.title}
         dark
       >
         <div className="rounded-[30px] border border-white/10 bg-white/8 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:p-8">
           <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
+            
+            {/* Left Side */}
             <div>
               <p className="text-5xl font-black text-blue-300">“</p>
-              <p className="mt-2 text-lg leading-8 text-white sm:text-xl">{active.quote}</p>
+
+              <p className="mt-2 text-lg leading-8 text-white sm:text-xl">
+                {active?.message}
+              </p>
+
               <div className="mt-6">
-                <p className="font-black text-white">{active.name}</p>
-                <p className="text-sm font-semibold text-blue-200">{active.role}</p>
+                <p className="font-black text-white">
+                  {active?.name}
+                </p>
+
+                <p className="text-sm font-semibold text-blue-200">
+                  {active?.designation}
+                </p>
               </div>
             </div>
+
+            {/* Right Side */}
             <div className="grid gap-3">
               {testimonials.map((item, index) => (
                 <button
-                  key={item.name}
+                  key={index}
                   type="button"
                   onClick={() => onChange(index)}
                   className={[
@@ -517,11 +535,17 @@ function Testimonials({ activeIndex, onChange }) {
                       : "border-white/10 bg-white/5 text-slate-300 hover:border-emerald-300/60 hover:bg-white/10",
                   ].join(" ")}
                 >
-                  <span className="block text-sm font-black">{item.name}</span>
-                  <span className="mt-1 block text-xs font-semibold opacity-80">{item.role}</span>
+                  <span className="block text-sm font-black">
+                    {item.name}
+                  </span>
+
+                  <span className="mt-1 block text-xs font-semibold opacity-80">
+                    {item.designation}
+                  </span>
                 </button>
               ))}
             </div>
+
           </div>
         </div>
       </SectionShell>
@@ -530,6 +554,7 @@ function Testimonials({ activeIndex, onChange }) {
 }
 
 function CertificatesSection({ onPreview }) {
+  
   return (
     <SectionShell
       eyebrow="Certificates"

@@ -127,30 +127,17 @@ function CreateCategory({
 
     try {
       if (isUpdateMode) {
-        await updateCategories({
-          id: formData.id,
-          categories_name: trimmedName,
-          categories_description: trimmedDescription,
-          image: formData.image || undefined,
-        }).unwrap();
+        // submitData.append("id", formData.id);
+        console.log("Submitting update", submitData.get("categories_name"), submitData.get("categories_description"), submitData.get("image"));
+        const response = await updateCategories({
+            id: formData.id,
+            body: submitData
+          }).unwrap();
 
-        if (formData.image) {
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}api/categories/${formData.id}`,
-            {
-              method: "PUT",
-              body: submitData,
-            },
-          );
-
-          const result = await response.json();
-
-          if (!response.ok) {
-            throw new Error(result?.message || "Failed to update category.");
-          }
-        }
-      } else {
-        await createCategories(submitData).unwrap();
+          console.log(response);
+        }else {
+        const response = await createCategories(submitData).unwrap();
+        console.log("create category response:", response);
       }
 
       closeModal();

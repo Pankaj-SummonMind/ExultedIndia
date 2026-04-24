@@ -68,13 +68,12 @@ async function getSubCategories(req, res) {
     const subCategories = await SubCategories.find({
       deletedAt: null
     })
-    .populate({
+      .populate({
         path: "category_Id",
         match: { deletedAt: null },
-        select: "name"
+        select: "_id categories_name"
       })
       .select("-__v -updatedAt");
-
 
     return res.status(200).json(
       new ApiResponse(200, subCategories, "Subcategories fetched successfully")
@@ -99,15 +98,17 @@ async function getSubCategoryById(req, res) {
       _id: id,
       deletedAt: null
     })
-    .populate("category_Id", "name")
+    .populate("category_Id", "categories_name")
       .select("-__v -updatedAt");
+
+      console.log(subCategory);
 
     if (!subCategory) {
       throw new ApiError(404, "No subcategory found with this id");
     }
 
     return res.status(200).json(
-      new ApiResponse(200, category, "Category fetched successfully")
+      new ApiResponse(200, subCategory, "subcategory fetched successfully")
     );
 
   } catch (error) {
@@ -124,7 +125,8 @@ async function getSubCategoryById(req, res) {
 async function updateSubCategory(req, res) {
   try {
     const { id } = req.params;
-    const { subCategories_Name, subCategories_Description } = req.body;
+    const { subCategories_Name, subCategories_Description, category_Id } = req.body;
+    console.log("req.body in update subcategory: ", subCategories_Name, subCategories_Description , category_Id, id);
 
     // validate subcategory id
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -146,11 +148,15 @@ async function updateSubCategory(req, res) {
       subCategory.description = subCategories_Description.trim();
     }
 
+    if (category_Id?.trim()) {
+      subCategory.category_Id = category_Id.trim();
+    }
+
     const file = req.file || (req.files && req.files.length > 0 ? req.files[0] : null);
 
     if (file) {
           const filePath = file.path.replace(/\\/g, "/");
-          updateData.image = {
+          subCategory.image = {
             url: `${req.protocol}://${req.get("host")}/${filePath}`,
             public_id: "" // To be updated if using Cloudinary
           };

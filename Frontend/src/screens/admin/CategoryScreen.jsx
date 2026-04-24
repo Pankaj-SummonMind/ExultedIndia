@@ -68,9 +68,9 @@ function CategoryScreen() {
                     <TableHeading className="rounded-tl-3xl">
                       Serial Number
                     </TableHeading>
-                    <TableHeading>Image</TableHeading>
                     <TableHeading>Category Name</TableHeading>
                     <TableHeading>Description</TableHeading>
+                    <TableHeading>Image</TableHeading>
                     <TableHeading className="rounded-tr-3xl">
                       Created At
                     </TableHeading>
@@ -97,6 +97,20 @@ function CategoryScreen() {
                         </span>
                       </TableCell>
 
+
+                      <TableCell>
+                        <div>
+                          <p className="font-semibold text-slate-700">
+                            {row.name}
+                          </p>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <p className="max-w-xs text-sm leading-6 text-slate-500">
+                          {row.description || "No description available"}
+                        </p>
+                      </TableCell>
                       <TableCell>
                         <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-white">
                           {row.image ? (
@@ -111,20 +125,6 @@ function CategoryScreen() {
                             </span>
                           )}
                         </div>
-                      </TableCell>
-
-                      <TableCell>
-                        <div>
-                          <p className="font-semibold text-slate-700">
-                            {row.name}
-                          </p>
-                        </div>
-                      </TableCell>
-
-                      <TableCell>
-                        <p className="max-w-xs text-sm leading-6 text-slate-500">
-                          {row.description || "No description available"}
-                        </p>
                       </TableCell>
 
                       <TableCell>

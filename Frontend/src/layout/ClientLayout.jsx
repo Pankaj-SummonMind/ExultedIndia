@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useGetAllSocialMediaQuery, useGetCategoriesQuery } from "../services/api";
+import { useGetAllSocialMediaQuery, useGetCategoriesQuery, useGetSubCategoriesQuery } from "../services/api";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -12,6 +12,7 @@ const navItems = [
 function ClientLayout() {
   const navigate = useNavigate();
   const { data: categoriesResponse, isLoading } = useGetCategoriesQuery();
+  const {data:subCategoryResponse} = useGetSubCategoriesQuery()
   const {data: SocialMediaAccounts} = useGetAllSocialMediaQuery()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);

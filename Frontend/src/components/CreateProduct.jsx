@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   useAddProductMutation,
   useGetCategoriesQuery,
-  useUpdateCategoriesMutation,
+  useGetSubCategoriesQuery,
   useUpdateProductMutation,
 } from "../services/api";
 
@@ -27,9 +27,12 @@ function CreateProduct({
 }) {
   const [addProduct, { isLoading }] = useAddProductMutation();
   const [updateProduct, { isLoading: isUpdateLoading }] =
-    useUpdateProductMutation();
-  const { data } = useGetCategoriesQuery();
-  // console.log("category data:", data)
+  useUpdateProductMutation();
+  const { data: categoryData } = useGetCategoriesQuery();
+  const { data: subCategoryData } = useGetSubCategoriesQuery();
+  console.log("category data:", categoryData);
+  console.log("subCategory Data", subCategoryData);
+
   const [formData, setFormData] = useState(initialFormState);
   const [categorySearch, setCategorySearch] = useState("");
   const [subCategorySearch, setSubCategorySearch] = useState("");
@@ -37,7 +40,31 @@ function CreateProduct({
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
   console.log("initial data ", initialData);
 
-  const categoryOptions = data?.data || [];
+  const categoryOptions = useMemo(
+    () =>
+      categoryData?.data?.map((item) => ({
+        ...item,
+        categories_name: item.categories_name || item.name || "",
+      })) || [],
+    [categoryData],
+  );
+
+  const subCategoryOptions = useMemo(
+    () =>
+      subCategoryData?.data?.map((item) => ({
+        ...item,
+        name: item.name || item.subCategories_Name || "",
+        category_Id: item.category_Id
+          ? {
+              ...item.category_Id,
+              _id: item.category_Id?._id || "",
+              categories_name:
+                item.category_Id?.categories_name || item.category_Id?.name || "",
+            }
+          : null,
+      })) || [],
+    [subCategoryData],
+  );
 
   useEffect(() => {
     if (mode === "update" && initialData) {
@@ -78,12 +105,10 @@ function CreateProduct({
   }, [categoryOptions, categorySearch]);
 
   const availableSubCategories = useMemo(() => {
-    const selectedCategory = categoryOptions.find(
-      (item) => item._id === formData.category,
+    return subCategoryOptions.filter(
+      (item) => item.category_Id?._id === formData.category,
     );
-
-    return selectedCategory?.subCategories || [];
-  }, [categoryOptions, formData.category]);
+  }, [subCategoryOptions, formData.category]);
 
   const filteredSubCategories = useMemo(() => {
     return availableSubCategories.filter((item) =>
@@ -318,7 +343,7 @@ function CreateProduct({
             setIsOpen={setIsCategoryOpen}
             onSearchChange={(value) => {
               setCategorySearch(value);
-              if (formData.category && value !== formData.category) {
+              if (formData.category) {
                 updateField("category", "");
                 updateField("subCategory", "");
                 setSubCategorySearch("");
@@ -344,7 +369,7 @@ function CreateProduct({
             setIsOpen={setIsSubCategoryOpen}
             onSearchChange={(value) => {
               setSubCategorySearch(value);
-              if (formData.subCategory && value !== formData.subCategory) {
+              if (formData.subCategory) {
                 updateField("subCategory", "");
               }
             }}

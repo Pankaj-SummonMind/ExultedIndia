@@ -7,6 +7,7 @@ function SubCategoryScreen() {
   const navigate = useNavigate();
   const { data: allSubCategories, isLoading } = useGetSubCategoriesQuery();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  console.log("all sub categories:", allSubCategories);
 
   const subCategoryRows =
     allSubCategories?.data?.map((item) => ({
@@ -43,7 +44,7 @@ function SubCategoryScreen() {
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* <div className="grid gap-4 md:grid-cols-3">
         {stats.map((card) => (
           <div
             key={card.label}
@@ -57,7 +58,7 @@ function SubCategoryScreen() {
             </p>
           </div>
         ))}
-      </div>
+      </div> */}
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
         <div className="flex flex-col gap-4 border-b border-blue-100 px-4 py-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between">
@@ -65,10 +66,10 @@ function SubCategoryScreen() {
             <h2 className="text-lg font-bold text-slate-800 sm:text-xl">
               Sub Category Table
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            {/* <p className="mt-1 text-sm text-slate-500">
               Manage sub categories with parent category mapping, description,
               and images.
-            </p>
+            </p> */}
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -85,17 +86,17 @@ function SubCategoryScreen() {
 
         <div className="min-h-0 flex-1 overflow-hidden p-3 sm:p-4">
           <div className="h-full max-h-116 overflow-auto rounded-3xl border border-blue-100 bg-slate-50/80">
-            <div className="min-w-[1100px]">
+            <div className="min-w-190">
               <table className="w-full border-separate border-spacing-0">
                 <thead className="sticky top-0 z-10 bg-white/95 backdrop-blur">
                   <tr>
                     <TableHeading className="rounded-tl-3xl">
                       Serial Number
                     </TableHeading>
-                    <TableHeading>Image</TableHeading>
                     <TableHeading>Sub Category Name</TableHeading>
                     <TableHeading>Category Name</TableHeading>
-                    <TableHeading>Description</TableHeading>
+                    {/* <TableHeading>Description</TableHeading> */}
+                    <TableHeading>Image</TableHeading>
                     <TableHeading className="rounded-tr-3xl">
                       Created At
                     </TableHeading>
@@ -137,21 +138,6 @@ function SubCategoryScreen() {
                           </span>
                         </TableCell>
 
-                        <TableCell>
-                          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-white">
-                            {row.image ? (
-                              <img
-                                src={row.image}
-                                alt={row.name}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <span className="text-xs font-semibold text-slate-400">
-                                N/A
-                              </span>
-                            )}
-                          </div>
-                        </TableCell>
 
                         <TableCell>
                           <p className="font-semibold text-slate-700">
@@ -165,12 +151,28 @@ function SubCategoryScreen() {
                           </span>
                         </TableCell>
 
-                        <TableCell>
+                        {/* <TableCell>
                           <p className="max-w-sm text-sm leading-6 text-slate-500">
-                            {row.description || "No description available"}
+                          {row.description || "No description available"}
                           </p>
-                        </TableCell>
+                          </TableCell> */}
 
+                          <TableCell>
+                            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-white">
+                              {row.image ? (
+                                <img
+                                  src={row.image}
+                                  alt={row.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <span className="text-xs font-semibold text-slate-400">
+                                  N/A
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          
                         <TableCell>
                           <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">
                             {row.createdAt}

@@ -8,9 +8,19 @@ import mongoose from "mongoose"
 async function createCategories(req, res) {
   try {
     const { categories_name, categories_description, } = req.body;
-
+    console.log("req.body in create category: ", req.body);
     if (!categories_name || !categories_description) {
       throw new ApiError(400, "Category and Description are required");
+    }
+
+    const exists = await Categories.findOne({
+      categories_name: categories_name.trim().toLowerCase(),
+      deletedAt: null
+    });
+    console.log("existing category with same name:", exists);
+
+    if (exists) {
+      throw new ApiError(400, "Category with this name already exists");
     }
 
     // Since a certificate only has one image in the schema `image: { url, public_id }`
@@ -132,9 +142,9 @@ async function getCategoryById(req, res) {
 
 async function updateCategory(req, res) {
   try {
-    console.log("req.body in update category: ", req.body);
     const { id } = req.params;
     const { categories_name, categories_description } = req.body;
+    console.log("req.body in update category: ", categories_name, categories_description , id);
 
     // validate category id
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -160,7 +170,7 @@ async function updateCategory(req, res) {
 
     if (file) {
           const filePath = file.path.replace(/\\/g, "/");
-          updateData.image = {
+          category.image = {
             url: `${req.protocol}://${req.get("host")}/${filePath}`,
             public_id: "" // To be updated if using Cloudinary
           };

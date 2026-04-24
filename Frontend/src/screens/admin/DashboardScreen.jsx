@@ -105,24 +105,24 @@ function DashboardScreen() {
     [users]
   );
 
-  if (hasError) {
-    return (
-      <section className="flex min-h-[calc(100vh-176px)] items-center justify-center">
-        <div className="w-full max-w-xl rounded-[30px] border border-red-100 bg-white p-8 text-center shadow-[0_20px_50px_rgba(248,113,113,0.12)]">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-500">
-            <AlertIcon className="h-7 w-7" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-800">
-            Dashboard data load nahi ho paya
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-slate-500">
-            Users, categories ya products me se kisi ek API response me issue
-            aa raha hai. Refresh karke dubara try karein.
-          </p>
-        </div>
-      </section>
-    );
-  }
+  // if (hasError) {
+  //   return (
+  //     <section className="flex min-h-[calc(100vh-176px)] items-center justify-center">
+  //       <div className="w-full max-w-xl rounded-[30px] border border-red-100 bg-white p-8 text-center shadow-[0_20px_50px_rgba(248,113,113,0.12)]">
+  //         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-500">
+  //           <AlertIcon className="h-7 w-7" />
+  //         </div>
+  //         <h2 className="text-xl font-bold text-slate-800">
+  //           Dashboard data load nahi ho paya
+  //         </h2>
+  //         <p className="mt-3 text-sm leading-6 text-slate-500">
+  //           Users, categories ya products me se kisi ek API response me issue
+  //           aa raha hai. Refresh karke dubara try karein.
+  //         </p>
+  //       </div>
+  //     </section>
+  //   );
+  // }
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">

@@ -26,17 +26,15 @@ function CategoryById() {
         label: "Created At",
         value: formatDate(category?.createdAt),
       },
-      {
-        label: "Image Status",
-        value: category?.image?.url ? "Available" : "Not Uploaded",
-      },
+
     ],
     [category],
   );
 
   const handleDelete = async () => {
     try {
-      await deleteCategories(id).unwrap();
+      const res = await deleteCategories(id).unwrap();
+      console.log("delete category response:", res);
       navigate("/admin/category");
     } catch (deleteError) {
       console.log("error while deleting category:", deleteError);
@@ -94,9 +92,9 @@ function CategoryById() {
               <h1 className="mt-3 text-2xl font-bold text-slate-800 sm:text-3xl">
                 {category.categories_name}
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+              {/* <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
                 {category.categories_description || "No description available."}
-              </p>
+              </p> */}
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">

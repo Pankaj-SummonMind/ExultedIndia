@@ -96,6 +96,8 @@ async function getAllProducts(req, res) {
       new ApiResponse(200, products, "Products fetched successfully")
     );
 
+    console.log("products: ",products)
+
   } catch (error) {
     console.error("Get All Products Error:", error);
 

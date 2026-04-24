@@ -1,28 +1,40 @@
 import { useMemo, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CreateSubCategory from "../../../components/createSubCategory";
 import {
   useDeleteSubCategoriesMutation,
-  useGetSubCategoriesQuery,
+  useGetSubCategoryByIdQuery,
 } from "../../../services/api";
 
 function SubCategoryById() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { id } = useParams();
-  const { data, isLoading } = useGetSubCategoriesQuery();
+  const { data: subCategorybyId, isLoading } = useGetSubCategoryByIdQuery(id);
+  console.log("data in by id:", subCategorybyId);
+
   const [deleteSubCategories, { isLoading: isDeleteLoading }] =
     useDeleteSubCategoriesMutation();
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
 
-  const stateSubCategory = location.state?.subCategory;
-  const fetchedSubCategory = data?.data?.find((item) => item._id === id);
-  const subCategory = stateSubCategory || fetchedSubCategory;
+  const subCategory = useMemo(() => {
+    const responseData = subCategorybyId?.data;
 
-  const categoryName =
-    subCategory?.category_Id?.categories_name ||
-    subCategory?.category_Id?.name ||
-    "Unassigned Category";
+    if (!responseData) return null;
+
+    return {
+      ...responseData,
+      category_Id: responseData.category_Id
+        ? {
+            ...responseData.category_Id,
+            _id: responseData.category_Id?._id || "",
+            categories_name:
+              responseData.category_Id?.categories_name ||
+              responseData.category_Id?.name ||
+              "Unassigned Category",
+          }
+        : null,
+    };
+  }, [subCategorybyId]);
 
   const summaryCards = useMemo(
     () => [
@@ -32,18 +44,14 @@ function SubCategoryById() {
       },
       {
         label: "Parent Category",
-        value: categoryName,
+        value: subCategory?.category_Id?.categories_name || "N/A",
       },
       {
         label: "Created At",
         value: formatDate(subCategory?.createdAt),
       },
-      {
-        label: "Image Status",
-        value: subCategory?.image?.url ? "Available" : "Not Uploaded",
-      },
     ],
-    [categoryName, subCategory],
+    [subCategory],
   );
 
   const handleDelete = async () => {
@@ -104,14 +112,14 @@ function SubCategoryById() {
               <h1 className="mt-3 text-2xl font-bold text-slate-800 sm:text-3xl">
                 {subCategory.name}
               </h1>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
+              {/* <div className="mt-3 flex flex-wrap items-center gap-3">
                 <span className="inline-flex rounded-full bg-blue-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">
-                  {categoryName}
+                  {subCategory.category_Id?.categories_name || "Unassigned Category"}
                 </span>
               </div>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
                 {subCategory.description || "No description available."}
-              </p>
+              </p> */}
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -225,13 +233,7 @@ function SubCategoryById() {
         onClose={() => setIsUpdateOpen(false)}
         setIsCreateModalOpen={setIsUpdateOpen}
         mode="update"
-        initialData={{
-          id: subCategory._id,
-          name: subCategory.name,
-          category_Id: subCategory.category_Id,
-          description: subCategory.description,
-          image: subCategory.image,
-        }}
+        initialData={subCategory}
       />
     </section>
   );

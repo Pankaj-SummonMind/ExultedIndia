@@ -22,11 +22,13 @@ function CreateSubCategory({
   mode = "create",
   setIsCreateModalOpen,
 }) {
+  // console.log("initialData: ",initialData)
   const [createSubCategories, { isLoading: isCreateLoading }] =
     useCreateSubCategoriesMutation();
   const [updateSubCategories, { isLoading: isUpdateLoading }] =
     useUpdateSubCategoriesMutation();
   const { data: categoriesResponse } = useGetCategoriesQuery();
+  console.log("categoriesResponse: ", categoriesResponse);
 
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
@@ -42,7 +44,7 @@ function CreateSubCategory({
     () =>
       categoriesResponse?.data?.map((item) => ({
         id: item._id,
-        name: item.categories_name || item.name || "Unnamed Category",
+        name: item.categories_name,
       })) || [],
     [categoriesResponse],
   );
@@ -61,13 +63,10 @@ function CreateSubCategory({
     if (!isOpen) return;
 
     const selectedCategoryName =
-      initialData?.categoryName ||
       initialData?.category_Id?.categories_name ||
-      initialData?.category_Id?.name ||
       "";
 
-    const selectedCategoryId =
-      initialData?.categoryId || initialData?.category_Id?._id || "";
+    const selectedCategoryId = initialData?.category_Id?._id || "";
 
     setFormData({
       id: initialData?.id || initialData?._id || "",
@@ -134,6 +133,7 @@ function CreateSubCategory({
   };
 
   const handleCategorySelect = (category) => {
+    console.log("Selected category: ", category);
     setFormError("");
     setFormData((prev) => ({
       ...prev,
@@ -195,7 +195,7 @@ function CreateSubCategory({
     submitData.append("subCategories_Name", trimmedName);
     submitData.append("subCategories_Description", trimmedDescription);
 
-    if (!isUpdateMode) {
+    if (formData.categoryId) {
       submitData.append("category_Id", formData.categoryId);
     }
 
@@ -205,6 +205,13 @@ function CreateSubCategory({
 
     try {
       if (isUpdateMode) {
+        console.log("Submitting update with data:", {
+          id: formData.id,
+          subCategories_Name: submitData.get("subCategories_Name"),
+          subCategories_Description: submitData.get("subCategories_Description"),
+          category_Id: submitData.get("category_Id"),
+          image: submitData.get("image"),
+        });
         await updateSubCategories({
           id: formData.id,
           body: submitData,
@@ -280,47 +287,48 @@ function CreateSubCategory({
                 }
               >
                 <div className="relative" ref={categoryMenuRef}>
-                  <input
-                    id="subCategoryCategory"
-                    type="text"
-                    value={categorySearch}
-                    disabled={isUpdateMode}
-                    onFocus={() => !isUpdateMode && setIsCategoryMenuOpen(true)}
-                    onChange={(event) => {
-                      setCategorySearch(event.target.value);
-                      setIsCategoryMenuOpen(true);
-                      handleChange("categoryId", "");
-                      handleChange("categoryName", "");
-                    }}
-                    placeholder="Search category name"
-                    className="w-full rounded-2xl border border-blue-100 bg-slate-50 px-4 py-3 pr-11 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"
-                  />
-                  <SearchIcon className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+  <input
+    id="subCategoryCategory"
+    type="text"
+    value={categorySearch}
+    onFocus={() => setIsCategoryMenuOpen(true)}
+    onChange={(event) => {
+      setCategorySearch(event.target.value);
+      setIsCategoryMenuOpen(true);
+      handleChange("categoryId", "");
+      handleChange("categoryName", "");
+    }}
+    placeholder="Search category name"
+    className="w-full rounded-2xl border border-blue-100 bg-slate-50 px-4 py-3 pr-11 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100"
+  />
 
-                  {!isUpdateMode && isCategoryMenuOpen ? (
-                    <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-20 max-h-56 overflow-auto rounded-3xl border border-blue-100 bg-white p-2 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
-                      {filteredCategories.length ? (
-                        filteredCategories.map((category) => (
-                          <button
-                            key={category.id}
-                            type="button"
-                            onClick={() => handleCategorySelect(category)}
-                            className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm text-slate-600 transition hover:bg-blue-50 hover:text-blue-700"
-                          >
-                            <span className="font-medium">{category.name}</span>
-                            {formData.categoryId === category.id ? (
-                              <CheckIcon className="h-4 w-4 text-blue-500" />
-                            ) : null}
-                          </button>
-                        ))
-                      ) : (
-                        <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
-                          No matching category found.
-                        </div>
-                      )}
-                    </div>
-                  ) : null}
-                </div>
+  <SearchIcon className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
+  {isCategoryMenuOpen ? (
+    <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-20 max-h-56 overflow-auto rounded-3xl border border-blue-100 bg-white p-2 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+      {filteredCategories.length ? (
+        filteredCategories.map((category) => (
+          <button
+            key={category.id}
+            type="button"
+            onClick={() => handleCategorySelect(category)}
+            className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm text-slate-600 transition hover:bg-blue-50 hover:text-blue-700"
+          >
+            <span className="font-medium">{category.name}</span>
+
+            {formData.categoryId === category.id ? (
+              <CheckIcon className="h-4 w-4 text-blue-500" />
+            ) : null}
+          </button>
+        ))
+      ) : (
+        <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
+          No matching category found.
+        </div>
+      )}
+    </div>
+  ) : null}
+</div>
               </FieldShell>
 
               <FieldShell

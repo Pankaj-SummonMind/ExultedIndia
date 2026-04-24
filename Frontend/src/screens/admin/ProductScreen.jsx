@@ -3,64 +3,6 @@ import { data, useNavigate } from "react-router-dom";
 import CreateProduct from "../../components/CreateProduct";
 import { useGetProductQuery } from "../../services/api";
 
-const productRows = [
-  {
-    id: 1,
-    name: "iPhone 15 Pro",
-    category: "Electronics",
-    subCategory: "Mobiles",
-    createdAt: "15 Apr 2026",
-  },
-  {
-    id: 2,
-    name: "MacBook Air M3",
-    category: "Electronics",
-    subCategory: "Laptops",
-    createdAt: "14 Apr 2026",
-  },
-  {
-    id: 3,
-    name: "Running Shoes",
-    category: "Fashion",
-    subCategory: "Footwear",
-    createdAt: "12 Apr 2026",
-  },
-  {
-    id: 4,
-    name: "Wooden Table Lamp",
-    category: "Home Decor",
-    subCategory: "Lighting",
-    createdAt: "10 Apr 2026",
-  },
-  {
-    id: 5,
-    name: "Protein Powder",
-    category: "Sports",
-    subCategory: "Fitness",
-    createdAt: "08 Apr 2026",
-  },
-  {
-    id: 6,
-    name: "Face Serum",
-    category: "Beauty",
-    subCategory: "Skin Care",
-    createdAt: "06 Apr 2026",
-  },
-  {
-    id: 7,
-    name: "Office Chair",
-    category: "Furniture",
-    subCategory: "Office",
-    createdAt: "04 Apr 2026",
-  },
-  {
-    id: 8,
-    name: "Organic Green Tea",
-    category: "Groceries",
-    subCategory: "Beverages",
-    createdAt: "02 Apr 2026",
-  },
-];
 
 function ProductScreen() {
   const navigate = useNavigate();

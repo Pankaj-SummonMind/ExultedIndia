@@ -34,7 +34,7 @@ export const api = createApi({
     }),
 
     updateCategories : builder.mutation({
-        query: ({id,...body}) => ({
+        query: ({id,body}) => ({
             url:`api/categories/${id}`,
             method:"PUT",
             body
