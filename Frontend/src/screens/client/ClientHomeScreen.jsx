@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useGetAllCertificatesQuery, useGetCategoriesQuery, useGetHomePageQuery } from "../../services/api";
+import {
+  useGetAboutUsQuery,
+  useGetAllCertificatesQuery,
+  useGetCategoriesQuery,
+  useGetHomePageQuery,
+} from "../../services/api";
 
 const heroImage =
   "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=80";
@@ -51,12 +56,36 @@ const stats = [
 ];
 
 const reasons = [
-  { title: "In-house R&D", text: "Rapid product development with tight quality control.", Icon: LabIcon },
-  { title: "Made in India", text: "Built for Indian grid conditions, climates, and duty cycles.", Icon: FlagIcon },
-  { title: "Widest Product Range", text: "Battery, inverter, UPS, gensets, transformers, and accessories.", Icon: LayersIcon },
-  { title: "High Performance", text: "Efficient conversion, clean output, and reliable runtime.", Icon: GaugeIcon },
-  { title: "Custom Solutions", text: "Application-specific systems for dealers, enterprises, and OEMs.", Icon: ToolIcon },
-  { title: "Warranty Support", text: "Responsive service network with practical ownership support.", Icon: ShieldIcon },
+  {
+    title: "In-house R&D",
+    text: "Rapid product development with tight quality control.",
+    Icon: LabIcon,
+  },
+  {
+    title: "Made in India",
+    text: "Built for Indian grid conditions, climates, and duty cycles.",
+    Icon: FlagIcon,
+  },
+  {
+    title: "Widest Product Range",
+    text: "Battery, inverter, UPS, gensets, transformers, and accessories.",
+    Icon: LayersIcon,
+  },
+  {
+    title: "High Performance",
+    text: "Efficient conversion, clean output, and reliable runtime.",
+    Icon: GaugeIcon,
+  },
+  {
+    title: "Custom Solutions",
+    text: "Application-specific systems for dealers, enterprises, and OEMs.",
+    Icon: ToolIcon,
+  },
+  {
+    title: "Warranty Support",
+    text: "Responsive service network with practical ownership support.",
+    Icon: ShieldIcon,
+  },
 ];
 
 const cities = [
@@ -90,26 +119,34 @@ const testimonials = [
   },
 ];
 
-const certificates = [
-  { title: "ISO 9001", text: "Quality Management", color: "from-blue-500 to-cyan-400" },
-  { title: "CE Certified", text: "Safety Compliance", color: "from-emerald-500 to-teal-400" },
-  { title: "MSME", text: "Made in India", color: "from-slate-700 to-blue-500" },
-  { title: "RoHS", text: "Eco Standards", color: "from-green-500 to-lime-400" },
-];
+// const certificates = [
+//   {
+//     title: "ISO 9001",
+//     text: "Quality Management",
+//     color: "from-blue-500 to-cyan-400",
+//   },
+//   {
+//     title: "CE Certified",
+//     text: "Safety Compliance",
+//     color: "from-emerald-500 to-teal-400",
+//   },
+//   { title: "MSME", text: "Made in India", color: "from-slate-700 to-blue-500" },
+//   { title: "RoHS", text: "Eco Standards", color: "from-green-500 to-lime-400" },
+// ];
 
 const quickLinks = ["Products", "About", "Certificates", "Contact"];
 
 function ClientHomeScreen() {
-  const{data:categories} = useGetCategoriesQuery()
-  const {data: certificates } = useGetAllCertificatesQuery()
-  const {data:HomeScreenData} = useGetHomePageQuery()
-  console.log("Categories:", categories,"HomeScreenData:",HomeScreenData,
-    "certificates:",certificates
-  );
+  const { data: categories } = useGetCategoriesQuery();
+  const { data: HomeScreenData } = useGetHomePageQuery();
+  const { data: certificates } = useGetAllCertificatesQuery();
+  const { data: aboutUsData } = useGetAboutUsQuery();
+  console.log("about us data : ", aboutUsData);
 
   const home = HomeScreenData?.data;
+  const aboutUs = aboutUsData?.data;
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const [previewCertificate, setPreviewCertificate] = useState(null);
+  // const [previewCertificate, setPreviewCertificate] = useState(null);
 
   return (
     <div className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
@@ -118,28 +155,30 @@ function ClientHomeScreen() {
       {/* <LoadingScreen /> */}
 
       <FloatingParticles />
-      <HeroSection data={home?.hero}/>
-      <ProductDetail data={home?.heroDetail}/>
-      <StatsSection />
-      <ProductShowcase data={home?.homeCategory}/>
-      <WhyChooseUs data={home?.whyChooseUs}/>
-      <CoverageSection data={home?.locations}/>
+      <HeroSection data={home?.hero} />
+      <ProductDetail data={home?.heroDetail} />
+      <StatsSection data={aboutUs?.companyStats} />
+      <ProductShowcase data={home?.homeCategory} />
+      <WhyChooseUs data={home?.whyChooseUs} />
+      <CoverageSection data={home?.locations} />
       <Testimonials
         activeIndex={activeTestimonial}
         onChange={setActiveTestimonial}
         data={home?.testimonials}
       />
-      <CertificatesSection onPreview={setPreviewCertificate}
+      <CertificatesSection
+        certificates={certificates?.data || []}
+        // onPreview={setPreviewCertificate}
       />
-      <CtaBanner />
+      <CtaBanner joinUs={home?.joinUs} />
       {/* <Footer /> */}
-
+      {/* 
       {previewCertificate ? (
         <CertificatePreview
           certificate={previewCertificate}
           onClose={() => setPreviewCertificate(null)}
         />
-      ) : null}
+      ) : null} */}
     </div>
   );
 }
@@ -148,18 +187,19 @@ function SeoBlock() {
   return (
     <>
       <h1 className="sr-only">
-        Exaulted India battery inverter transformer online UPS gensets and EV charger
-        manufacturing company
+        Exaulted India battery inverter transformer online UPS gensets and EV
+        charger manufacturing company
       </h1>
       <p className="sr-only">
         Premium power systems, EV chargers, batteries, inverters, online UPS,
-        generators, transformers, service coverage, certificates, and inquiry form.
+        generators, transformers, service coverage, certificates, and inquiry
+        form.
       </p>
     </>
   );
 }
 
-function HeroSection({data}) {
+function HeroSection({ data }) {
   return (
     <section className="relative min-h-[calc(100vh-72px)] overflow-hidden bg-slate-950">
       <img
@@ -173,7 +213,7 @@ function HeroSection({data}) {
         <div className="max-w-3xl motion-safe:animate-[slideUp_700ms_ease-out_both]">
           <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-cyan-100 shadow-2xl backdrop-blur-xl">
             <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.9)]" />
-            Exaulted India 
+            Exaulted India
           </p>
 
           <h2 className="mt-7 max-w-3xl text-4xl font-black leading-[1.03] text-white sm:text-5xl lg:text-6xl">
@@ -246,11 +286,10 @@ function HeroSection({data}) {
   );
 }
 
-function ProductDetail({data}) {
+function ProductDetail({ data }) {
   return (
     <section className="relative min-h-[calc(100vh-72px)] overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center">
-        
         {/* LEFT IMAGE */}
         <div className="relative z-10 shrink-0 lg:-mr-20">
           <div className="h-137.5 w-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
@@ -276,9 +315,7 @@ function ProductDetail({data}) {
                     {/* <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-300">
                       DC Fast Charger
                     </p> */}
-                    <h3 className="mt-2 text-2xl font-black">
-                      {data?.title}
-                    </h3>
+                    <h3 className="mt-2 text-2xl font-black">{data?.title}</h3>
                   </div>
 
                   <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white">
@@ -300,9 +337,18 @@ function ProductDetail({data}) {
                   </div>
 
                   <div className="space-y-3 self-center">
-                    <HeroMetric label={data?.stats[0]?.label} value={data?.stats[0]?.value} />
-                    <HeroMetric label={data?.stats[1]?.label} value={data?.stats[1]?.value} />
-                    <HeroMetric label={data?.stats[2]?.label} value={data?.stats[2]?.value} />
+                    <HeroMetric
+                      label={data?.stats[0]?.label}
+                      value={data?.stats[0]?.value}
+                    />
+                    <HeroMetric
+                      label={data?.stats[1]?.label}
+                      value={data?.stats[1]?.value}
+                    />
+                    <HeroMetric
+                      label={data?.stats[2]?.label}
+                      value={data?.stats[2]?.value}
+                    />
                   </div>
                 </div>
               </div>
@@ -312,9 +358,12 @@ function ProductDetail({data}) {
 
         {/* RIGHT BUTTON */}
         <div className="relative z-20 shrink-0">
-          <button className="rounded-2xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-blue-700 hover:scale-105">
+          <NavLink
+            to="/aboutus"
+            className="rounded-2xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-blue-700 hover:scale-105 inline-block"
+          >
             More About Us
-          </button>
+          </NavLink>
         </div>
       </div>
     </section>
@@ -324,24 +373,30 @@ function ProductDetail({data}) {
 function HeroMetric({ label, value }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+        {label}
+      </p>
       <p className="mt-1 text-2xl font-black text-white">{value}</p>
     </div>
   );
 }
 
-function StatsSection() {
+function StatsSection({ data }) {
   return (
     <SectionShell className="-mt-10">
       <div className="relative z-10 grid gap-4 rounded-[28px] border border-white/80 bg-white/80 p-4 shadow-[0_24px_80px_rgba(15,91,191,0.14)] backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((item) => (
+        {data?.map((item) => (
           <div
-            key={`${item.value}-${item.label}`}
+            key={`${item.value}-${item.key}`}
             className="rounded-2xl border border-blue-100 bg-white/85 p-5 motion-safe:animate-[revealUp_700ms_ease-out_both]"
             style={{ animationDelay: item.delay }}
           >
-            <p className="text-2xl font-black text-[#111827] sm:text-3xl">{item.value}</p>
-            <p className="mt-2 text-sm font-semibold text-slate-500">{item.label}</p>
+            <p className="text-2xl font-black text-[#111827] sm:text-3xl">
+              {item.value}
+            </p>
+            <p className="mt-2 text-sm font-semibold text-slate-500">
+              {item.key}
+            </p>
           </div>
         ))}
       </div>
@@ -349,7 +404,7 @@ function StatsSection() {
   );
 }
 
-function ProductShowcase({data}) {
+function ProductShowcase({ data }) {
   return (
     <SectionShell
       eyebrow="Product Showcase"
@@ -357,7 +412,7 @@ function ProductShowcase({data}) {
       action={<NavLinkButton to="/products" label="Explore Range" />}
     >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
-        {data?.categories.map((category, index) => (
+        {data?.categories?.slice(0, 5).map((category, index) => (
           <article
             key={category._id}
             className="group overflow-hidden rounded-[26px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)] transition duration-500 hover:-translate-y-2 hover:border-blue-300 hover:shadow-[0_28px_90px_rgba(15,91,191,0.18)]"
@@ -371,13 +426,17 @@ function ProductShowcase({data}) {
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-linear-to-t from-[#111827]/74 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 grid h-11 w-11 place-items-center rounded-xl bg-white/90 text-blue-500 shadow-lg backdrop-blur">
-                {/* <product.Icon className="h-5 w-5" /> */}
-              </div>
             </div>
+
             <div className="p-5">
-              <h3 className="text-lg font-black text-[#111827]">{category.categories_name}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{category.categories_description}</p>
+              <h3 className="text-lg font-black text-[#111827]">
+                {category.categories_name}
+              </h3>
+
+              <p className="mt-3 text-sm leading-6 text-slate-600 line-clamp-4">
+                {category.categories_description}
+              </p>
+
               <NavLink
                 to="/products"
                 className="mt-5 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-600 transition group-hover:bg-blue-400 group-hover:text-white"
@@ -396,10 +455,7 @@ function ProductShowcase({data}) {
 function WhyChooseUs({ data }) {
   return (
     <section className="bg-white">
-      <SectionShell
-        eyebrow="Exulted India"
-        title={data?.title}
-      >
+      <SectionShell eyebrow="Exulted India" title={data?.title}>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {data?.points.map((item) => (
             <article
@@ -409,8 +465,12 @@ function WhyChooseUs({ data }) {
               <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25 transition group-hover:bg-emerald-400">
                 {/* <item.Icon className="h-6 w-6" /> */}
               </div>
-              <h3 className="mt-5 text-lg font-black text-[#111827]">{item.label}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{item.detail}</p>
+              <h3 className="mt-5 text-lg font-black text-[#111827]">
+                {item.label}
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                {item.detail}
+              </p>
             </article>
           ))}
         </div>
@@ -421,17 +481,11 @@ function WhyChooseUs({ data }) {
 
 function CoverageSection({ data }) {
   return (
-    <SectionShell
-      eyebrow="Pan India Coverage"
-      title={data?.title}
-    >
+    <SectionShell eyebrow="Pan India Coverage" title={data?.title}>
       <div className="grid gap-8 rounded-[30px] border border-blue-100 bg-white/80 p-5 shadow-[0_24px_80px_rgba(15,91,191,0.1)] backdrop-blur-xl lg:grid-cols-[0.92fr_1.08fr] lg:p-8">
-        
         {/* LEFT CONTENT */}
         <div className="self-center">
-          <p className="text-sm leading-7 text-slate-600">
-            {data?.detail}
-          </p>
+          <p className="text-sm leading-7 text-slate-600">{data?.detail}</p>
 
           <div className="mt-6 flex flex-wrap gap-2">
             {data?.locations.map((city) => (
@@ -448,7 +502,6 @@ function CoverageSection({ data }) {
         {/* INDIA MAP */}
         <div className="relative mx-auto w-full max-w-md">
           <div className="relative">
-
             {/* INDIA IMAGE */}
             <img
               src="https://www.dronepwr.com/wp-content/uploads/India-Map-Location-Drone-Power.svg"
@@ -479,10 +532,8 @@ function CoverageSection({ data }) {
                 </span>
               </button>
             ))} */}
-
           </div>
         </div>
-
       </div>
     </SectionShell>
   );
@@ -494,14 +545,9 @@ function Testimonials({ activeIndex, onChange, data }) {
 
   return (
     <section className="bg-[#111827]">
-      <SectionShell
-        eyebrow="Customer Review"
-        title={active?.title}
-        dark
-      >
+      <SectionShell eyebrow="Customer Review" title={active?.title} dark>
         <div className="rounded-[30px] border border-white/10 bg-white/8 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:p-8">
           <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
-            
             {/* Left Side */}
             <div>
               <p className="text-5xl font-black text-blue-300">“</p>
@@ -511,9 +557,7 @@ function Testimonials({ activeIndex, onChange, data }) {
               </p>
 
               <div className="mt-6">
-                <p className="font-black text-white">
-                  {active?.name}
-                </p>
+                <p className="font-black text-white">{active?.name}</p>
 
                 <p className="text-sm font-semibold text-blue-200">
                   {active?.designation}
@@ -535,9 +579,7 @@ function Testimonials({ activeIndex, onChange, data }) {
                       : "border-white/10 bg-white/5 text-slate-300 hover:border-emerald-300/60 hover:bg-white/10",
                   ].join(" ")}
                 >
-                  <span className="block text-sm font-black">
-                    {item.name}
-                  </span>
+                  <span className="block text-sm font-black">{item.name}</span>
 
                   <span className="mt-1 block text-xs font-semibold opacity-80">
                     {item.designation}
@@ -545,7 +587,6 @@ function Testimonials({ activeIndex, onChange, data }) {
                 </button>
               ))}
             </div>
-
           </div>
         </div>
       </SectionShell>
@@ -553,8 +594,7 @@ function Testimonials({ activeIndex, onChange, data }) {
   );
 }
 
-function CertificatesSection({ onPreview }) {
-  
+function CertificatesSection({ certificates = [], onPreview }) {
   return (
     <SectionShell
       eyebrow="Certificates"
@@ -564,20 +604,29 @@ function CertificatesSection({ onPreview }) {
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {certificates.map((certificate) => (
           <button
-            key={certificate.title}
+            key={certificate._id}
             type="button"
-            onClick={() => onPreview(certificate)}
+            // onClick={() => onPreview(certificate)}
             className="group overflow-hidden rounded-3xl border border-blue-100 bg-white text-left shadow-[0_18px_55px_rgba(15,91,191,0.08)] transition hover:-translate-y-1 hover:shadow-[0_24px_80px_rgba(15,91,191,0.15)]"
           >
-            <div className={`h-36 bg-linear-to-br ${certificate.color} p-5 text-white`}>
-              <AwardIcon className="h-10 w-10" />
-              <p className="mt-8 text-xl font-black">{certificate.title}</p>
+            {/* IMAGE */}
+            <div className="h-36 overflow-hidden">
+              <img
+                src={certificate.image?.url}
+                alt={certificate.certificate_name}
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+              />
             </div>
+
+            {/* CONTENT */}
             <div className="p-5">
-              <p className="text-sm font-semibold text-slate-600">{certificate.text}</p>
-              <p className="mt-4 text-sm font-bold text-blue-600 transition group-hover:text-emerald-600">
-                Preview Certificate
+              <p className="text-lg font-black text-slate-800">
+                {certificate.certificate_name}
               </p>
+
+              {/* <p className="mt-3 text-sm font-bold text-blue-600 transition group-hover:text-emerald-600">
+                Preview Certificate
+              </p> */}
             </div>
           </button>
         ))}
@@ -604,17 +653,22 @@ function CertificatePreview({ certificate, onClose }) {
         >
           <XIcon className="h-5 w-5" />
         </button>
-        <div className={`rounded-3xl bg-linear-to-br ${certificate.color} p-8 text-white`}>
+        <div
+          className={`rounded-3xl bg-linear-to-br ${certificate.color} p-8 text-white`}
+        >
           <AwardIcon className="h-14 w-14" />
           <p className="mt-20 text-3xl font-black">{certificate.title}</p>
-          <p className="mt-2 text-sm font-semibold text-white/80">{certificate.text}</p>
+          <p className="mt-2 text-sm font-semibold text-white/80">
+            {certificate.text}
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-function CtaBanner() {
+function CtaBanner({ joinUs }) {
+  console.log("Join Us Data:", joinUs);
   return (
     <SectionShell>
       <div className="relative overflow-hidden rounded-4xl bg-[#111827] p-8 text-white shadow-[0_28px_100px_rgba(17,24,39,0.22)] sm:p-10 lg:p-12">
@@ -626,11 +680,10 @@ function CtaBanner() {
               Partner with us
             </p>
             <h2 className="mt-3 text-3xl font-black sm:text-4xl">
-              Join the EV Revolution Today
+              {joinUs?.title}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-              Build with a manufacturing partner that understands power reliability,
-              premium product presentation, and long-term support.
+              {joinUs?.detail}
             </p>
           </div>
           <NavLink
@@ -752,19 +805,41 @@ function InquiryForm() {
   );
 }
 
-function SectionShell({ eyebrow, title, action, children, className = "", dark = false }) {
+function SectionShell({
+  eyebrow,
+  title,
+  action,
+  children,
+  className = "",
+  dark = false,
+}) {
   return (
-    <section className={["relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8", className].join(" ")}>
+    <section
+      className={[
+        "relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8",
+        className,
+      ].join(" ")}
+    >
       {eyebrow || title || action ? (
         <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             {eyebrow ? (
-              <p className={["text-xs font-black uppercase tracking-[0.24em]", dark ? "text-emerald-300" : "text-blue-500"].join(" ")}>
+              <p
+                className={[
+                  "text-xs font-black uppercase tracking-[0.24em]",
+                  dark ? "text-emerald-300" : "text-blue-500",
+                ].join(" ")}
+              >
                 {eyebrow}
               </p>
             ) : null}
             {title ? (
-              <h2 className={["mt-3 max-w-3xl text-3xl font-black leading-tight sm:text-4xl", dark ? "text-white" : "text-[#111827]"].join(" ")}>
+              <h2
+                className={[
+                  "mt-3 max-w-3xl text-3xl font-black leading-tight sm:text-4xl",
+                  dark ? "text-white" : "text-[#111827]",
+                ].join(" ")}
+              >
                 {title}
               </h2>
             ) : null}

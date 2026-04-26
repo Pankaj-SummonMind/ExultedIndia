@@ -15,8 +15,12 @@ function ClientProductDetailScreen() {
 
   const product = data?.data;
   const productImages = useMemo(() => getProductImages(product), [product]);
-  const galleryImages = productImages.length ? productImages : fallbackGalleryImages;
-  const features = Array.isArray(product?.features) ? product.features.filter(Boolean) : [];
+  const galleryImages = productImages.length
+    ? productImages
+    : fallbackGalleryImages;
+  const features = Array.isArray(product?.features)
+    ? product.features.filter(Boolean)
+    : [];
   const specifications = Array.isArray(product?.specifications)
     ? product.specifications.filter((item) => item?.key || item?.value)
     : [];
@@ -29,7 +33,7 @@ function ClientProductDetailScreen() {
     if (galleryImages.length <= 1) return;
 
     setCurrentImageIndex((current) =>
-      current === 0 ? galleryImages.length - 1 : current - 1
+      current === 0 ? galleryImages.length - 1 : current - 1,
     );
   };
 
@@ -37,7 +41,7 @@ function ClientProductDetailScreen() {
     if (galleryImages.length <= 1) return;
 
     setCurrentImageIndex((current) =>
-      current === galleryImages.length - 1 ? 0 : current + 1
+      current === galleryImages.length - 1 ? 0 : current + 1,
     );
   };
 
@@ -77,9 +81,9 @@ function ClientProductDetailScreen() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#F5F9FF] text-slate-950">
       <section className="relative isolate overflow-hidden border-b border-blue-100">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.16),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(14,165,233,0.18),_transparent_30%),linear-gradient(135deg,_#ffffff_0%,_#eff6ff_45%,_#f8fafc_100%)]" />
-        <div className="absolute left-[-6rem] top-10 h-48 w-48 rounded-full bg-blue-200/25 blur-3xl sm:h-72 sm:w-72" />
-        <div className="absolute right-[-5rem] top-20 h-44 w-44 rounded-full bg-cyan-200/30 blur-3xl sm:h-64 sm:w-64" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.18),transparent_30%),linear-gradient(135deg,#ffffff_0%,#eff6ff_45%,#f8fafc_100%)]" />
+        <div className="absolute -left-24 top-10 h-48 w-48 rounded-full bg-blue-200/25 blur-3xl sm:h-72 sm:w-72" />
+        <div className="absolute -right-20 top-20 h-44 w-44 rounded-full bg-cyan-200/30 blur-3xl sm:h-64 sm:w-64" />
 
         {/* <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <button
@@ -123,7 +127,7 @@ function ClientProductDetailScreen() {
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="rounded-[30px] border border-blue-100 bg-white/90 p-4 shadow-[0_22px_70px_rgba(15,91,191,0.10)] backdrop-blur sm:p-5">
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,_#eff6ff_0%,_#ffffff_52%,_#f8fafc_100%)]">
+              <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_52%,#f8fafc_100%)]">
                 <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
                   <span className="rounded-full border border-white/75 bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.24em] text-slate-500 shadow-sm backdrop-blur">
                     Product Gallery
@@ -215,7 +219,8 @@ function ClientProductDetailScreen() {
                 icon={<InfoIcon className="h-5 w-5" />}
               >
                 <p className="text-sm leading-7 text-slate-600 sm:text-base">
-                  {product?.description || "No description available for this product."}
+                  {product?.description ||
+                    "No description available for this product."}
                 </p>
               </ContentSection>
 
@@ -253,7 +258,9 @@ function ClientProductDetailScreen() {
                         key={item?._id || `${item?.key}-${index}`}
                         className={[
                           "grid gap-2 px-4 py-4 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] sm:px-5",
-                          index !== specifications.length - 1 ? "border-b border-slate-200" : "",
+                          index !== specifications.length - 1
+                            ? "border-b border-slate-200"
+                            : "",
                         ].join(" ")}
                       >
                         <p className="text-sm font-semibold text-slate-900 sm:text-[15px]">
@@ -348,7 +355,11 @@ function StatusPanel({
           isError ? "bg-red-50 text-red-500" : "bg-blue-50 text-blue-600",
         ].join(" ")}
       >
-        {isError ? <AlertIcon className="h-7 w-7" /> : <GalleryIcon className="h-7 w-7" />}
+        {isError ? (
+          <AlertIcon className="h-7 w-7" />
+        ) : (
+          <GalleryIcon className="h-7 w-7" />
+        )}
       </div>
       <h1 className="mt-5 text-2xl font-black text-slate-950">{title}</h1>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-600">
@@ -403,7 +414,10 @@ function LoadingState() {
           <div className="rounded-[30px] border border-blue-100 bg-white px-5 py-6 shadow-[0_22px_70px_rgba(15,91,191,0.08)] sm:px-7 sm:py-8">
             <div className="space-y-7 animate-pulse">
               {[1, 2, 3, 4].map((section) => (
-                <div key={section} className="border-b border-slate-200 pb-6 last:border-b-0 last:pb-0">
+                <div
+                  key={section}
+                  className="border-b border-slate-200 pb-6 last:border-b-0 last:pb-0"
+                >
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-2xl bg-blue-100" />
                     <div className="h-4 w-32 rounded-full bg-slate-100" />

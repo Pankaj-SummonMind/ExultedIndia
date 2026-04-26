@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useGetAllSocialMediaQuery, useGetCategoriesQuery, useGetSubCategoriesQuery } from "../services/api";
+import {
+  useGetAllSocialMediaQuery,
+  useGetCategoriesQuery,
+  useGetSubCategoriesQuery,
+} from "../services/api";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -12,8 +16,8 @@ const navItems = [
 function ClientLayout() {
   const navigate = useNavigate();
   const { data: categoriesResponse, isLoading } = useGetCategoriesQuery();
-  const {data:subCategoryResponse} = useGetSubCategoriesQuery()
-  const {data: SocialMediaAccounts} = useGetAllSocialMediaQuery()
+  const { data: subCategoryResponse } = useGetSubCategoriesQuery();
+  const { data: SocialMediaAccounts } = useGetAllSocialMediaQuery();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
   const [activeCategoryId, setActiveCategoryId] = useState(null);
@@ -66,14 +70,19 @@ function ClientLayout() {
             </span>
           </NavLink>
 
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+          <nav
+            className="hidden items-center gap-1 lg:flex"
+            aria-label="Main navigation"
+          >
             {navItems.slice(0, 1).map((item) => (
               <NavItem key={item.to} item={item} />
             ))}
 
             <div
               className="group relative"
-              onMouseEnter={() => setActiveCategoryId(categories[0]?._id ?? null)}
+              onMouseEnter={() =>
+                setActiveCategoryId(categories[0]?._id ?? null)
+              }
             >
               <NavLink
                 to="/products"
@@ -162,7 +171,7 @@ function ClientLayout() {
               to="/contact"
               className="rounded-full bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition hover:-translate-y-0.5 hover:bg-blue-700"
             >
-              Get in Touch 
+              Get in Touch
             </NavLink>
           </div>
 
@@ -173,14 +182,20 @@ function ClientLayout() {
             onClick={() => setIsMenuOpen((value) => !value)}
             className="grid h-11 w-11 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-700 shadow-sm transition hover:border-blue-300 hover:bg-blue-100 lg:hidden"
           >
-            {isMenuOpen ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+            {isMenuOpen ? (
+              <XIcon className="h-5 w-5" />
+            ) : (
+              <MenuIcon className="h-5 w-5" />
+            )}
           </button>
         </div>
 
         <div
           className={[
             "grid overflow-hidden border-t border-blue-50 bg-white/96 transition-all duration-300 lg:hidden",
-            isMenuOpen ? "max-h-[calc(100vh-72px)] opacity-100" : "max-h-0 opacity-0",
+            isMenuOpen
+              ? "max-h-[calc(100vh-72px)] opacity-100"
+              : "max-h-0 opacity-0",
           ].join(" ")}
         >
           <div className="max-h-[calc(100vh-72px)] overflow-y-auto px-4 py-4">
@@ -202,16 +217,25 @@ function ClientLayout() {
             <div
               className={[
                 "grid overflow-hidden transition-all duration-300",
-                isMobileProductsOpen ? "max-h-180 opacity-100" : "max-h-0 opacity-0",
+                isMobileProductsOpen
+                  ? "max-h-180 opacity-100"
+                  : "max-h-0 opacity-0",
               ].join(" ")}
             >
               <div className="mt-2 rounded-2xl border border-blue-100 bg-slate-50 p-2">
-                <MobileLink to="/products" label="All Products" onClick={closeMobileMenu} />
+                <MobileLink
+                  to="/products"
+                  label="All Products"
+                  onClick={closeMobileMenu}
+                />
                 {isLoading ? (
                   <DropdownState label="Loading categories..." />
                 ) : categories.length ? (
                   categories.map((category) => (
-                    <div key={category._id} className="rounded-xl bg-white/70 p-1">
+                    <div
+                      key={category._id}
+                      className="rounded-xl bg-white/70 p-1"
+                    >
                       <button
                         type="button"
                         onClick={() => goToCategory(category._id)}
@@ -274,165 +298,167 @@ function ClientLayout() {
       <main>
         <Outlet />
       </main>
-      
+
       {/* <Footer /> */}
       <footer className="relative overflow-hidden bg-[#0f172a] text-white">
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <img
-          src="/footer-bg.jpg"
-          alt="Footer Background"
-          className="h-full w-full object-cover opacity-10"
-        />
-        <div className="absolute inset-0 bg-linear-to-r from-[#020617]/95 via-[#0f172a]/92 to-[#111827]/95" />
-      </div>
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="/footer-bg.jpg"
+            alt="Footer Background"
+            className="h-full w-full object-cover opacity-10"
+          />
+          <div className="absolute inset-0 bg-linear-to-r from-[#020617]/95 via-[#0f172a]/92 to-[#111827]/95" />
+        </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          
-          {/* Company Info */}
-          <div>
-            <div className="flex items-center gap-4">
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/30">
-                <BoltIcon className="h-7 w-7 text-white" />
+        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+            {/* Company Info */}
+            <div>
+              <div className="flex items-center gap-4">
+                <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/30">
+                  <BoltIcon className="h-7 w-7 text-white" />
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-black tracking-wide">
+                    Exaulted India
+                  </h3>
+                  <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-300">
+                    Future Power Systems
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h3 className="text-xl font-black tracking-wide">
-                  Exaulted India
-                </h3>
-                <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-300">
-                  Future Power Systems
-                </p>
+              <p className="mt-5 text-sm leading-7 text-slate-300">
+                Leading manufacturer of Battery, Inverter, Transformer, Online
+                UPS, Gensets and EV Chargers with trusted Pan India support.
+              </p>
+
+              {/* Social */}
+              <div className="mt-6 flex gap-3">
+                {(SocialMediaAccounts?.data || [])
+                  .filter((item) =>
+                    [
+                      "instagram",
+                      "facebook",
+                      "twitter",
+                      "youtube",
+                      "linkedin",
+                    ].includes(item.key?.toLowerCase()),
+                  )
+                  .map((item) => (
+                    <a
+                      key={item._id}
+                      href={item.value}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/5 text-sm font-black text-white transition hover:bg-blue-500 hover:scale-110"
+                    >
+                      {item.key === "instagram" && "in"}
+                      {item.key === "facebook" && "f"}
+                      {item.key === "twitter" && "x"}
+                      {item.key === "youtube" && "yt"}
+                      {item.key === "linkedin" && "li"}
+                    </a>
+                  ))}
               </div>
             </div>
 
-            <p className="mt-5 text-sm leading-7 text-slate-300">
-              Leading manufacturer of Battery, Inverter, Transformer,
-              Online UPS, Gensets and EV Chargers with trusted Pan India support.
-            </p>
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-lg font-black text-white">Quick Links</h4>
 
-            {/* Social */}
-            <div className="mt-6 flex gap-3">
-  {(SocialMediaAccounts?.data || []).filter((item) => ["instagram", "facebook", "twitter", "youtube", "linkedin"].includes(item.key?.toLowerCase())).map((item) => (
-    <a
-      key={item._id}
-      href={item.value}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/5 text-sm font-black text-white transition hover:bg-blue-500 hover:scale-110"
-    >
-      {item.key === "instagram" && "in"}
-      {item.key === "facebook" && "f"}
-      {item.key === "twitter" && "x"}
-      {item.key === "youtube" && "yt"}
-      {item.key === "linkedin" && "li"}
-    </a>
-  ))}
-</div>
-          </div>
+              <div className="mt-5 grid gap-3">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.label}
+                    to={item.to}
+                    className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-blue-400"
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-lg font-black text-white">
-              Quick Links
-            </h4>
+            {/* Products */}
+            <div>
+              <h4 className="text-lg font-black text-white">Products</h4>
 
-            <div className="mt-5 grid gap-3">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.label}
-                  to={item.to}
-                  className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-blue-400"
-                >
-                  {item.label}
-                </NavLink>
-              ))}
+              <div className="mt-5 grid gap-3">
+                {categories.map((category) => (
+                  <a
+                    key={category._id}
+                    href={`/products/category/${category._id}`}
+                    className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-emerald-400"
+                  >
+                    {category.categories_name}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-lg font-black text-white">Contact</h4>
+
+              <p className="mt-4 text-sm leading-7 text-slate-300">
+                If you have any questions or need help, feel free to contact
+                with our team.
+              </p>
+
+              <div className="mt-6 space-y-4">
+                {(SocialMediaAccounts?.data || [])
+                  .filter((item) =>
+                    ["phone", "mail", "whatsapp"].includes(
+                      item.key?.toLowerCase(),
+                    ),
+                  )
+                  .map((item) => (
+                    <div key={item._id} className="flex items-start gap-3">
+                      <div
+                        className={`grid h-10 w-10 place-items-center rounded-xl ${
+                          item.key?.toLowerCase() === "phone"
+                            ? "bg-blue-500/20 text-blue-400"
+                            : item.key?.toLowerCase() === "email"
+                              ? "bg-emerald-500/20 text-emerald-400"
+                              : "bg-green-500/20 text-green-400"
+                        }`}
+                      >
+                        {/* Icon */}
+                      </div>
+
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                          {item.key}
+                        </p>
+
+                        <p className="text-sm font-semibold text-white">
+                          {item.value}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
             </div>
           </div>
 
-          {/* Products */}
-          <div>
-            <h4 className="text-lg font-black text-white">
-              Products
-            </h4>
+          {/* Bottom */}
+          <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+            <p>© 2026 Exaulted India. All rights reserved.</p>
 
-            <div className="mt-5 grid gap-3">
-              {categories.map((category) => (
-                <a
-                  key={category._id}
-                  href={`/products/category/${category._id}`}
-                  className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-emerald-400"
-                >
-                  {category.categories_name}
-                </a>
-              ))}
+            <div className="flex gap-6">
+              <a href="/" className="hover:text-white transition">
+                Privacy Policy
+              </a>
+              <a href="/" className="hover:text-white transition">
+                Terms of Use
+              </a>
             </div>
           </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="text-lg font-black text-white">
-              Contact
-            </h4>
-
-            <p className="mt-4 text-sm leading-7 text-slate-300">
-              If you have any questions or need help, feel free to
-              contact with our team.
-            </p>
-
-            <div className="mt-6 space-y-4">
-  {(SocialMediaAccounts?.data || [])
-    .filter((item) =>
-      ["phone", "mail", "whatsapp"].includes(item.key?.toLowerCase())
-    )
-    .map((item) => (
-      <div key={item._id} className="flex items-start gap-3">
-        <div
-          className={`grid h-10 w-10 place-items-center rounded-xl ${
-            item.key?.toLowerCase() === "phone"
-              ? "bg-blue-500/20 text-blue-400"
-              : item.key?.toLowerCase() === "email"
-              ? "bg-emerald-500/20 text-emerald-400"
-              : "bg-green-500/20 text-green-400"
-          }`}
-        >
-          {/* Icon */}
         </div>
-
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-            {item.key}
-          </p>
-
-          <p className="text-sm font-semibold text-white">
-            {item.value}
-          </p>
-        </div>
-      </div>
-    ))}
-</div>
-          </div>
-
-        </div>
-
-        {/* Bottom */}
-        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © 2026 Exaulted India. All rights reserved.
-          </p>
-
-          <div className="flex gap-6">
-            <a href="/" className="hover:text-white transition">
-              Privacy Policy
-            </a>
-            <a href="/" className="hover:text-white transition">
-              Terms of Use
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
+      </footer>
     </div>
   );
 }
@@ -552,13 +578,7 @@ function ArrowUpRightIcon({ className }) {
 }
 
 function Footer() {
-  const quickLinks = [
-    "Home",
-    "About",
-    "Products",
-    "Certificates",
-    "Contact",
-  ];
+  const quickLinks = ["Home", "About", "Products", "Certificates", "Contact"];
 
   const products = [
     "Battery",
@@ -582,7 +602,6 @@ function Footer() {
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          
           {/* Company Info */}
           <div>
             <div className="flex items-center gap-4">
@@ -601,8 +620,8 @@ function Footer() {
             </div>
 
             <p className="mt-5 text-sm leading-7 text-slate-300">
-              Leading manufacturer of Battery, Inverter, Transformer,
-              Online UPS, Gensets and EV Chargers with trusted Pan India support.
+              Leading manufacturer of Battery, Inverter, Transformer, Online
+              UPS, Gensets and EV Chargers with trusted Pan India support.
             </p>
 
             {/* Social */}
@@ -621,9 +640,7 @@ function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-black text-white">
-              Quick Links
-            </h4>
+            <h4 className="text-lg font-black text-white">Quick Links</h4>
 
             <div className="mt-5 grid gap-3">
               {navItems.map((item) => (
@@ -640,9 +657,7 @@ function Footer() {
 
           {/* Products */}
           <div>
-            <h4 className="text-lg font-black text-white">
-              Products
-            </h4>
+            <h4 className="text-lg font-black text-white">Products</h4>
 
             <div className="mt-5 grid gap-3">
               {categories.map((category) => (
@@ -659,13 +674,11 @@ function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-lg font-black text-white">
-              Contact
-            </h4>
+            <h4 className="text-lg font-black text-white">Contact</h4>
 
             <p className="mt-4 text-sm leading-7 text-slate-300">
-              If you have any questions or need help, feel free to
-              contact with our team.
+              If you have any questions or need help, feel free to contact with
+              our team.
             </p>
 
             <div className="mt-6 space-y-4">
@@ -698,14 +711,11 @@ function Footer() {
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Bottom */}
         <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © 2026 Exaulted India. All rights reserved.
-          </p>
+          <p>© 2026 Exaulted India. All rights reserved.</p>
 
           <div className="flex gap-6">
             <a href="/" className="hover:text-white transition">

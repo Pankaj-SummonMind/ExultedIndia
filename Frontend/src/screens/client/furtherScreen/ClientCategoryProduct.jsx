@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetCategoriesByIdQuery } from "../../../services/api";
+import {
+  useGetCategoriesByIdQuery,
+  useGetSubCategoriesQuery,
+} from "../../../services/api";
 
 const batteryDescription =
   "Exulted India offers energy efficient Batteries uniquely designed as bigger electrolyte reserve volume requires less topping up during service periods. Deep Cycle Design. Extra thick tubular plates with superfine grain structure, minimizes grid corrosion at high temperature. Exulted is offering Tubular batteries in the variants of 150Ah, 200Ah, 220Ah, 240Ah of 12V as per the requirements.";
@@ -51,15 +54,22 @@ function ClientCategoryProduct() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { data, isLoading, error } = useGetCategoriesByIdQuery(id);
+  const { data: allSubCategories, isLoading: subCatogriesLoading } =
+    useGetSubCategoriesQuery();
+  console.log("Fetched all sub categories data:", allSubCategories);
 
   const category = data?.data || {};
+  console.log("Fetched category data:", category);
   const categoryName = category?.categories_name || "Power Solutions";
-  const subCategories = useMemo(() => {
-    if (Array.isArray(category?.subCategories)) return category.subCategories;
-    return [];
-  }, [category?.subCategories]);
 
-  const heroImage = getHeroImage(categoryName);
+  const subCategories = useMemo(() => {
+    const list = allSubCategories?.data || [];
+
+    return list.filter((item) => item.category_Id?._id === id);
+  }, [allSubCategories, id]);
+  console.log("Fetched sub categories data:", subCategories);
+
+  const heroImage = category?.image?.url;
 
   const goToSubCategory = (subCategoryId) => {
     if (!subCategoryId) return;
@@ -107,10 +117,10 @@ function ClientCategoryProduct() {
               {categoryName}
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-slate-100 sm:text-lg">
-              {batteryDescription}
+              {category?.categories_description}
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            {/* <div className="mt-8 flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur">
                 <GridIcon className="h-4 w-4" />
                 {subCategories.length || 0} Sub Categories
@@ -119,7 +129,7 @@ function ClientCategoryProduct() {
                 <ShieldIcon className="h-4 w-4" />
                 Deep Cycle Design
               </span>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
@@ -171,7 +181,7 @@ function ClientCategoryProduct() {
 
 function SubCategoryCard({ subCategory, index, onOpen }) {
   const title = subCategory?.name || "Sub Category";
-  const image = getSubCategoryImage(title, index);
+  const image = subCategory?.image.url;
 
   return (
     <article
@@ -280,7 +290,9 @@ function getHeroImage(categoryName) {
 function getSubCategoryImage(name, index) {
   const key = String(name || "").toLowerCase();
   const matched = subCategoryImages.find((item) => key.includes(item.key));
-  return matched?.image || fallbackCardImages[index % fallbackCardImages.length];
+  return (
+    matched?.image || fallbackCardImages[index % fallbackCardImages.length]
+  );
 }
 
 function IconShell({ className, children }) {

@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetProductByidQuery, useGetProductQuery } from "../../../services/api";
+import {
+  useGetProductByidQuery,
+  useGetProductQuery,
+  useGetSubCategoryByIdQuery,
+} from "../../../services/api";
 
 const subCategoryDescription =
   "The Exulted Tubular battery is a robust and reliable energy storage solution designed to deliver exceptional performance in various applications. This battery utilizes advanced tubular technology, ensuring superior resilience and longer life compared to conventional batteries. Its unique design incorporates tubular positive plates, which enhance the battery's efficiency and charge retention capabilities. With excellent deep-cycling capabilities, the Exulted Tubular battery is an ideal choice for backup power systems, renewable energy storage, and UPS applications. Its dependable performance and low maintenance requirements make it a trusted option for both residential and industrial use, providing uninterrupted power supply and peace of mind.";
@@ -15,8 +19,16 @@ const fallbackImages = [
 function ClientsSubCategory() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: allProduct, isLoading, error } = useGetProductQuery();
-  console.log("data",allProduct)
+  const { data, isLoading } = useGetSubCategoryByIdQuery(id);
+  const {
+    data: allProduct,
+    isLoading: isProductLoading,
+    error,
+  } = useGetProductQuery();
+  console.log("data", allProduct);
+
+  const subCategory = data?.data;
+  console.log("subcategory", subCategory);
 
   const products = useMemo(() => {
     const rows = Array.isArray(allProduct?.data)
@@ -30,7 +42,8 @@ function ClientsSubCategory() {
 
   const subCategoryName =
     products[0]?.product_subCategory?.name || "Selected Sub Category";
-  const categoryName = products[0]?.product_category?.categories_name || "Products";
+  const categoryName =
+    products[0]?.product_category?.categories_name || "Products";
 
   if (isLoading) return <SubCategoryLoading />;
 
@@ -55,23 +68,23 @@ function ClientsSubCategory() {
         <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-18 lg:px-8">
           <div className="max-w-4xl">
             <p className="inline-flex rounded-full border border-blue-200 bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-blue-600 shadow-sm backdrop-blur">
-              {categoryName}
+              {subCategory?.category_Id?.categories_name}
             </p>
             <h1 className="mt-5 text-4xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-6xl">
-              {subCategoryName}
+              {subCategory?.name}
             </h1>
             <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base lg:text-lg lg:leading-8">
-              {subCategoryDescription}
+              {subCategory?.description}
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            {/* <div className="mt-8 flex flex-wrap gap-3">
               <MetricPill icon={<GridIcon className="h-4 w-4" />}>
                 {products.length} Product{products.length === 1 ? "" : "s"}
               </MetricPill>
               <MetricPill icon={<BoltIcon className="h-4 w-4" />}>
                 Reliable Power Range
               </MetricPill>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
@@ -83,7 +96,7 @@ function ClientsSubCategory() {
               Related Products
             </p>
             <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
-              Explore {subCategoryName}
+              Explore {subCategory?.name}
             </h2>
           </div>
         </div>
@@ -111,7 +124,7 @@ function ClientsSubCategory() {
 }
 
 function ProductCard({ product, index, onOpen }) {
-  const image = getProductImage(product, index);
+  const image = product?.images?.[0]?.url;
   const title = product?.product_name || "Product";
   const description =
     product?.description ||
@@ -214,7 +227,11 @@ function StateCard({ title, description, tone = "default" }) {
           isError ? "bg-red-50 text-red-500" : "bg-blue-50 text-blue-600",
         ].join(" ")}
       >
-        {isError ? <AlertIcon className="h-7 w-7" /> : <GridIcon className="h-7 w-7" />}
+        {isError ? (
+          <AlertIcon className="h-7 w-7" />
+        ) : (
+          <GridIcon className="h-7 w-7" />
+        )}
       </div>
       <h2 className="mt-5 text-2xl font-black text-slate-950">{title}</h2>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-600">
@@ -234,7 +251,10 @@ function MetricPill({ icon, children }) {
 }
 
 function getProductImage(product, index) {
-  return getProductImages(product)[0] || fallbackImages[index % fallbackImages.length];
+  return (
+    getProductImages(product)[0] ||
+    fallbackImages[index % fallbackImages.length]
+  );
 }
 
 function getProductImages(product) {

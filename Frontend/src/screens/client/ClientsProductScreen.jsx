@@ -36,6 +36,8 @@ function ClientsProductScreen() {
     return [];
   }, [data]);
 
+  console.log("Fetched categories:", categories);
+
   return (
     <main className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
       <BackgroundDecor />
@@ -60,7 +62,9 @@ function ClientsProductScreen() {
 
         {!isLoading && isError ? <ErrorState error={error} /> : null}
 
-        {!isLoading && !isError && categories.length === 0 ? <EmptyState /> : null}
+        {!isLoading && !isError && categories.length === 0 ? (
+          <EmptyState />
+        ) : null}
 
         {!isLoading && !isError && categories.length > 0 ? (
           <div className="grid gap-8 lg:gap-10">
@@ -80,12 +84,11 @@ function ClientsProductScreen() {
 
 function CategoryPanel({ category, index }) {
   const imageOnLeft = index % 2 === 0;
-  const image = categoryImages[index % categoryImages.length];
-  const title = category.categories_name || "Power Category";
+  const title = category.categories_name;
   const subCategories = Array.isArray(category.subCategories)
     ? category.subCategories
     : [];
-  const description = getCategoryDescription(title, subCategories.length);
+  const description = category.categories_description;
 
   return (
     <article className="group relative overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_24px_90px_rgba(15,91,191,0.1)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_34px_110px_rgba(15,91,191,0.16)]">
@@ -100,44 +103,36 @@ function CategoryPanel({ category, index }) {
 
       <div
         className={[
-          "relative grid min-h-110 lg:grid-cols-2",
+          "relative grid h-130 lg:grid-cols-2",
           imageOnLeft ? "" : "lg:[&_.category-image]:order-2",
         ].join(" ")}
       >
-        <div className="category-image relative min-h-75 overflow-hidden bg-blue-50 lg:min-h-full">
+        {/* IMAGE */}
+        <div className="category-image relative h-full overflow-hidden bg-blue-50">
           <img
-            src={image}
+            src={category.image.url}
             alt={`${title} category by Exaulted India`}
             loading="lazy"
             className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
           />
-          {/* <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.58),rgba(96,165,250,0.18),rgba(34,197,94,0.12))]" />
-          <div className="absolute bottom-5 left-5 rounded-2xl border border-white/55 bg-white/72 px-4 py-3 shadow-xl backdrop-blur-xl">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
-              Exaulted Range
-            </p>
-            <p className="mt-1 text-sm font-bold text-slate-800">
-              {subCategories.length || "Premium"} options
-            </p>
-          </div> */}
         </div>
 
-        <div className="relative flex items-center bg-[#111827] p-6 sm:p-8 lg:p-10">
+        {/* CONTENT */}
+        <div className="relative flex h-full items-center bg-[#111827] p-6 sm:p-8 lg:p-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(96,165,250,0.24),transparent_32%),radial-gradient(circle_at_20%_82%,rgba(34,197,94,0.18),transparent_28%)]" />
-          <div className="relative max-w-xl">
+
+          <div className="relative flex h-full max-w-xl flex-col justify-center">
             <div className="flex items-center gap-3">
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25">
                 <BoltIcon className="h-6 w-6" />
               </span>
-              {/* <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-300">
-                Category {String(index + 1).padStart(2, "0")}
-              </p> */}
             </div>
 
             <h2 className="mt-5 text-3xl font-black leading-tight text-white sm:text-4xl">
               {title}
             </h2>
-            <p className="mt-5 text-sm leading-7 text-slate-300 sm:text-base">
+
+            <p className="mt-5 text-sm leading-7 text-slate-300 sm:text-base line-clamp-6">
               {description}
             </p>
 
@@ -152,6 +147,7 @@ function CategoryPanel({ category, index }) {
                     {subCategory.name}
                   </NavLink>
                 ))}
+
                 {subCategories.length > 5 ? (
                   <span className="rounded-full border border-white/10 bg-white/8 px-3 py-2 text-xs font-bold text-slate-300">
                     +{subCategories.length - 5} more
@@ -162,7 +158,7 @@ function CategoryPanel({ category, index }) {
 
             <NavLink
               to={`/products/category/${category._id}`}
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-blue-400 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-400/25 transition hover:-translate-y-0.5 hover:bg-blue-500"
+              className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-blue-400 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-400/25 transition hover:-translate-y-0.5 hover:bg-blue-500"
             >
               View More
               <ArrowUpRightIcon className="h-4 w-4" />
@@ -176,7 +172,9 @@ function CategoryPanel({ category, index }) {
 
 function getCategoryDescription(title, subCategoryCount) {
   const key = title.toLowerCase();
-  const matchedKey = Object.keys(categoryCopy).find((item) => key.includes(item));
+  const matchedKey = Object.keys(categoryCopy).find((item) =>
+    key.includes(item),
+  );
   const base =
     categoryCopy[matchedKey] ||
     "A carefully built product category from Exaulted India, focused on premium performance, dependable operation, and professional-grade support.";
