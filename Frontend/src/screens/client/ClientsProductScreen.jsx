@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { useGetCategoriesQuery } from "../../services/api";
+import { Helmet } from "react-helmet-async";
 
 const categoryImages = [
   "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1200&q=80",
@@ -40,8 +41,13 @@ function ClientsProductScreen() {
 
   return (
     <main className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
-      <BackgroundDecor />
+      <Helmet>
+        <title>Products | Exulted India</title>
+        <meta name="description" content="Explore Exulted India's premium range of batteries, inverters, transformers, online UPS, gensets, and power ecosystem products. Discover high-quality solutions for reliable energy storage, efficient power conversion, and seamless backup across residential, commercial, and industrial applications." />
+        <meta name="keywords" content="Exulted India products, batteries, inverters, transformers, online UPS, gensets, power ecosystem, energy storage solutions, reliable power backup" />
+      </Helmet>
 
+      <BackgroundDecor />
       {/* <section className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
         <div className="max-w-3xl">
           <p className="inline-flex rounded-full border border-blue-200 bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-blue-500 shadow-sm backdrop-blur">

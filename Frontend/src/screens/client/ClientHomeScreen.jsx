@@ -6,6 +6,7 @@ import {
   useGetCategoriesQuery,
   useGetHomePageQuery,
 } from "../../services/api";
+import { Helmet } from "react-helmet-async";
 
 const heroImage =
   "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=80";
@@ -150,6 +151,14 @@ function ClientHomeScreen() {
 
   return (
     <div className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
+
+      <Helmet>
+        <title>Exulted India | Batteries, UPS & EV Chargers</title>
+        <meta name="description" content="Discover Exaulted India's range of premium power systems, including EV chargers, batteries, inverters, online UPS, generators, transformers, and more. Explore our products, certifications, and pan-India service coverage." />
+        <meta name="keywords" content="Exaulted India, power systems, EV chargers, batteries, inverters, online UPS, generators, transformers, certifications, pan-India service" />
+      </Helmet>
+
+
       <SeoBlock />
       <LocalAnimationStyles />
       {/* <LoadingScreen /> */}
@@ -161,14 +170,14 @@ function ClientHomeScreen() {
       <ProductShowcase data={home?.homeCategory} />
       <WhyChooseUs data={home?.whyChooseUs} />
       <CoverageSection data={home?.locations} />
+      <CertificatesSection
+        certificates={certificates?.data || []}
+        // onPreview={setPreviewCertificate}
+      />
       <Testimonials
         activeIndex={activeTestimonial}
         onChange={setActiveTestimonial}
         data={home?.testimonials}
-      />
-      <CertificatesSection
-        certificates={certificates?.data || []}
-        // onPreview={setPreviewCertificate}
       />
       <CtaBanner joinUs={home?.joinUs} />
       {/* <Footer /> */}
@@ -216,10 +225,10 @@ function HeroSection({ data }) {
             Exaulted India
           </p>
 
-          <h2 className="mt-7 max-w-3xl text-4xl font-black leading-[1.03] text-white sm:text-5xl lg:text-6xl">
+          <h2 className="mt-7 max-w-3xl text-2xl font-black leading-[1.03] text-white sm:text-5xl lg:text-2xl">
             {data?.title}
           </h2>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg">
+          <p className="mt-5 max-w-2xl text-lg leading-7 text-slate-200 sm:text-lg">
             {data?.subTitle}
           </p>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
@@ -229,13 +238,13 @@ function HeroSection({ data }) {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <NavLink
               to="/products"
-              className="rounded-full bg-blue-400 px-6 py-3 text-center text-sm font-bold text-white shadow-[0_18px_45px_rgba(96,165,250,0.35)] transition hover:-translate-y-1 hover:bg-blue-500"
+              className="rounded-full bg-blue-400 px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_18px_45px_rgba(96,165,250,0.35)] transition hover:-translate-y-1 hover:bg-blue-500"
             >
               Explore Products
             </NavLink>
             <NavLink
               to="/contact"
-              className="rounded-full border border-white/25 bg-white/10 px-6 py-3 text-center text-sm font-bold text-white backdrop-blur-xl transition hover:-translate-y-1 hover:border-emerald-300 hover:bg-emerald-400/15"
+              className="rounded-full border border-white/25 bg-white/10 px-6 py-3 text-center text-sm font-semibold text-white backdrop-blur-xl transition hover:-translate-y-1 hover:border-emerald-300 hover:bg-emerald-400/15"
             >
               Contact Us
             </NavLink>
@@ -315,7 +324,7 @@ function ProductDetail({ data }) {
                     {/* <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-300">
                       DC Fast Charger
                     </p> */}
-                    <h3 className="mt-2 text-2xl font-black">{data?.title}</h3>
+                    <h3 className="mt-2 text-xl font-black">{data?.title}</h3>
                   </div>
 
                   <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white">
@@ -360,7 +369,7 @@ function ProductDetail({ data }) {
         <div className="relative z-20 shrink-0">
           <NavLink
             to="/aboutus"
-            className="rounded-2xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-blue-700 hover:scale-105 inline-block"
+            className="rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semiBold text-white shadow-xl transition hover:bg-blue-700 hover:scale-105 inline-block"
           >
             More About Us
           </NavLink>
@@ -376,7 +385,7 @@ function HeroMetric({ label, value }) {
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
         {label}
       </p>
-      <p className="mt-1 text-2xl font-black text-white">{value}</p>
+      <p className="mt-1 text-base font-black text-white">{value}</p>
     </div>
   );
 }
@@ -391,7 +400,7 @@ function StatsSection({ data }) {
             className="rounded-2xl border border-blue-100 bg-white/85 p-5 motion-safe:animate-[revealUp_700ms_ease-out_both]"
             style={{ animationDelay: item.delay }}
           >
-            <p className="text-2xl font-black text-[#111827] sm:text-3xl">
+            <p className="text-lg font-black text-[#111827] sm:text-lg">
               {item.value}
             </p>
             <p className="mt-2 text-sm font-semibold text-slate-500">
@@ -429,7 +438,7 @@ function ProductShowcase({ data }) {
             </div>
 
             <div className="p-5">
-              <h3 className="text-lg font-black text-[#111827]">
+              <h3 className="text-base font-black text-[#111827]">
                 {category.categories_name}
               </h3>
 
@@ -438,8 +447,8 @@ function ProductShowcase({ data }) {
               </p>
 
               <NavLink
-                to="/products"
-                className="mt-5 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-600 transition group-hover:bg-blue-400 group-hover:text-white"
+                to={`/products/category/${category._id}`}
+                className="mt-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-600 transition group-hover:bg-blue-400 group-hover:text-white"
               >
                 Learn More
                 <ArrowUpRightIcon className="h-4 w-4" />
@@ -465,10 +474,10 @@ function WhyChooseUs({ data }) {
               <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25 transition group-hover:bg-emerald-400">
                 {/* <item.Icon className="h-6 w-6" /> */}
               </div>
-              <h3 className="mt-5 text-lg font-black text-[#111827]">
+              <h3 className="mt-3 text-sm font-black text-[#111827]">
                 {item.label}
               </h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
+              <p className="mt-2 text-sm leading-5 text-slate-600">
                 {item.detail}
               </p>
             </article>
@@ -482,16 +491,16 @@ function WhyChooseUs({ data }) {
 function CoverageSection({ data }) {
   return (
     <SectionShell eyebrow="Pan India Coverage" title={data?.title}>
-      <div className="grid gap-8 rounded-[30px] border border-blue-100 bg-white/80 p-5 shadow-[0_24px_80px_rgba(15,91,191,0.1)] backdrop-blur-xl lg:grid-cols-[0.92fr_1.08fr] lg:p-8">
+      <div className="grid gap-8 rounded-[30px] border border-blue-100 bg-white/80 p-5 shadow-[0_24px_80px_rgba(15,91,191,0.1)] backdrop-blur-xl lg:grid-cols-[0.92fr_1.08fr] lg:p-8 ">
         {/* LEFT CONTENT */}
-        <div className="self-center">
+        <div >
           <p className="text-sm leading-7 text-slate-600">{data?.detail}</p>
 
           <div className="mt-6 flex flex-wrap gap-2">
             {data?.locations.map((city) => (
               <span
                 key={city}
-                className="rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700"
+                className="rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-xs font-bold text-blue-700"
               >
                 {city}
               </span>
@@ -550,13 +559,13 @@ function Testimonials({ activeIndex, onChange, data }) {
           <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
             {/* Left Side */}
             <div>
-              <p className="text-5xl font-black text-blue-300">“</p>
+              <p className="text-3xl font-black text-blue-300">“</p>
 
-              <p className="mt-2 text-lg leading-8 text-white sm:text-xl">
+              <p className=" text-base leading-6 text-white sm:text-base">
                 {active?.message}
               </p>
 
-              <div className="mt-6">
+              <div className="mt-4">
                 <p className="font-black text-white">{active?.name}</p>
 
                 <p className="text-sm font-semibold text-blue-200">
@@ -668,7 +677,7 @@ function CertificatePreview({ certificate, onClose }) {
 }
 
 function CtaBanner({ joinUs }) {
-  console.log("Join Us Data:", joinUs);
+  // console.log("Join Us Data:", joinUs);
   return (
     <SectionShell>
       <div className="relative overflow-hidden rounded-4xl bg-[#111827] p-8 text-white shadow-[0_28px_100px_rgba(17,24,39,0.22)] sm:p-10 lg:p-12">
@@ -679,7 +688,7 @@ function CtaBanner({ joinUs }) {
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-300">
               Partner with us
             </p>
-            <h2 className="mt-3 text-3xl font-black sm:text-4xl">
+            <h2 className="mt-3 text-xl font-black sm:text-xl">
               {joinUs?.title}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
@@ -688,7 +697,7 @@ function CtaBanner({ joinUs }) {
           </div>
           <NavLink
             to="/contact"
-            className="w-fit rounded-full bg-blue-400 px-6 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/25 transition hover:-translate-y-1 hover:bg-blue-500"
+            className="w-fit rounded-full bg-blue-400 px-6 py-3 text-sm font-semiBold text-white shadow-xl shadow-blue-500/25 transition hover:-translate-y-1 hover:bg-blue-500"
           >
             Start Inquiry
           </NavLink>
@@ -816,12 +825,12 @@ function SectionShell({
   return (
     <section
       className={[
-        "relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8",
+        "relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8",
         className,
       ].join(" ")}
     >
       {eyebrow || title || action ? (
-        <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+        <div className="mb-5 flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             {eyebrow ? (
               <p
@@ -836,7 +845,7 @@ function SectionShell({
             {title ? (
               <h2
                 className={[
-                  "mt-3 max-w-3xl text-3xl font-black leading-tight sm:text-4xl",
+                  "mt-1 max-w-3xl text-xl font-black leading-tight sm:text-xl",
                   dark ? "text-white" : "text-[#111827]",
                 ].join(" ")}
               >

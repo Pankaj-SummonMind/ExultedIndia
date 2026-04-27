@@ -5,6 +5,7 @@ import {
   useGetProductQuery,
   useGetSubCategoryByIdQuery,
 } from "../../../services/api";
+import { Helmet } from "react-helmet-async";
 
 const subCategoryDescription =
   "The Exulted Tubular battery is a robust and reliable energy storage solution designed to deliver exceptional performance in various applications. This battery utilizes advanced tubular technology, ensuring superior resilience and longer life compared to conventional batteries. Its unique design incorporates tubular positive plates, which enhance the battery's efficiency and charge retention capabilities. With excellent deep-cycling capabilities, the Exulted Tubular battery is an ideal choice for backup power systems, renewable energy storage, and UPS applications. Its dependable performance and low maintenance requirements make it a trusted option for both residential and industrial use, providing uninterrupted power supply and peace of mind.";
@@ -41,7 +42,7 @@ function ClientsSubCategory() {
   }, [allProduct, id]);
 
   const subCategoryName =
-    products[0]?.product_subCategory?.name || "Selected Sub Category";
+    products[0]?.product_subCategory?.name;
   const categoryName =
     products[0]?.product_category?.categories_name || "Products";
 
@@ -63,7 +64,20 @@ function ClientsSubCategory() {
 
   return (
     <main className="overflow-hidden bg-[#F8FAFC] text-slate-950">
+
+      <Helmet>
+        <title>{`${subCategory?.name} | Exulted India`}</title>
+        <meta name="description" content={subCategory?.description || `Discover our range of ${subCategory?.name} at Exulted India. Explore high-quality products, certifications, and pan-India service coverage for all your power needs.`} />
+        <meta name="keywords" content={`Exulted India, ${subCategory?.name}, power solutions, product range, certifications, pan-India service`} />
+      </Helmet>
+
+
       <section className="relative border-b border-blue-100 bg-white">
+        <img
+          src={subCategory?.image.url}
+          alt={`${subCategory?.name} category`}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(219,234,254,0.78),rgba(255,255,255,0.92)_45%,rgba(240,253,244,0.76))]" />
         <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-18 lg:px-8">
           <div className="max-w-4xl">
@@ -131,7 +145,7 @@ function ProductCard({ product, index, onOpen }) {
     "Premium Exulted India product designed for dependable power performance and long service life.";
 
   return (
-    <article className="group flex h-[430px] flex-col overflow-hidden rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.18)]">
+    <article className="group flex h-107.5 flex-col overflow-hidden rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.18)]">
       <button
         type="button"
         onClick={onOpen}
@@ -191,7 +205,7 @@ function SubCategoryLoading() {
           {[1, 2, 3, 4].map((item) => (
             <div
               key={item}
-              className="h-[430px] animate-pulse rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)]"
+              className="h-107.5 animate-pulse rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)]"
             >
               <div className="h-[58%] rounded-t-[22px] bg-blue-100" />
               <div className="p-4">

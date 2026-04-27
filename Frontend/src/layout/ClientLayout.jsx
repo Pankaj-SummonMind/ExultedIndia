@@ -28,9 +28,27 @@ function ClientLayout() {
     return [];
   }, [categoriesResponse]);
 
-  const activeCategory =
+  const subCategories = useMemo(() => {
+  if (Array.isArray(subCategoryResponse?.data)) return subCategoryResponse.data;
+  if (Array.isArray(subCategoryResponse)) return subCategoryResponse;
+  return [];
+}, [subCategoryResponse]);
+
+const activeCategory =
     categories.find((category) => category._id === activeCategoryId) ||
-    categories[0];
+    categories[0]
+
+const activeSubCategories = useMemo(() => {
+  if (!activeCategory?._id) return [];
+
+  return subCategories.filter(
+    (item) =>
+      item.category_Id === activeCategory._id ||
+      item.category_Id?._id === activeCategory._id
+  );
+}, [subCategories, activeCategory]);
+
+  
 
   const closeMobileMenu = () => {
     setIsMenuOpen(false);
@@ -135,15 +153,15 @@ function ClientLayout() {
                     <p className="px-3 py-2 text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">
                       Sub Categories
                     </p>
-                    {activeCategory?.subCategories?.length ? (
-                      activeCategory.subCategories.map((subCategory) => (
+                    {activeSubCategories.length ? (
+                      activeSubCategories.map((subCategory) => (
                         <button
                           key={subCategory._id}
                           type="button"
                           onClick={() => goToSubCategory(subCategory._id)}
                           className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
                         >
-                          <span>{subCategory.name}</span>
+                          <span>{subCategory.subCategories_Name || subCategory.name}</span>
                           <ArrowUpRightIcon className="h-4 w-4" />
                         </button>
                       ))

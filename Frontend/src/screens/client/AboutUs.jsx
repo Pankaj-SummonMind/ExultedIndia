@@ -1,3 +1,6 @@
+import { Helmet } from "react-helmet-async";
+import { useGetAboutUsQuery } from "../../services/api";
+
 const heroImage =
   "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80";
 const factoryImage =
@@ -52,23 +55,35 @@ const splitSections = [
 ];
 
 function AboutUs() {
+   const { data } = useGetAboutUsQuery();
+   console.log("about us data : ",data)
+   const AboutUsData = data?.data;
+   const missionData = AboutUsData?.mission;
+   const researchData = AboutUsData?.research;
+    const visionData = AboutUsData?.vision;
   return (
     <main className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
+      <Helmet>
+        <title>About Us | Exulted India</title>
+        <meta name="description" content="Learn about Exulted India's mission, vision, and commitment to sustainable energy solutions. Discover our journey, values, and dedication to providing high-quality power products for a greener future." />
+        <meta name="keywords" content="Exulted India, about us, mission, vision, sustainable energy, power products, company values, green future" />
+      </Helmet>
+      
       <LocalStyles />
       <FloatingParticles />
-      <HeroAbout />
-      <CompanyOverview />
+      <HeroAbout AboutUsData={AboutUsData}/>
+      <CompanyOverview AboutUsData={AboutUsData}/>
 
       <section className="relative mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:px-8">
-        {splitSections.map((section, index) => (
-          <SplitInfoSection key={section.eyebrow} section={section} index={index} />
-        ))}
+          <SplitInfoSection AboutUsData={missionData} eyebrow="Mission"/>
+          <SplitInfoSection AboutUsData={researchData} eyebrow="Our Research"/>
+          <SplitInfoSection AboutUsData={visionData} eyebrow="Vision"/>
       </section>
     </main>
   );
 }
 
-function HeroAbout() {
+function HeroAbout({AboutUsData}) {
   return (
     <section className="relative overflow-hidden bg-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(96,165,250,0.18),transparent_28%),radial-gradient(circle_at_80%_18%,rgba(34,197,94,0.12),transparent_30%)]" />
@@ -78,15 +93,14 @@ function HeroAbout() {
             About Us
           </p>
           <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight text-[#111827] sm:text-5xl lg:text-6xl">
-            Powering Sustainable Mobility Since 2017
+            {AboutUsData?.hero?.heading}
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-            Leading EV charger manufacturer driving cleaner transportation with
-            advanced technology.
+            {AboutUsData?.hero?.subHeading}
           </p>
           <div className="mt-8 grid max-w-xl gap-3 sm:grid-cols-3">
-            {heroStats.map((item, index) => (
-              <GlassStat key={item.label} item={item} delay={index * 120} />
+            {AboutUsData?.companyStats.map((item, index) => index < 3 && (
+              <GlassStat key={item.key} item={item} delay={index * 120} />
             ))}
           </div>
         </div>
@@ -96,7 +110,7 @@ function HeroAbout() {
           <div className="relative grid gap-4 sm:grid-cols-[0.85fr_1.15fr]">
             <div className="space-y-4 sm:pt-14">
               <ImageTile
-                src={factoryImage}
+                src={AboutUsData?.hero?.images[0].url}
                 alt="Exulted India factory and manufacturing facility"
                 className="h-52"
               />
@@ -104,13 +118,13 @@ function HeroAbout() {
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-600">
                   Quality Core
                 </p>
-                <p className="mt-2 text-2xl font-black text-[#111827]">EV + Power</p>
+                <p className="mt-2 text-2xl font-black text-[#111827]">Energy + Power</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <ImageTile
-                src={heroImage}
+                src={AboutUsData?.hero?.images[1].url}
                 alt="Company employee working on advanced power product"
                 className="h-64"
               />
@@ -118,13 +132,13 @@ function HeroAbout() {
                 <div className="absolute right-4 top-4 h-24 w-24 rounded-full bg-blue-400/24 blur-2xl" />
                 <div className="relative flex items-center gap-4">
                   <img
-                    src={chargerImage}
+                    src={AboutUsData?.hero?.images[2].url}
                     alt="Floating EV charger product"
                     className="h-24 w-24 rounded-2xl object-cover shadow-xl motion-safe:animate-[softFloat_4s_ease-in-out_infinite]"
                   />
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-200">
-                      Charger Systems
+                      Energy Systems
                     </p>
                     <p className="mt-2 text-xl font-black">Built for scale</p>
                   </div>
@@ -138,14 +152,14 @@ function HeroAbout() {
   );
 }
 
-function CompanyOverview() {
+function CompanyOverview({ AboutUsData }) {
   return (
     <section className="relative bg-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
         <div className="relative">
           <div className="absolute -left-4 -top-4 h-32 w-32 rounded-full bg-emerald-300/20 blur-2xl" />
           <ImageTile
-            src={factoryImage}
+            src={AboutUsData?.companyOverview?.image.url}
             alt="Modern factory and production team"
             className="relative h-107.5"
           />
@@ -156,19 +170,16 @@ function CompanyOverview() {
             Company Overview
           </p>
           <h2 className="mt-4 text-3xl font-black leading-tight text-[#111827] sm:text-4xl">
-            Company Overview
+            {AboutUsData?.companyOverview?.heading}
           </h2>
           <p className="mt-5 text-base leading-8 text-slate-600">
-            Drone Power is a dynamic EV charger manufacturing company established
-            in 2017, specializing in chargers for scooters, e-rickshaws, autos,
-            and charging stations. Exulted India carries the same future-facing
-            power identity with strong manufacturing depth in batteries,
-            inverters, and EV energy systems.
+            {AboutUsData?.companyOverview?.detail}
           </p>
 
+
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {overviewStats.map((stat, index) => (
-              <OverviewStat key={stat.label} stat={stat} delay={index * 120} />
+            {AboutUsData?.companyStats.map((stat, index) => (
+              <OverviewStat key={stat.key} stat={stat} delay={index * 120} />
             ))}
           </div>
         </div>
@@ -177,18 +188,18 @@ function CompanyOverview() {
   );
 }
 
-function SplitInfoSection({ section, index }) {
-  const ImageIcon = section.Icon;
+function SplitInfoSection({AboutUsData, eyebrow}) {
+  // const ImageIcon = section.Icon;
 
   return (
     <article
       className="grid overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_24px_90px_rgba(15,91,191,0.1)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_34px_110px_rgba(15,91,191,0.16)] lg:grid-cols-2"
-      style={{ animationDelay: `${index * 120}ms` }}
+      // style={{ animationDelay: `${index * 120}ms` }}
     >
       <div className="relative min-h-80 overflow-hidden">
         <img
-          src={section.image}
-          alt={section.imageAlt}
+          src={AboutUsData?.image?.url}
+          alt="mission image"
           loading="lazy"
           className="h-full w-full object-cover transition duration-700 hover:scale-105"
         />
@@ -199,16 +210,16 @@ function SplitInfoSection({ section, index }) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(96,165,250,0.24),transparent_32%),radial-gradient(circle_at_20%_82%,rgba(34,197,94,0.18),transparent_28%)]" />
         <div className="relative">
           <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25">
-            <ImageIcon className="h-7 w-7" />
+            {/* <ImageIcon className="h-7 w-7" /> */}
           </div>
           <p className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-emerald-300">
-            {section.eyebrow}
+            {AboutUsData?.heading}
           </p>
           <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
-            {section.title}
+            {AboutUsData?.subHeading}
           </h2>
           <p className="mt-5 text-sm leading-7 text-slate-300 sm:text-base">
-            {section.text}
+            {AboutUsData?.detail}
           </p>
         </div>
       </div>
@@ -224,14 +235,14 @@ function GlassStat({ item, delay }) {
     >
       <p className="text-2xl font-black text-[#111827]">{item.value}</p>
       <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
-        {item.label}
+        {item.key}
       </p>
     </div>
   );
 }
 
-function OverviewStat({ stat, delay }) {
-  const StatIcon = stat.Icon;
+function  OverviewStat({ stat, delay }) {
+  // const StatIcon = stat.Icon;
 
   return (
     <div
@@ -239,10 +250,10 @@ function OverviewStat({ stat, delay }) {
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue-50 text-blue-500 transition group-hover:bg-blue-400 group-hover:text-white">
-        <StatIcon className="h-5 w-5" />
+        {/* <StatIcon className="h-5 w-5" /> */}
       </div>
       <p className="mt-4 text-2xl font-black text-[#111827]">{stat.value}</p>
-      <p className="mt-1 text-sm font-semibold text-slate-500">{stat.label}</p>
+      <p className="mt-1 text-sm font-semibold text-slate-500">{stat.key}</p>
     </div>
   );
 }

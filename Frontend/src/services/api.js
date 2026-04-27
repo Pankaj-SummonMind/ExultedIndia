@@ -10,7 +10,7 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
   }),     
   
-  tagTypes : ["Category","CategoryById","SubCategory","SubCategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById","Certificate","CertificateById","HomePage","AboutUs"] ,
+  tagTypes : ["Category","CategoryById","SubCategory","SubCategoryById","Product","ProductById","User","UserById","SocialMedia","SocialMediaById","Certificate","CertificateById","HomePage","AboutUs","Contact"] ,
   
   endpoints: (builder) => ({
 
@@ -320,6 +320,33 @@ export const api = createApi({
         invalidatesTags:["AboutUs"]
     }),
 
+    //contact api services
+        createContact : builder.mutation({
+        query: (body) => ({
+            url:"api/contact/createContact",
+            method:"POST",
+            body
+        }),
+        invalidatesTags: ["Contact"],
+    }),
+
+    getContacts: builder.query({
+        query: () => ({
+            url:"api/contact/getContacts",
+            method:"GET"
+        }),
+        providesTags: [{type:"Contact"}]
+    }),
+    
+    updateContact : builder.mutation({
+        query: ({id, body}) => ({
+            url:`api/contact/updateContact/${id}`,
+            method:"PUT",
+            body
+        }),
+        invalidatesTags:["Contact"]
+    }),
+
 
   })
 });
@@ -372,5 +399,10 @@ export const {
     useGetAboutUsQuery,
     useCreateAboutUsMutation,
     useUpdateAboutUsMutation,
+
+  // Contact
+    useGetContactsQuery,
+    useCreateContactMutation,
+    useUpdateContactMutation,
 
 } = api;

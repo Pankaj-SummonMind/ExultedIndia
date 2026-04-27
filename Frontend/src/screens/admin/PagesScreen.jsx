@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import HomePageScreen from "./HomePageScreen";
 import AboutUsPageScreen from "./AboutUsPageScreen";
+import ContactPageScreen from "./ContactPageScreen";
 
 const PAGE_TABS = [
   {
@@ -13,10 +14,11 @@ const PAGE_TABS = [
     label: "About Us",
     component: <AboutUsPageScreen />,
   },
-  // {
-  //   id: "contact",
-  //   label: "Contact",
-  // },
+  {
+    id: "contact",
+    label: "Contact",
+    component: <ContactPageScreen />,
+  },
 ];
 
 function PagesScreen() {

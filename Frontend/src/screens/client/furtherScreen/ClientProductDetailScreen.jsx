@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetProductByidQuery } from "../../../services/api";
+import { Helmet } from "react-helmet-async";
 
 const fallbackGalleryImages = [
   "https://images.unsplash.com/photo-1581092160607-ee22731d8ca7?auto=format&fit=crop&w=1200&q=80",
@@ -80,6 +81,11 @@ function ClientProductDetailScreen() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#F5F9FF] text-slate-950">
+      <Helmet>
+        <title>{`${product?.product_name || "Product Detail"} | Exulted India`}</title>
+        <meta name="description" content={product?.description || "Explore the detailed specifications, features, and gallery of our premium product at Exulted India. Discover high-quality power solutions with certifications and pan-India service coverage for all your energy needs."} />
+        <meta name="keywords" content={`Exulted India, ${product?.product_name || "Product"}, product details, specifications, features, gallery, certifications, pan-India service`} />
+      </Helmet>
       <section className="relative isolate overflow-hidden border-b border-blue-100">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.18),transparent_30%),linear-gradient(135deg,#ffffff_0%,#eff6ff_45%,#f8fafc_100%)]" />
         <div className="absolute -left-24 top-10 h-48 w-48 rounded-full bg-blue-200/25 blur-3xl sm:h-72 sm:w-72" />
@@ -156,11 +162,11 @@ function ClientProductDetailScreen() {
                   ) : null}
                 </div>
 
-                <div className="flex min-h-[300px] items-center justify-center p-6 sm:min-h-[460px] sm:p-8">
+                <div className="flex min-h-75 items-center justify-center p-6 sm:min-h-115 sm:p-8">
                   <img
                     src={galleryImages[currentImageIndex]}
                     alt={product?.product_name || "Product image"}
-                    className="max-h-[420px] w-full rounded-[24px] object-contain sm:max-h-[520px]"
+                    className="max-h-105 w-full rounded-3xl object-contain sm:max-h-130"
                   />
                 </div>
               </div>
@@ -403,7 +409,7 @@ function LoadingState() {
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="rounded-[30px] border border-blue-100 bg-white p-5 shadow-[0_22px_70px_rgba(15,91,191,0.08)]">
-            <div className="h-[420px] animate-pulse rounded-[28px] bg-blue-100" />
+            <div className="h-105 animate-pulse rounded-[28px] bg-blue-100" />
             <div className="mt-4 grid grid-cols-4 gap-3">
               {[1, 2, 3, 4].map((item) => (
                 <div key={item} className="h-24 rounded-[22px] bg-slate-100" />

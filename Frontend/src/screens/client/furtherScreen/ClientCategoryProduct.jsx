@@ -4,6 +4,7 @@ import {
   useGetCategoriesByIdQuery,
   useGetSubCategoriesQuery,
 } from "../../../services/api";
+import { Helmet } from "react-helmet-async";
 
 const batteryDescription =
   "Exulted India offers energy efficient Batteries uniquely designed as bigger electrolyte reserve volume requires less topping up during service periods. Deep Cycle Design. Extra thick tubular plates with superfine grain structure, minimizes grid corrosion at high temperature. Exulted is offering Tubular batteries in the variants of 150Ah, 200Ah, 220Ah, 240Ah of 12V as per the requirements.";
@@ -99,6 +100,12 @@ function ClientCategoryProduct() {
 
   return (
     <main className="overflow-hidden bg-[#F8FAFC] text-slate-950">
+      <Helmet>
+        <title>{`${categoryName} | Exulted India`}</title>
+        <meta name="description" content={category?.categories_description || `Explore our range of ${categoryName} at Exulted India. Discover high-quality products, certifications, and pan-India service coverage for all your power needs.`} />
+        <meta name="keywords" content={`Exulted India, ${categoryName}, power solutions, product range, certifications, pan-India service`} />
+      </Helmet>
+
       <section className="relative flex min-h-[calc(100vh-72px)] w-full items-center overflow-hidden bg-slate-950">
         <img
           src={heroImage}
@@ -110,13 +117,13 @@ function ClientCategoryProduct() {
 
         <div className="relative mx-auto w-full max-w-7xl px-4 py-18 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <p className="inline-flex rounded-full border border-white/16 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-blue-100 backdrop-blur">
+            <p className="inline-flex rounded-full border border-white/16 bg-white/10 px-4 py-2 text-xs  uppercase tracking-[0.24em] text-blue-100 backdrop-blur">
               Exulted India Range
             </p>
-            <h1 className="mt-6 text-4xl font-black leading-tight text-white sm:text-6xl lg:text-7xl">
+            <h1 className="mt-6 text-4xl font-black leading-tight text-white sm:text-2xl lg:text-2xl">
               {categoryName}
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-slate-100 sm:text-lg">
+            <p className="mt-4 max-w-2xl text-base leading-8 text-slate-100 sm:text-base">
               {category?.categories_description}
             </p>
 
@@ -140,7 +147,7 @@ function ClientCategoryProduct() {
             <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-600">
               Explore Products
             </p>
-            <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
+            <h2 className="mt-2 text-xl font-black text-slate-950 sm:text-xl">
               {categoryName}
             </h2>
           </div>
@@ -191,7 +198,7 @@ function SubCategoryCard({ subCategory, index, onOpen }) {
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") onOpen();
       }}
-      className="group flex h-[430px] cursor-pointer flex-col overflow-hidden rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] outline-none transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.18)] focus-visible:ring-4 focus-visible:ring-blue-200"
+      className="group flex `h-107.5 cursor-pointer flex-col overflow-hidden rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] outline-none transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.18)] focus-visible:ring-4 focus-visible:ring-blue-200"
     >
       <div className="relative h-[68%] w-full overflow-hidden bg-blue-50">
         <img
@@ -208,7 +215,7 @@ function SubCategoryCard({ subCategory, index, onOpen }) {
 
       <div className="flex flex-1 flex-col justify-between p-4">
         <div>
-          <h3 className="line-clamp-2 min-h-12 text-lg font-black leading-6 text-slate-950">
+          <h3 className="line-clamp-2 min-h-12 text-base font-black leading-6 text-slate-950">
             {title}
           </h3>
           {/* <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
@@ -216,7 +223,7 @@ function SubCategoryCard({ subCategory, index, onOpen }) {
           </p> */}
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={(event) => {
@@ -263,7 +270,7 @@ function LoadingState() {
         {[1, 2, 3, 4].map((item) => (
           <div
             key={item}
-            className="h-[430px] animate-pulse rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)]"
+            className="h-107.5 animate-pulse rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)]"
           >
             <div className="h-[68%] rounded-t-[22px] bg-blue-100" />
             <div className="p-4">

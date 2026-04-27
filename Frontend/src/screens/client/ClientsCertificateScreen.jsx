@@ -4,6 +4,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 import "yet-another-react-lightbox/styles.css";
 import { useGetAllCertificatesQuery } from "../../services/api";
+import { Helmet } from "react-helmet-async";
 
 const fallbackCertificates = [
   {
@@ -84,6 +85,13 @@ function ClientsCertificateScreen() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#F8FAFC] text-[#111827]">
+
+      <Helmet>
+        <title>Certificates | Exulted India</title>
+        <meta name="description" content="Explore Exulted India's certifications and standards that ensure the quality, safety, and reliability of our power products. Learn about our commitment to excellence and customer satisfaction." />
+        <meta name="keywords" content="Exulted India, certificates, certifications, quality standards, safety compliance, product testing, customer assurance" />
+      </Helmet>
+
       <CertificateBackground />
 
       <section className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">

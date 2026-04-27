@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { useGetContactsQuery, useRegisterUserMutation } from "../../services/api";
+import { Helmet } from "react-helmet-async";
+
 const officeAddress =
   "694 Office Unit, Vegas Mall, Dwarka Sector -14, New Delhi -110078, INDIA";
 
@@ -24,17 +28,112 @@ const contactCards = [
     tone: "bg-cyan-50 text-cyan-600 border-cyan-100",
   },
 ];
+const initialFormState = {
+  name: "",
+  mobileNumber: "",
+  email: "",
+  message: "",
+};
+
+const initialErrorState = {
+  name: "",
+  mobileNumber: "",
+  email: "",
+  message: "",
+};
 
 function ContactUsScreen() {
+  const {data,isLoading,error} = useGetContactsQuery();
+  const [registerUser,{isLoading: isRegistering}] = useRegisterUserMutation();
+  const contactInfo = data?.data ;
+  console.log("contact info", contactInfo);
+  const [formData, setFormData] = useState(initialFormState);
+  const [errors, setErrors] = useState(initialErrorState);
+
+  const updateField = (field, value) => {
+    setFormData((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    setErrors((current) => ({
+      ...current,
+      [field]: "",
+    }));
+  };
+
+  const validateForm = () => {
+    const nextErrors = {
+      name: formData.name.trim() ? "" : "Name is required.",
+      mobileNumber: formData.mobileNumber.trim()
+        ? ""
+        : "Mobile number is required.",
+      email: formData.email.trim() ? "" : "Email is required.",
+      message: formData.message.trim() ? "" : "Message is required.",
+    };
+
+    if (
+      formData.mobileNumber.trim() &&
+      !/^\d{10,15}$/.test(formData.mobileNumber.trim())
+    ) {
+      nextErrors.mobileNumber =
+        "Enter a valid mobile number with 10 to 15 digits.";
+    }
+
+    if (
+      formData.email.trim() &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
+    ) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+
+    setErrors(nextErrors);
+    return !Object.values(nextErrors).some(Boolean);
+  };
+
+  const resetForm = () => {
+    setFormData(initialFormState);
+    setErrors(initialErrorState);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const payload = {
+      name: formData.name.trim(),
+      mobileNumber: formData.mobileNumber.trim(),
+      email: formData.email.trim(),
+      message: formData.message.trim(),
+    };
+
+    try {
+      const response = await registerUser(payload).unwrap();
+      console.log("user create response:", response);
+      resetForm();
+      // setIsCreateModalOpen?.(false);
+      // onClose();
+    } catch (error) {
+      console.log("error while creating user:", error);
+    }
+  };
+
   return (
     <main className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
+      <Helmet>
+        <title>Contact Us | Exulted India</title>
+        <meta name="description" content="Get in touch with Exulted India for inquiries, support, or to learn more about our power products and services. Contact us via phone, WhatsApp, email, or visit our office at Vegas Mall, Dwarka Sector 14, New Delhi." />
+        <meta name="keywords" content="Exulted India contact, customer support, inquiries, phone number, WhatsApp, email, office address, Vegas Mall contact" />
+      </Helmet>
       <BackgroundDecor />
-
       <section className="relative">
         <div className="h-85 w-full overflow-hidden border-b border-blue-100 bg-blue-50 sm:h-107.5 lg:h-130">
           <iframe
             title="Exulted India office location at Vegas Mall, Dwarka Sector 14, New Delhi"
-            src="https://www.google.com/maps?q=694%20Office%20Unit%2C%20Vegas%20Mall%2C%20Dwarka%20Sector%2014%2C%20New%20Delhi%20110078%2C%20India&output=embed"
+            src={contactInfo?.mapLocation}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             className="h-full w-full"
@@ -44,30 +143,34 @@ function ContactUsScreen() {
 
       <section className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="-mt-24 grid gap-4 sm:grid-cols-2 lg:-mt-28 lg:grid-cols-3">
-          {contactCards.map((card, index) => (
-            <ContactCard key={card.label} card={card} delay={index * 100} />
-          ))}
+          {/* {contactCards.map((card, index) => ( */}
+            <ContactCard  card={contactCards[0]} contactInfo={contactInfo} label={"Phone Number"}  value = {contactInfo?.phoneNumber}  />
+            <ContactCard  card={contactCards[1]} contactInfo={contactInfo} label={"WhatsApp"}  value = {contactInfo?.whatappNumber }/>
+            <ContactCard  card={contactCards[2]} contactInfo={contactInfo} label={"Email"}  value = {contactInfo?.email} />
+          {/* ))} */}
         </div>
 
         <div className="mt-10 grid gap-7 lg:mt-14 lg:grid-cols-[0.92fr_1.08fr]">
-          <GetInTouchCard />
-          <ContactFormCard />
+          <GetInTouchCard contactInfo={contactInfo} />
+          <ContactFormCard handleSubmit={handleSubmit} formData={formData} setFormData={setFormData} errors={errors} setErrors={setErrors} isLoading={isRegistering} updateField={updateField} />
         </div>
       </section>
     </main>
   );
 }
 
-function ContactCard({ card, delay }) {
+function ContactCard({ card, contactInfo, label,value }) {
   const CardIcon = card.Icon;
+  
+
 
   return (
     <a
-      href={card.href}
-      target={card.href.startsWith("http") ? "_blank" : undefined}
-      rel={card.href.startsWith("http") ? "noreferrer" : undefined}
+      // href={card.href}
+      // target={card.href.startsWith("http") ? "_blank" : undefined}
+      // rel={card.href.startsWith("http") ? "noreferrer" : undefined}
       className="group rounded-[26px] border border-white/80 bg-white/92 p-5 shadow-[0_22px_80px_rgba(15,91,191,0.13)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_95px_rgba(15,91,191,0.18)] motion-safe:animate-[contactFadeUp_650ms_ease-out_both]"
-      style={{ animationDelay: `${delay}ms` }}
+      // style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-center gap-4">
         <span
@@ -77,10 +180,10 @@ function ContactCard({ card, delay }) {
         </span>
         <span className="min-w-0">
           <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-400">
-            {card.label}
+            {label}
           </span>
           <span className="mt-1 block `wrap-break-word text-base font-black text-[#111827] sm:text-lg">
-            {card.value}
+            {value}
           </span>
         </span>
       </div>
@@ -88,7 +191,7 @@ function ContactCard({ card, delay }) {
   );
 }
 
-function GetInTouchCard() {
+function GetInTouchCard({ contactInfo }) {
   return (
     <article className="relative overflow-hidden rounded-4xl border border-blue-100 bg-[#EEF7FF] p-6 shadow-[0_24px_90px_rgba(15,91,191,0.1)] sm:p-8 lg:p-10">
       <div className="absolute right-0 top-0 h-56 w-56 rounded-full blur-3xl" />
@@ -101,38 +204,36 @@ function GetInTouchCard() {
         </span>
 
         <h1 className="mt-6 text-3xl font-black leading-tight text-[#111827] sm:text-4xl">
-          Get in touch
+          {contactInfo?.heading || "Get in touch"}
         </h1>
         <p className="mt-4 text-base leading-8 text-slate-600">
-          From New Delhi to Turkey, we have you covered with our global products
-          in more than 22 countries. Don't let distance be a barrier to quality
-          products! Let's bridge the gap and connect! Contact us for
-          international products!
+          {contactInfo?.detail }
         </p>
 
         <div className="mt-8 space-y-6">
           <InfoBlock title="Address">
-            <p>694 Office Unit,</p>
+            <p>{contactInfo?.address}</p>
+            {/* <p>694 Office Unit,</p>
             <p>Vegas Mall, Dwarka Sector -14,</p>
             <p>New Delhi -110078</p>
-            <p>INDIA</p>
+            <p>INDIA</p> */}
           </InfoBlock>
 
           <InfoBlock title="Email">
             <a
-              href="mailto:sales@exultedindia.com"
+              href={`mailto:${contactInfo?.email}`}
               className="font-semibold text-slate-700 transition hover:text-blue-600"
             >
-              sales@exultedindia.com
+              {contactInfo?.email}
             </a>
           </InfoBlock>
 
           <InfoBlock title="Toll Free No">
             <a
-              href="tel:18008899410"
+              href={`tel:${contactInfo?.phoneNumber}`}
               className="font-semibold text-slate-700 transition hover:text-blue-600"
             >
-              1800-8899-410
+              {contactInfo?.phoneNumber}
             </a>
           </InfoBlock>
         </div>
@@ -152,7 +253,7 @@ function InfoBlock({ title, children }) {
   );
 }
 
-function ContactFormCard() {
+function ContactFormCard({ handleSubmit, formData, setFormData, errors, setErrors, isLoading ,updateField={updateField}}) {
   return (
     <article className="rounded-4xl border border-blue-100 p-6 shadow-[0_24px_90px_rgba(16,185,129,0.1)] sm:p-8 lg:p-10">
       <div className="flex items-start justify-between gap-4">
@@ -169,42 +270,103 @@ function ContactFormCard() {
         </span>
       </div>
 
-      <form className="mt-8 grid gap-5">
-        <FloatingInput id="firstName" label="First name" type="text" />
-        <FloatingInput id="email" label="Email" type="email" />
-        <FloatingInput id="mobile" label="Mobile number" type="tel" />
+      <form onSubmit={handleSubmit} className="mt-8 grid gap-5">
+  <FloatingInput
+    id="firstName"
+    label="First name"
+    type="text"
+    value={formData.name}
+    onChange={(event) => updateField("name", event.target.value)}
+    error={errors.name}
+  />
 
-        <label className="block">
-          <span className="mb-2 block text-sm font-black text-slate-700">Message</span>
-          <textarea
-            rows="5"
-            placeholder="Write your message here"
-            className="min-h-34 w-full resize-none rounded-[22px] border border-emerald-100 bg-white/86 px-4 py-4 text-sm font-semibold text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
-          />
-        </label>
+  <FloatingInput
+    id="email"
+    label="Email"
+    type="email"
+    value={formData.email}
+    onChange={(event) => updateField("email", event.target.value)}
+    error={errors.email}
+  />
 
-        <button
-          type="submit"
-          className="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-[#111827] px-6 text-sm font-black text-white shadow-xl shadow-slate-900/18 transition duration-300 hover:-translate-y-0.5 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 sm:w-max"
-        >
-          Send message
-          <SendIcon className="h-4 w-4" />
-        </button>
-      </form>
+  <FloatingInput
+    id="mobile"
+    label="Mobile number"
+    type="tel"
+    value={formData.mobileNumber}
+    onChange={(event) => updateField("mobileNumber", event.target.value)}
+    error={errors.mobileNumber}
+  />
+
+  <label className="block">
+    <span className="mb-2 block text-sm font-black text-slate-700">
+      Message
+    </span>
+
+    <textarea
+      rows="5"
+      value={formData.message}
+      onChange={(event) => updateField("message", event.target.value)}
+      placeholder="Write your message here"
+      className={`min-h-34 w-full resize-none rounded-[22px] border bg-white/86 px-4 py-4 text-sm font-semibold text-slate-700 outline-none transition placeholder:text-slate-400 focus:bg-white focus:ring-4 ${
+        errors.message
+          ? "border-red-300 focus:border-red-400 focus:ring-red-100"
+          : "border-emerald-100 focus:border-emerald-400 focus:ring-emerald-100"
+      }`}
+    />
+
+    {errors.message && (
+      <p className="mt-2 text-xs font-semibold text-red-500">
+        {errors.message}
+      </p>
+    )}
+  </label>
+
+  <button
+    type="submit"
+    disabled={isLoading}
+    className="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-[#111827] px-6 text-sm font-black text-white shadow-xl shadow-slate-900/18 transition duration-300 hover:-translate-y-0.5 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-70 sm:w-max"
+  >
+    {isLoading ? "Submitting..." : "Send message"}
+    <SendIcon className="h-4 w-4" />
+  </button>
+</form>
     </article>
   );
 }
 
-function FloatingInput({ id, label, type }) {
+function FloatingInput({
+  id,
+  label,
+  type,
+  value,
+  onChange,
+  error,
+}) {
   return (
     <label htmlFor={id} className="block">
-      <span className="mb-2 block text-sm font-black text-slate-700">{label}</span>
+      <span className="mb-2 block text-sm font-black text-slate-700">
+        {label}
+      </span>
+
       <input
         id={id}
         type={type}
+        value={value}
+        onChange={onChange}
         placeholder={label}
-        className="h-13 w-full rounded-[22px] border border-emerald-100 bg-white/86 px-4 text-sm font-semibold text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-100"
+        className={`h-13 w-full rounded-[22px] bg-white/86 px-4 text-sm font-semibold text-slate-700 outline-none transition placeholder:text-slate-400 focus:bg-white focus:ring-4 ${
+          error
+            ? "border border-red-300 focus:border-red-400 focus:ring-red-100"
+            : "border border-emerald-100 focus:border-emerald-400 focus:ring-emerald-100"
+        }`}
       />
+
+      {error && (
+        <p className="mt-2 text-xs font-semibold text-red-500">
+          {error}
+        </p>
+      )}
     </label>
   );
 }
