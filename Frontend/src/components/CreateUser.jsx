@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRegisterUserMutation } from "../services/api";
+import toast from "react-hot-toast";
 
 const initialFormState = {
   name: "",
@@ -20,7 +21,7 @@ function CreateUser({
   onClose = () => {},
   setIsCreateModalOpen,
 }) {
-  const [registerUser, { isLoading }] = useRegisterUserMutation();
+  const [registerUser, { isLoading}] = useRegisterUserMutation();
   const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState(initialErrorState);
 
@@ -104,16 +105,19 @@ function CreateUser({
     try {
       const response = await registerUser(payload).unwrap();
       console.log("user create response:", response);
+      toast.success(response?.message || "User created successfully!");
       resetForm();
       setIsCreateModalOpen?.(false);
       onClose();
     } catch (error) {
+      toast.error(error?.data?.message || "Failed to create user. Please try again.");
       console.log("error while creating user:", error);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5">
+      <Loader isLoading={isLoading} />
       <button
         type="button"
         aria-label="Close create user modal"

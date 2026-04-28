@@ -1,20 +1,30 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CreateSubCategory from "../../../components/createSubCategory";
 import {
   useDeleteSubCategoriesMutation,
   useGetSubCategoryByIdQuery,
 } from "../../../services/api";
+import toast from "react-hot-toast";
+import Loader from "../../../components/loader/Loader";
 
 function SubCategoryById() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data: subCategorybyId, isLoading } = useGetSubCategoryByIdQuery(id);
+  const { data: subCategorybyId, isLoading:isSubCategoryLoading,error } = useGetSubCategoryByIdQuery(id);
   console.log("data in by id:", subCategorybyId);
 
   const [deleteSubCategories, { isLoading: isDeleteLoading }] =
     useDeleteSubCategoriesMutation();
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+
+  const isLoading = isSubCategoryLoading || isDeleteLoading;
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Internal Server Error");
+    }
+  }, [error]);
 
   const subCategory = useMemo(() => {
     const responseData = subCategorybyId?.data;
@@ -56,53 +66,56 @@ function SubCategoryById() {
 
   const handleDelete = async () => {
     try {
-      await deleteSubCategories(id).unwrap();
+      const res = await deleteSubCategories(id).unwrap();
       navigate("/admin/subcategory");
+      toast.success(res?.message || "Sub category deleted successfully.");
     } catch (deleteError) {
       console.log("error while deleting sub category:", deleteError);
+      toast.error(deleteError?.data?.message || "Failed to delete sub category.");
     }
   };
 
-  if (isLoading && !subCategory) {
-    return (
-      <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
-        <div className="rounded-[32px] border border-blue-100 bg-white p-6 shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
-          <div className="animate-pulse space-y-5">
-            <div className="h-6 w-56 rounded-full bg-blue-100" />
-            <div className="h-64 rounded-[28px] bg-slate-100" />
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="h-28 rounded-[24px] bg-slate-100" />
-              <div className="h-28 rounded-[24px] bg-slate-100" />
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // if (isSubCategoryLoading && !subCategory) {
+  //   return (
+  //     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+  //       <div className="rounded-4xl border border-blue-100 bg-white p-6 shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
+  //         <div className="animate-pulse space-y-5">
+  //           <div className="h-6 w-56 rounded-full bg-blue-100" />
+  //           <div className="h-64 rounded-[28px] bg-slate-100" />
+  //           <div className="grid gap-4 md:grid-cols-2">
+  //             <div className="h-28 rounded-3xl bg-slate-100" />
+  //             <div className="h-28 rounded-3xl bg-slate-100" />
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </section>
+  //   );
+  // }
 
-  if (!subCategory) {
-    return (
-      <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
-        <div className="rounded-[32px] border border-red-100 bg-white p-6 shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
-          <div className="rounded-[28px] border border-red-100 bg-red-50 px-5 py-6 text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-400">
-              Sub Category Detail
-            </p>
-            <h1 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
-              Unable to load sub category
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-slate-500">
-              This sub category could not be fetched right now.
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // if (!subCategory) {
+  //   return (
+  //     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+  //       <div className="rounded-4xl border border-red-100 bg-white p-6 shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
+  //         <div className="rounded-[28px] border border-red-100 bg-red-50 px-5 py-6 text-center">
+  //           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-red-400">
+  //             Sub Category Detail
+  //           </p>
+  //           <h1 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
+  //             Unable to load sub category
+  //           </h1>
+  //           <p className="mt-3 text-sm leading-6 text-slate-500">
+  //             This sub category could not be fetched right now.
+  //           </p>
+  //         </div>
+  //       </div>
+  //     </section>
+  //   );
+  // }
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
-      <div className="overflow-hidden rounded-[32px] border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
+      {<Loader isLoading={isLoading} /> }
+      <div className="overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
         <div className="bg-linear-to-br from-white via-blue-50 to-slate-50 px-5 py-6 sm:px-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
@@ -110,7 +123,7 @@ function SubCategoryById() {
                 Sub Category Detail
               </p>
               <h1 className="mt-3 text-2xl font-bold text-slate-800 sm:text-3xl">
-                {subCategory.name}
+                {subCategory?.name}
               </h1>
               {/* <div className="mt-3 flex flex-wrap items-center gap-3">
                 <span className="inline-flex rounded-full bg-blue-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-blue-700">
@@ -147,23 +160,23 @@ function SubCategoryById() {
 
         <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
           <section className="overflow-hidden rounded-[30px] border border-blue-100 bg-linear-to-br from-slate-950 via-slate-900 to-blue-950 shadow-[0_18px_45px_rgba(15,23,42,0.18)]">
-            <div className="flex h-full min-h-[320px] items-center justify-center bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.25),transparent_55%)] p-4 sm:p-6">
-              {subCategory.image?.url ? (
+            <div className="flex h-full min-h-80 items-center justify-center bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.25),transparent_55%)] p-4 sm:p-6">
+              {subCategory?.image?.url ? (
                 <img
                   src={subCategory.image.url}
                   alt={subCategory.name}
-                  className="max-h-[420px] w-full rounded-[24px] border border-white/10 bg-white/5 object-cover shadow-[0_20px_50px_rgba(15,23,42,0.35)]"
+                  className="max-h-105 w-full rounded-3xl border border-white/10 bg-white/5 object-cover shadow-[0_20px_50px_rgba(15,23,42,0.35)]"
                 />
               ) : (
-                <div className="flex h-full min-h-[280px] w-full flex-col items-center justify-center rounded-[24px] border border-dashed border-white/15 bg-white/5 px-6 text-center">
+                <div className="flex h-full min-h-70 w-full flex-col items-center justify-center rounded-3xl border border-dashed border-white/15 bg-white/5 px-6 text-center">
                   <ImageIcon className="h-10 w-10 text-blue-200" />
                   <p className="mt-4 text-sm font-semibold text-white">
                     No sub category image available
                   </p>
-                  <p className="mt-2 max-w-sm text-sm leading-6 text-blue-100/70">
+                  {/* <p className="mt-2 max-w-sm text-sm leading-6 text-blue-100/70">
                     Uploading an image makes this detail page more informative
                     and visually complete.
-                  </p>
+                  </p> */}
                 </div>
               )}
             </div>
@@ -189,7 +202,7 @@ function SubCategoryById() {
                 {summaryCards.map((card) => (
                   <div
                     key={card.label}
-                    className="rounded-[24px] border border-slate-100 bg-slate-50 px-4 py-4"
+                    className="rounded-3xl border border-slate-100 bg-slate-50 px-4 py-4"
                   >
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                       {card.label}
@@ -217,9 +230,9 @@ function SubCategoryById() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-[24px] border border-slate-100 bg-slate-50 px-4 py-5">
+              <div className="mt-5 rounded-3xl border border-slate-100 bg-slate-50 px-4 py-5">
                 <p className="text-sm leading-7 text-slate-600 sm:text-base">
-                  {subCategory.description ||
+                  {subCategory?.description ||
                     "No description has been added for this sub category yet."}
                 </p>
               </div>

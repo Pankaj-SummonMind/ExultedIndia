@@ -179,10 +179,10 @@ function ContactCard({ card, contactInfo, label,value }) {
           <CardIcon className="h-6 w-6" />
         </span>
         <span className="min-w-0">
-          <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+          <span className="block text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
             {label}
           </span>
-          <span className="mt-1 block `wrap-break-word text-base font-black text-[#111827] sm:text-lg">
+          <span className="mt-1 block `wrap-break-word text-base font-black text-[#111827] sm:text-base">
             {value}
           </span>
         </span>
@@ -198,12 +198,12 @@ function GetInTouchCard({ contactInfo }) {
       <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full blur-3xl" />
 
       <div className="relative">
-        <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/75 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-blue-600 shadow-sm backdrop-blur">
+        <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/75 px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-600 shadow-sm backdrop-blur">
           <MapPinIcon className="h-4 w-4" />
           Contact Office
         </span>
 
-        <h1 className="mt-6 text-3xl font-black leading-tight text-[#111827] sm:text-4xl">
+        <h1 className="mt-6 text-xl font-bold leading-tight text-[#111827] sm:text-xl">
           {contactInfo?.heading || "Get in touch"}
         </h1>
         <p className="mt-4 text-base leading-8 text-slate-600">
@@ -245,10 +245,10 @@ function GetInTouchCard({ contactInfo }) {
 function InfoBlock({ title, children }) {
   return (
     <div>
-      <h2 className="text-sm font-black uppercase tracking-[0.18em] text-[#111827]">
+      <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-[#111827]">
         {title}
       </h2>
-      <div className="mt-2 text-sm leading-7 text-slate-600 sm:text-base">{children}</div>
+      <div className="mt-2 text-base leading-7 text-slate-600 sm:text-base">{children}</div>
     </div>
   );
 }
@@ -258,14 +258,14 @@ function ContactFormCard({ handleSubmit, formData, setFormData, errors, setError
     <article className="rounded-4xl border border-blue-100 p-6 shadow-[0_24px_90px_rgba(16,185,129,0.1)] sm:p-8 lg:p-10">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-600">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-600">
             Send Message
           </p>
-          <h2 className="mt-3 text-3xl font-black leading-tight text-[#111827] sm:text-4xl">
+          <h2 className="mt-3 text-xl font-black leading-tight text-[#111827] sm:text-xl">
             Let's connect
           </h2>
         </div>
-        <span className="hidden h-14 w-14 place-items-center rounded-2xl bg-white text-emerald-600 shadow-lg shadow-emerald-200/60 sm:grid">
+        <span className="hidden h-10 w-10 place-items-center rounded-2xl bg-white text-emerald-600 shadow-lg shadow-emerald-200/60 sm:grid">
           <SendIcon className="h-6 w-6" />
         </span>
       </div>
@@ -299,7 +299,7 @@ function ContactFormCard({ handleSubmit, formData, setFormData, errors, setError
   />
 
   <label className="block">
-    <span className="mb-2 block text-sm font-black text-slate-700">
+    <span className="mb-2 block text-sm font-semibold text-slate-700">
       Message
     </span>
 
@@ -325,7 +325,7 @@ function ContactFormCard({ handleSubmit, formData, setFormData, errors, setError
   <button
     type="submit"
     disabled={isLoading}
-    className="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-[#111827] px-6 text-sm font-black text-white shadow-xl shadow-slate-900/18 transition duration-300 hover:-translate-y-0.5 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-70 sm:w-max"
+    className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#111827] px-6 text-sm font-bold text-white shadow-xl shadow-slate-900/18 transition duration-300 hover:-translate-y-0.5 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-70 sm:w-max"
   >
     {isLoading ? "Submitting..." : "Send message"}
     <SendIcon className="h-4 w-4" />
@@ -345,7 +345,7 @@ function FloatingInput({
 }) {
   return (
     <label htmlFor={id} className="block">
-      <span className="mb-2 block text-sm font-black text-slate-700">
+      <span className="mb-2 block text-sm font-semibold text-slate-700">
         {label}
       </span>
 
@@ -355,7 +355,7 @@ function FloatingInput({
         value={value}
         onChange={onChange}
         placeholder={label}
-        className={`h-13 w-full rounded-[22px] bg-white/86 px-4 text-sm font-semibold text-slate-700 outline-none transition placeholder:text-slate-400 focus:bg-white focus:ring-4 ${
+        className={`h-10 w-full rounded-[22px] bg-white/86 px-4 text-sm font-semibold text-slate-700 outline-none transition placeholder:text-slate-400 focus:bg-white focus:ring-4 ${
           error
             ? "border border-red-300 focus:border-red-400 focus:ring-red-100"
             : "border border-emerald-100 focus:border-emerald-400 focus:ring-emerald-100"

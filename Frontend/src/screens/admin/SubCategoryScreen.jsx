@@ -1,13 +1,21 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateSubCategory from "../../components/createSubCategory";
 import { useGetSubCategoriesQuery } from "../../services/api";
+import Loader from "../../components/loader/Loader";
+import toast from "react-hot-toast";
 
 function SubCategoryScreen() {
   const navigate = useNavigate();
-  const { data: allSubCategories, isLoading } = useGetSubCategoriesQuery();
+  const { data: allSubCategories, isLoading,error } = useGetSubCategoriesQuery();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   console.log("all sub categories:", allSubCategories);
+
+  useEffect(() => {
+      if (error) {
+        toast.error("Internal Server Error");
+      }
+    }, [error]);
 
   const subCategoryRows =
     allSubCategories?.data?.map((item) => ({
@@ -44,6 +52,7 @@ function SubCategoryScreen() {
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+      {<Loader isLoading={isLoading} />}
       {/* <div className="grid gap-4 md:grid-cols-3">
         {stats.map((card) => (
           <div
@@ -96,7 +105,7 @@ function SubCategoryScreen() {
                     <TableHeading>Sub Category Name</TableHeading>
                     <TableHeading>Category Name</TableHeading>
                     {/* <TableHeading>Description</TableHeading> */}
-                    <TableHeading>Image</TableHeading>
+                    {/* <TableHeading>Image</TableHeading> */}
                     <TableHeading className="rounded-tr-3xl">
                       Created At
                     </TableHeading>
@@ -157,7 +166,7 @@ function SubCategoryScreen() {
                           </p>
                           </TableCell> */}
 
-                          <TableCell>
+                          {/* <TableCell>
                             <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-white">
                               {row.image ? (
                                 <img
@@ -171,7 +180,7 @@ function SubCategoryScreen() {
                                 </span>
                               )}
                             </div>
-                          </TableCell>
+                          </TableCell> */}
                           
                         <TableCell>
                           <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">

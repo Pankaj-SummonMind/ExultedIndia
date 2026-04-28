@@ -89,10 +89,10 @@ function HeroAbout({AboutUsData}) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(96,165,250,0.18),transparent_28%),radial-gradient(circle_at_80%_18%,rgba(34,197,94,0.12),transparent_30%)]" />
       <div className="relative mx-auto grid min-h-[calc(100vh-72px)] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
         <div className="motion-safe:animate-[fadeUp_700ms_ease-out_both]">
-          <p className="inline-flex rounded-full border border-blue-200 bg-white/75 px-4 py-2 text-xs font-black uppercase tracking-[0.26em] text-blue-500 shadow-sm backdrop-blur">
+          <p className="inline-flex rounded-full border border-blue-200 bg-white/75 px-3 py-2 text-xs font-bold uppercase tracking-[0.26em] text-blue-500 shadow-sm backdrop-blur">
             About Us
           </p>
-          <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight text-[#111827] sm:text-5xl lg:text-6xl">
+          <h1 className="mt-6 max-w-3xl text-2xl font-black leading-tight text-[#111827] sm:text-2xl lg:text-2xl">
             {AboutUsData?.hero?.heading}
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
@@ -115,10 +115,10 @@ function HeroAbout({AboutUsData}) {
                 className="h-52"
               />
               <div className="rounded-3xl border border-white/70 bg-white/70 p-5 shadow-[0_22px_70px_rgba(15,91,191,0.12)] backdrop-blur-xl">
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-emerald-600">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-600">
                   Quality Core
                 </p>
-                <p className="mt-2 text-2xl font-black text-[#111827]">Energy + Power</p>
+                <p className="mt-2 text-lg font-bold text-[#111827]">Energy + Power</p>
               </div>
             </div>
 
@@ -137,10 +137,10 @@ function HeroAbout({AboutUsData}) {
                     className="h-24 w-24 rounded-2xl object-cover shadow-xl motion-safe:animate-[softFloat_4s_ease-in-out_infinite]"
                   />
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-200">
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-200">
                       Energy Systems
                     </p>
-                    <p className="mt-2 text-xl font-black">Built for scale</p>
+                    <p className="mt-2 text-lg font-bold">Built for scale</p>
                   </div>
                 </div>
               </div>
@@ -166,13 +166,13 @@ function CompanyOverview({ AboutUsData }) {
         </div>
 
         <div className="self-center">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-500">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-blue-500">
             Company Overview
           </p>
-          <h2 className="mt-4 text-3xl font-black leading-tight text-[#111827] sm:text-4xl">
+          <h2 className="mt-3 text-2xl font-black leading-tight text-[#111827] sm:text-2xl">
             {AboutUsData?.companyOverview?.heading}
           </h2>
-          <p className="mt-5 text-base leading-8 text-slate-600">
+          <p className=" text-base leading-8 text-slate-600">
             {AboutUsData?.companyOverview?.detail}
           </p>
 
@@ -215,10 +215,10 @@ function SplitInfoSection({AboutUsData, eyebrow}) {
           <p className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-emerald-300">
             {AboutUsData?.heading}
           </p>
-          <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
+          <h2 className="mt-3 text-lg font-black leading-tight sm:text-lg">
             {AboutUsData?.subHeading}
           </h2>
-          <p className="mt-5 text-sm leading-7 text-slate-300 sm:text-base">
+          <p className="mt-2 text-sm leading-7 text-slate-300 sm:text-base">
             {AboutUsData?.detail}
           </p>
         </div>
@@ -233,8 +233,8 @@ function GlassStat({ item, delay }) {
       className="rounded-2xl border border-white/70 bg-white/72 p-4 shadow-[0_18px_60px_rgba(15,91,191,0.1)] backdrop-blur-xl motion-safe:animate-[fadeUp_700ms_ease-out_both]"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <p className="text-2xl font-black text-[#111827]">{item.value}</p>
-      <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+      <p className="text-lg font-black text-[#111827]">{item.value}</p>
+      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
         {item.key}
       </p>
     </div>
@@ -252,7 +252,7 @@ function  OverviewStat({ stat, delay }) {
       <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue-50 text-blue-500 transition group-hover:bg-blue-400 group-hover:text-white">
         {/* <StatIcon className="h-5 w-5" /> */}
       </div>
-      <p className="mt-4 text-2xl font-black text-[#111827]">{stat.value}</p>
+      <p className="mt-4 text-lg font-black text-[#111827]">{stat.value}</p>
       <p className="mt-1 text-sm font-semibold text-slate-500">{stat.key}</p>
     </div>
   );

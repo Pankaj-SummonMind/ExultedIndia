@@ -1,72 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateUser from "../../components/createUser";
 import { useGetAllUsersQuery } from "../../services/api";
 import { data, useNavigate } from "react-router-dom";
+import Loader from "../../components/loader/Loader";
+import toast from "react-hot-toast";
 
-// const userRows = [
-//   {
-//     id: 1,
-//     name: "Aarav Sharma",
-//     mobileNumber: "+91 98765 43210",
-//     emailId: "aarav.sharma@example.com",
-//     registeredAt: "15 Apr 2026",
-//   },
-//   {
-//     id: 2,
-//     name: "Priya Verma",
-//     mobileNumber: "+91 91234 56789",
-//     emailId: "priya.verma@example.com",
-//     registeredAt: "13 Apr 2026",
-//   },
-//   {
-//     id: 3,
-//     name: "Rohan Mehta",
-//     mobileNumber: "+91 99887 76655",
-//     emailId: "rohan.mehta@example.com",
-//     registeredAt: "11 Apr 2026",
-//   },
-//   {
-//     id: 4,
-//     name: "Sneha Kapoor",
-//     mobileNumber: "+91 90123 45678",
-//     emailId: "sneha.kapoor@example.com",
-//     registeredAt: "09 Apr 2026",
-//   },
-//   {
-//     id: 5,
-//     name: "Kabir Singh",
-//     mobileNumber: "+91 97654 32109",
-//     emailId: "kabir.singh@example.com",
-//     registeredAt: "07 Apr 2026",
-//   },
-//   {
-//     id: 6,
-//     name: "Ananya Gupta",
-//     mobileNumber: "+91 93456 78901",
-//     emailId: "ananya.gupta@example.com",
-//     registeredAt: "05 Apr 2026",
-//   },
-//   {
-//     id: 7,
-//     name: "Dev Malhotra",
-//     mobileNumber: "+91 98989 12121",
-//     emailId: "dev.malhotra@example.com",
-//     registeredAt: "03 Apr 2026",
-//   },
-//   {
-//     id: 8,
-//     name: "Ishita Jain",
-//     mobileNumber: "+91 95555 66778",
-//     emailId: "ishita.jain@example.com",
-//     registeredAt: "01 Apr 2026",
-//   },
-// ];
 
 function UserScreen() {
   const navigate = useNavigate();
   const [isOpen,setIsOpen] = useState(false)
-  const {data : userRows} = useGetAllUsersQuery()
+  const {data : userRows,isLoading,error} = useGetAllUsersQuery()
   
+  useEffect(() => {
+    if (error) {
+      toast.error("Internal Server Error:");
+    }
+  }, [error]);
 
   const onClose = () => {
     setIsOpen(false)
@@ -74,6 +23,7 @@ function UserScreen() {
   console.log("user data :",userRows)
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+      <Loader isLoading={isLoading} />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
         <div className="flex flex-col gap-4 border-b border-blue-100 px-4 py-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between">
           <div>

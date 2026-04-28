@@ -3,6 +3,8 @@ import {
   useCreateCertificateMutation,
   useUpdateCertificateMutation,
 } from "../services/api";
+import toast from "react-hot-toast";
+import Loader from "./loader/Loader";
 // import {
 //   useCreateCertificateMutation,
 //   useUpdateCertificateMutation,
@@ -95,14 +97,17 @@ function CreateCertificate({ isOpen, onClose, activeCertificate }) {
         submitData.append("id", formData.id);
         // Note: Depending on your RTK setup, you might need to pass { id: formData.id, data: submitData }
         const res = await updateCertificate(submitData).unwrap();
+        toast.success(res?.message || "Certificate updated successfully");
         console.log("res after updating certificate", res);
       } else {
         const res = await createCertificate(submitData).unwrap();
+        toast.success(res?.message || "Certificate created successfully");
         console.log("res after creating certificate", res);
       }
 
       onClose();
     } catch (error) {
+      toast.error(error?.data?.message || error.message || "Failed to save certificate. Please try again.");
       setFormError(
         error?.data?.message || error.message || "Something went wrong",
       );
@@ -114,6 +119,7 @@ function CreateCertificate({ isOpen, onClose, activeCertificate }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-[3px]">
+      <Loader isLoading={isSubmitting} />
       <div className="w-full max-w-lg overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.20)]">
         <div className="border-b border-blue-100 bg-linear-to-r from-white via-blue-50 to-slate-50 px-5 py-5 sm:px-6">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-400">

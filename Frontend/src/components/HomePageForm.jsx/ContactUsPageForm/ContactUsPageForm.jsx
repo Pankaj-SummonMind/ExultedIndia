@@ -3,6 +3,8 @@ import {
   useCreateContactMutation,
   useUpdateContactMutation,
 } from "../../../services/api";
+import toast from "react-hot-toast";
+import Loader from "../../loader/Loader";
 
 const EMPTY_FORM = {
   mapLocation: "",
@@ -161,11 +163,13 @@ function ContactUsPageForm({
       if (onSuccess) {
         onSuccess(response?.data || response);
       }
+      toast.success(response?.message || "Contact created successfully.");
     } catch (error) {
       setSuccessMessage("");
       setFormError(
         error?.data?.message || error?.message || "Something went wrong.",
       );
+      toast.error(error?.data?.message || error?.message || "Failed to create contact. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -173,6 +177,7 @@ function ContactUsPageForm({
 
   return (
     <section className="min-h-screen bg-[linear-gradient(180deg,#f4fbff_0%,#f8fafc_30%,#ffffff_100%)] px-4 py-6 sm:px-5 lg:px-6">
+      <Loader isLoading={isSubmitting} />
       <div className="mx-auto max-w-6xl space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {formError ? <MessageBanner tone="error">{formError}</MessageBanner> : null}
@@ -353,7 +358,7 @@ function ContactUsPageForm({
 
 function SectionCard({ eyebrow, title, description, children }) {
   return (
-    <section className="overflow-hidden rounded-[32px] border border-slate-200/80 bg-white/95 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+    <section className="overflow-hidden rounded-4xl border border-slate-200/80 bg-white/95 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
       <div className="border-b border-slate-200/80 bg-linear-to-r from-white via-slate-50 to-sky-50 px-5 py-5 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">
           {eyebrow}
@@ -396,7 +401,7 @@ function MessageBanner({ tone = "error", children }) {
 
   return (
     <div
-      className={`rounded-[24px] border px-4 py-4 text-sm font-medium ${toneClassName}`}
+      className={`rounded-3xl border px-4 py-4 text-sm font-medium ${toneClassName}`}
     >
       {children}
     </div>

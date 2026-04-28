@@ -225,13 +225,13 @@ function HeroSection({ data }) {
             Exaulted India
           </p>
 
-          <h2 className="mt-7 max-w-3xl text-2xl font-black leading-[1.03] text-white sm:text-5xl lg:text-2xl">
+          <h2 className="mt-7 max-w-3xl text-2xl font-black leading-[1.03] text-white sm:text-2xl lg:text-2xl">
             {data?.title}
           </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-7 text-slate-200 sm:text-lg">
+          <p className="mt-3 max-w-2xl text-lg leading-7 text-slate-200 sm:text-lg">
             {data?.subTitle}
           </p>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
             {data?.detail}
           </p>
 

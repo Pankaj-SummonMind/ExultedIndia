@@ -1,9 +1,11 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   useGetAllUsersQuery,
   useGetCategoriesQuery,
   useGetProductQuery,
 } from "../../services/api";
+import Loader from "../../components/loader/Loader";
+import toast from "react-hot-toast";
 
 function DashboardScreen() {
   const {
@@ -28,6 +30,12 @@ function DashboardScreen() {
 
   const isLoading = isUsersLoading || isCategoriesLoading || isProductsLoading;
   const hasError = isUsersError || isCategoriesError || isProductsError;
+
+  useEffect(() => {
+    if (hasError) {
+      toast.error("Internal Server Error");
+    }
+  }, [hasError]);
 
   const overviewCards = useMemo(
     () => [
@@ -105,27 +113,11 @@ function DashboardScreen() {
     [users]
   );
 
-  // if (hasError) {
-  //   return (
-  //     <section className="flex min-h-[calc(100vh-176px)] items-center justify-center">
-  //       <div className="w-full max-w-xl rounded-[30px] border border-red-100 bg-white p-8 text-center shadow-[0_20px_50px_rgba(248,113,113,0.12)]">
-  //         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-500">
-  //           <AlertIcon className="h-7 w-7" />
-  //         </div>
-  //         <h2 className="text-xl font-bold text-slate-800">
-  //           Dashboard data load nahi ho paya
-  //         </h2>
-  //         <p className="mt-3 text-sm leading-6 text-slate-500">
-  //           Users, categories ya products me se kisi ek API response me issue
-  //           aa raha hai. Refresh karke dubara try karein.
-  //         </p>
-  //       </div>
-  //     </section>
-  //   );
-  // }
+  
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+      <Loader isLoading={isLoading} />
       <div className="relative overflow-hidden rounded-4xl border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.16),transparent_34%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.14),transparent_30%),linear-gradient(135deg,#ffffff,#f8fbff_55%,#f3f7ff)] p-5 shadow-[0_20px_60px_rgba(148,163,184,0.16)] sm:p-6 lg:p-7">
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white to-transparent" />
 
@@ -137,7 +129,7 @@ function DashboardScreen() {
               key={card.label}
               className={`relative overflow-hidden rounded-[28px] bg-linear-to-br ${card.accent} p-px shadow-[0_18px_45px_rgba(15,23,42,0.12)]`}
             >
-              <div className="flex h-full min-h-45 flex-col justify-between rounded-[27px] bg-slate-950/86 p-5 text-white backdrop-blur-xl sm:p-6">
+              <div className="flex h-37 min-h-37 flex-col justify-between rounded-[27px] bg-slate-950/86 p-5 text-white backdrop-blur-xl sm:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/70">
@@ -149,14 +141,14 @@ function DashboardScreen() {
                   </div>
 
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-2xl ${card.iconBg}`}
+                    className={`flex h-8 w-8 items-center justify-center rounded-2xl ${card.iconBg}`}
                   >
-                    <OverviewIcon label={card.label} className="h-6 w-6" />
+                    <OverviewIcon label={card.label} className="h-5 w-5" />
                   </div>
                 </div>
 
                 <div className="flex flex-1 items-center justify-center py-6">
-                  <span className="text-4xl font-black tracking-tight sm:text-5xl">
+                  <span className="text-2xl font-black tracking-tight sm:text-2xl">
                     {isLoading ? "--" : String(card.value).padStart(2, "0")}
                   </span>
                 </div>
@@ -174,13 +166,9 @@ function DashboardScreen() {
                 <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-600">
                   Monthly Trend
                 </p>
-                <h2 className="mt-2 text-xl font-bold text-slate-800">
+                <h2 className="mt-2 text-lg font-bold text-slate-800">
                   User registrations by month
                 </h2>
-                {/* <p className="mt-2 text-sm leading-6 text-slate-500">
-                  Last 6 months ke registration records dynamic graph ke through
-                  show kiye gaye hain.
-                </p> */}
               </div>
 
               <div className="inline-flex w-fit items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
@@ -241,7 +229,7 @@ function DashboardScreen() {
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-emerald-600">
               Recent Users
             </p>
-            <h2 className="mt-2 text-xl font-bold text-slate-800">
+            <h2 className="mt-2 text-lg font-bold text-slate-800">
               Latest registrations
             </h2>
             {/* <p className="mt-2 text-sm leading-6 text-slate-500">
@@ -256,9 +244,6 @@ function DashboardScreen() {
                   key={user._id ?? `${user.email}-${index}`}
                   className="flex items-center gap-4 rounded-3xl border border-slate-100 bg-slate-50/80 px-4 py-4"
                 >
-                  {/* <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-sm font-bold uppercase text-white">
-                    {getInitials(user?.name)}
-                  </div> */}
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-semibold text-slate-800">
@@ -278,7 +263,7 @@ function DashboardScreen() {
               <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-5 py-10 text-center text-sm text-slate-500">
                 {isLoading
                   ? "Dashboard data loading..."
-                  : "Abhi recent user registrations available nahi hain."}
+                  : "No registered users data available."}
               </div>
             )}
           </div>

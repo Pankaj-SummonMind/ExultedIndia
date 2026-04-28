@@ -1,23 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { data, useNavigate } from "react-router-dom";
 import CreateProduct from "../../components/CreateProduct";
 import { useGetProductQuery } from "../../services/api";
+import Loader from "../../components/loader/Loader";
+import toast from "react-hot-toast";
 
 
 function ProductScreen() {
   const navigate = useNavigate();
-  const {data : allProduct} = useGetProductQuery()
+  const {data : allProduct, isLoading,error} = useGetProductQuery()
   console.log(allProduct);
   const [showCreateProduct, setShowCreateProduct] = useState(false);
 
+  useEffect(() => {
+    if (error) {
+      toast.error("Internal Server Error:");
+    }
+  }, [error]);
+  
   if (showCreateProduct) {
     return <CreateProduct 
     mode = "create"
     onShowList={() => setShowCreateProduct(false)} />;
   }
 
+
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+      <Loader isLoading={isLoading} />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
         <div className="flex flex-col gap-4 border-b border-blue-100 px-4 py-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -55,50 +65,70 @@ function ProductScreen() {
                 </thead>
 
                 <tbody>
-  {allProduct?.data?.map((row, index) => (
-    <tr
-      key={row._id}
-      role="button"
-      tabIndex={0}
-      onClick={() => navigate(`/admin/product/${row._id}`)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          navigate(`/admin/category/${row.id}`);
-                        }
-                      }}
-      className="group transition hover:bg-blue-50/70"
-    >
-      <TableCell>
-        <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs font-bold text-blue-700">
-          {String(index + 1).padStart(2, "0")}
-        </span>
-      </TableCell>
+                  {
+                    allProduct?.data?.length ? (
+                      allProduct?.data?.map((row, index) => (
+                        <tr
+                          key={row._id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => navigate(`/admin/product/${row._id}`)}
+                                          onKeyDown={(event) => {
+                                            if (event.key === "Enter" || event.key === " ") {
+                                              navigate(`/admin/category/${row.id}`);
+                                            }
+                                          }}
+                          className="group transition hover:bg-blue-50/70"
+                        >
+                          <TableCell>
+                            <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs font-bold text-blue-700">
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
+                          </TableCell>
+                    
+                          <TableCell>
+                            <p className="font-semibold text-slate-700">
+                              {row.product_name}
+                            </p>
+                          </TableCell>
+                    
+                          <TableCell>
+                            <span className="inline-flex rounded-full bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
+                              {row.product_category?.categories_name}
+                            </span>
+                          </TableCell>
+                    
+                          <TableCell>
+                            <p className="text-sm leading-6 text-slate-500">
+                              {row.product_subCategory?.name}
+                            </p>
+                          </TableCell>
+                    
+                          <TableCell>
+                            <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">
+                              {new Date(row.createdAt).toLocaleDateString()}
+                            </span>
+                          </TableCell>
+                        </tr>
+                      ))
+                    )
+                    : 
+                    (
+                      <tr>
+      <td colSpan="6" className="py-16">
+        <div className="flex w-full flex-col items-center justify-center text-center">
+          <p className="text-lg font-semibold text-slate-700">
+            No Product Found
+          </p>
 
-      <TableCell>
-        <p className="font-semibold text-slate-700">
-          {row.product_name}
-        </p>
-      </TableCell>
-
-      <TableCell>
-        <span className="inline-flex rounded-full bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
-          {row.product_category?.categories_name}
-        </span>
-      </TableCell>
-
-      <TableCell>
-        <p className="text-sm leading-6 text-slate-500">
-          {row.product_subCategory?.name}
-        </p>
-      </TableCell>
-
-      <TableCell>
-        <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">
-          {new Date(row.createdAt).toLocaleDateString()}
-        </span>
-      </TableCell>
+          {/* <p className="mt-2 text-sm leading-6 text-slate-500">
+            Currently there are no categories available.
+          </p> */}
+        </div>
+      </td>
     </tr>
-  ))}
+                    )
+                  }
 </tbody>
               </table>
             </div>

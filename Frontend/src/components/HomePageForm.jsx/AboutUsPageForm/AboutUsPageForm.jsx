@@ -3,6 +3,8 @@ import {
   useCreateAboutUsMutation,
   useUpdateAboutUsMutation,
 } from "../../../services/api";
+import toast from "react-hot-toast";
+import Loader from "../../loader/Loader";
 
 const CONTENT_SECTION_KEYS = [
   "companyOverview",
@@ -143,8 +145,8 @@ function AboutUsPageForm({
     [initialData],
   );
 
-  const [createAboutUs] = useCreateAboutUsMutation();
-  const [updateAboutUs] = useUpdateAboutUsMutation();
+  const [createAboutUs, { isLoading: isCreating }] = useCreateAboutUsMutation();
+  const [updateAboutUs,{ isLoading: isUpdating }] = useUpdateAboutUsMutation();
   const [formData, setFormData] = useState(() =>
     createInitialFormState(initialData),
   );
@@ -152,6 +154,7 @@ function AboutUsPageForm({
   const [formError, setFormError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isLoading = isCreating || isUpdating;
 
   useEffect(() => {
     setFormData(createInitialFormState(initialData));
@@ -543,8 +546,11 @@ function AboutUsPageForm({
       if (onSuccess) {
         onSuccess(response?.data || response);
       }
+
+      toast.success(response?.message || "About Us content saved successfully!");
     } catch (error) {
       setSuccessMessage("");
+      toast.error(error?.data?.message || "Failed to save About Us content.");
       setFormError(
         error?.data?.message || error?.message || "Something went wrong.",
       );
@@ -559,6 +565,7 @@ function AboutUsPageForm({
 
   return (
     <section className="min-h-screen bg-[linear-gradient(180deg,#f4fbff_0%,#f8fafc_30%,#ffffff_100%)] px-4 py-6 sm:px-5 lg:px-6">
+      <Loader isLoading={isLoading} />
       <div className="mx-auto max-w-7xl space-y-6">
        
 
@@ -995,7 +1002,7 @@ function SectionContentEditor({
 
 function SectionCard({ eyebrow, title, description, children }) {
   return (
-    <section className="overflow-hidden rounded-[32px] border border-slate-200/80 bg-white/95 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+    <section className="overflow-hidden rounded-4xl border border-slate-200/80 bg-white/95 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
       <div className="border-b border-slate-200/80 bg-linear-to-r from-white via-slate-50 to-sky-50 px-5 py-5 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">
           {eyebrow}
@@ -1111,7 +1118,7 @@ function ImageUploadCard({
 
 function ImageThumb({ src, title, caption, badge }) {
   return (
-    <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_14px_35px_rgba(148,163,184,0.12)]">
+    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_14px_35px_rgba(148,163,184,0.12)]">
       <div className="relative h-36 overflow-hidden bg-slate-100">
         <img src={src} alt={title} className="h-full w-full object-cover" />
         <span className="absolute left-3 top-3 rounded-full bg-slate-900/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
@@ -1129,7 +1136,7 @@ function ImageThumb({ src, title, caption, badge }) {
 function EmptyImageState({ label }) {
   return (
     <div className="sm:col-span-2 xl:col-span-3">
-      <div className="flex min-h-32 items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-slate-50/80 px-4 py-6 text-center text-sm font-medium text-slate-400">
+      <div className="flex min-h-32 items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/80 px-4 py-6 text-center text-sm font-medium text-slate-400">
         {label}
       </div>
     </div>
@@ -1144,7 +1151,7 @@ function MessageBanner({ tone = "error", children }) {
 
   return (
     <div
-      className={`rounded-[24px] border px-4 py-4 text-sm font-medium ${toneClassName}`}
+      className={`rounded-3xl border px-4 py-4 text-sm font-medium ${toneClassName}`}
     >
       {children}
     </div>

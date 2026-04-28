@@ -144,8 +144,8 @@ function ClientCategoryProduct() {
       <section className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-600">
-              Explore Products
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-blue-600">
+              Explore Sub Categories
             </p>
             <h2 className="mt-2 text-xl font-black text-slate-950 sm:text-xl">
               {categoryName}
@@ -208,14 +208,14 @@ function SubCategoryCard({ subCategory, index, onOpen }) {
           className="h-full w-full object-cover transition duration-700 group-hover:scale-108"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.04),rgba(15,23,42,0.54))]" />
-        <span className="absolute left-4 top-4 rounded-full border border-white/35 bg-white/82 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-blue-700 shadow-sm backdrop-blur">
+        {/* <span className="absolute left-4 top-4 rounded-full border border-white/35 bg-white/82 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-blue-700 shadow-sm backdrop-blur">
           {String(index + 1).padStart(2, "0")}
-        </span>
+        </span> */}
       </div>
 
       <div className="flex flex-1 flex-col justify-between p-4">
         <div>
-          <h3 className="line-clamp-2 min-h-12 text-base font-black leading-6 text-slate-950">
+          <h3 className="line-clamp-2 min-h-10 text-base font-black leading-6 text-slate-950">
             {title}
           </h3>
           {/* <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
@@ -223,14 +223,14 @@ function SubCategoryCard({ subCategory, index, onOpen }) {
           </p> */}
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={(event) => {
               event.stopPropagation();
               onOpen();
             }}
-            className="inline-flex min-h-10 items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-3 text-xs font-black text-blue-700 transition hover:border-blue-500 hover:bg-blue-100"
+            className="inline-flex min-h-8 items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-3 text-xs font-bold text-blue-700 transition hover:border-blue-500 hover:bg-blue-100"
           >
             View Catalogue
           </button>
@@ -240,9 +240,9 @@ function SubCategoryCard({ subCategory, index, onOpen }) {
               event.stopPropagation();
               onOpen();
             }}
-            className="inline-flex min-h-10 items-center justify-center rounded-full bg-blue-600 px-3 text-xs font-black text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
+            className="inline-flex min-h-8 items-center justify-center rounded-full bg-blue-600 px-3 text-xs font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
           >
-            View Products
+            Sub Categories
           </button>
         </div>
       </div>

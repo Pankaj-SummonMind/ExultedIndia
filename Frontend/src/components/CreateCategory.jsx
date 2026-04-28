@@ -3,6 +3,8 @@ import {
   useCreateCategoriesMutation,
   useUpdateCategoriesMutation,
 } from "../services/api";
+import Loader from "./loader/Loader";
+import toast from "react-hot-toast";
 
 const EMPTY_FORM = {
   id: "",
@@ -30,6 +32,7 @@ function CreateCategory({
 
   const isSubmitting = isCreateLoading || isUpdateLoading;
   const isUpdateMode = mode === "update";
+  const isLoading = isCreateLoading || isUpdateLoading;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -135,9 +138,12 @@ function CreateCategory({
           }).unwrap();
 
           console.log(response);
+          toast.success(response?.message)
+
         }else {
         const response = await createCategories(submitData).unwrap();
         console.log("create category response:", response);
+        toast.success(response?.message)
       }
 
       closeModal();
@@ -146,11 +152,13 @@ function CreateCategory({
         error?.data?.message || error?.message || "Something went wrong.",
       );
       console.log("error while submitting category:", error);
+      toast.error(error?.data?.message || error?.message || "Something went wrong.");
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      {<Loader isLoading={isLoading} />}
       <button
         type="button"
         aria-label="Close create category modal"
@@ -161,12 +169,18 @@ function CreateCategory({
       <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.20)]">
         <div className="flex items-start justify-between gap-4 border-b border-blue-100 bg-linear-to-r from-white via-blue-50 to-slate-50 px-5 py-5 sm:px-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-400">
+            {/* <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-400">
               {isUpdateMode ? "Update Category" : "Category Modal"}
-            </p>
-            <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
+            </p> */}
+            <h2 className="mt-2 text-lg font-bold text-slate-800 sm:text-lg">
               {isUpdateMode ? "Update Category" : "Create Category"}
             </h2>
+
+            {formError ? (
+                <p className=" mt-2 rounded-2xl border border-red-100 bg-red-50 px-2 py-2 text-sm font-medium text-red-500">
+                  {formError}
+                </p>
+              ) : null}
           </div>
 
           <button
@@ -243,9 +257,9 @@ function CreateCategory({
                         <p className="text-sm font-semibold text-slate-700">
                           Click to replace image
                         </p>
-                        <p className="text-xs text-slate-500">
+                        {/* <p className="text-xs text-slate-500">
                           Best results with a sharp product or category banner.
-                        </p>
+                        </p> */}
                       </div>
                     </div>
                   ) : (
@@ -254,19 +268,15 @@ function CreateCategory({
                       <span className="text-sm font-semibold text-slate-700">
                         Click to upload image
                       </span>
-                      <span className="mt-1 text-xs text-slate-500">
+                      {/* <span className="mt-1 text-xs text-slate-500">
                         Recommended size: high-quality square or landscape image
-                      </span>
+                      </span> */}
                     </div>
                   )}
                 </div>
               </FieldShell>
 
-              {formError ? (
-                <p className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-500">
-                  {formError}
-                </p>
-              ) : null}
+              
             </div>
           </div>
 

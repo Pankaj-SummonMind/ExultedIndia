@@ -7,6 +7,8 @@ import {
 import Lightbox from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
+import Loader from "../../components/loader/Loader";
+import toast from "react-hot-toast";
 // import {trash} from "lucide-react"
 // import {
 //   useDeleteCertificateMutation,
@@ -15,9 +17,10 @@ import "yet-another-react-lightbox/styles.css";
 // } from "../../services/api";
 
 function CertificateScreen() {
-  const [deleteCertificate] = useDeleteCertificateMutation();
-  const { data, isLoading } = useGetAllCertificatesQuery();
+  const [deleteCertificate,{isLoading:isDeleteLoading}] = useDeleteCertificateMutation();
+  const { data, isLoading:isCertificateLoading,error:fetchingError } = useGetAllCertificatesQuery();
   console.log("data from getAllCertificates api : ", data);
+  const isLoading = isCertificateLoading || isDeleteLoading;
 
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -56,14 +59,17 @@ function CertificateScreen() {
       const res = await deleteCertificate({
         id: item._id,
       }).unwrap();
+      toast.success(res?.message || "Certificate deleted successfully");
       console.log("res after deleting certificate :", res);
     } catch (error) {
+      toast.error(error?.data?.message || "Failed to delete certificate");
       console.log("error : ", error);
     }
   };
 
   return (
     <section className="p-4 sm:p-5 lg:p-6">
+      <Loader isLoading={isLoading} />
       <div className="mb-5 rounded-[30px] border border-blue-100 bg-linear-to-br from-white via-blue-50 to-slate-50 p-5 shadow-[0_18px_45px_rgba(59,130,246,0.10)] sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>

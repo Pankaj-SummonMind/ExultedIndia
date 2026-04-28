@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import CreateProduct from "../../../components/CreateProduct";
 import { useDeleteProductMutation, useGetProductByidQuery } from "../../../services/api";
+import Loader from "../../../components/loader/Loader";
+import toast from "react-hot-toast";
 
 function ProductById() {
   const navigate = useNavigate();
@@ -10,9 +12,10 @@ function ProductById() {
   const [category, setCategory] = useState({});
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const {data : productDetail} = useGetProductByidQuery(id)
-  const [deleteProduct,{isLoading}] = useDeleteProductMutation()
+  const {data : productDetail, isLoading: isProductLoading,error} = useGetProductByidQuery(id)
+  const [deleteProduct,{isLoading: isDeleteLoading}] = useDeleteProductMutation()
   const [showCreateProduct, setShowCreateProduct] = useState(false);
+  const isLoading = isProductLoading || isDeleteLoading;
   const productData = productDetail?.data;
   const productImages = useMemo(
     () =>
@@ -39,14 +42,22 @@ function ProductById() {
   // });
   // }, [id]);
 
+  useEffect(() => {
+    if (error) {
+      toast.error("Internal Server Error:");
+    }
+  }, [error]);
+
 
   const handleDelete = async () => {
     try {
       const res = await deleteProduct(id).unwrap()
       console.log("respone while deleting categories", res)
       navigate("/admin/product");
+      toast.success(res?.message || "Product deleted successfully");
     } catch (error) {
       console.log("error: ", error)
+      toast.error(error?.data?.message || "Failed to delete product");
     }
   };
 
@@ -86,12 +97,14 @@ function ProductById() {
       onShowList={() => setShowCreateProduct(false)} 
       mode = "update"
       initialData={productDetail.data}
+      productImages={productImages}
       />;
     }
   
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+      <Loader isLoading={isLoading} />
       <div className="`rounded-4xl border border-blue-100 bg-linear-to-br from-white via-blue-50 to-slate-50 p-5 shadow-[0_18px_45px_rgba(59,130,246,0.10)] sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">

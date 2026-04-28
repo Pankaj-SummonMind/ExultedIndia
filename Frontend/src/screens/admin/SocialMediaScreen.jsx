@@ -1,7 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 // import { api } from "../../services/api";
 import CreateSocialMedia from "../../components/CreateSocialMedia";
 import {useDeleteSocialMediaMutation, useGetAllSocialMediaQuery } from "../../services/api";
+import Loader from "../../components/loader/Loader";
+import toast from "react-hot-toast";
 function SocialMediaScreen() {
   // const {
   //   data,
@@ -9,12 +11,19 @@ function SocialMediaScreen() {
   //   refetch,
   // } = api.useGetAllSocialMediaQuery();
 
-  const {data,isLoading}  = useGetAllSocialMediaQuery()
-  const [deleteSocialMedia] = useDeleteSocialMediaMutation()
+  const {data,isLoading:isFetching,error:fetchError}  = useGetAllSocialMediaQuery()
+  const [deleteSocialMedia,{isLoading: isDeleting}] = useDeleteSocialMediaMutation()
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [activeAccount, setActiveAccount] = useState(null);
   console.log("social media data :",data);
+  const isLoading = isFetching || isDeleting;
+
+  useEffect(() => {
+    if (fetchError) {
+      toast.error("internal server error");
+    }
+  }, [fetchError]);
 
   const socialAccounts = useMemo(() => {
     return Array.isArray(data?.data) ? data.data : [];
@@ -47,14 +56,17 @@ function SocialMediaScreen() {
       const res = await deleteSocialMedia({
         id : item._id
       }).unwrap() 
+      toast.success(res?.message || "Account deleted successfully");
       console.log("res after deleting account :",res);
     } catch (error) {
+      toast.error(error?.data?.message || "Failed to delete account");
       console.log("error : ", error)
     }
   }
 
   return (
     <section className="p-4 sm:p-5 lg:p-6">
+      <Loader isLoading={isLoading} />
       <div className="mb-5 rounded-[30px] border border-blue-100 bg-linear-to-br from-white via-blue-50 to-slate-50 p-5 shadow-[0_18px_45px_rgba(59,130,246,0.10)] sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -85,7 +97,7 @@ function SocialMediaScreen() {
         </div>
       </div>
 
-      {isLoading ? (
+      {isFetching ? (
         <div className="rounded-3xl border border-blue-100 bg-white px-5 py-8 text-center text-sm font-medium text-slate-500 shadow-[0_14px_35px_rgba(148,163,184,0.10)]">
           Loading accounts...
         </div>

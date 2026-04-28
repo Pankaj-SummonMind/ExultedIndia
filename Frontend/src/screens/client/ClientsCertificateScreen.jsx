@@ -96,10 +96,10 @@ function ClientsCertificateScreen() {
 
       <section className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="inline-flex rounded-full border border-blue-200 bg-white/85 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-blue-500 shadow-sm backdrop-blur">
+          <p className="inline-flex rounded-full border border-blue-200 bg-white/85 px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-blue-500 shadow-sm backdrop-blur">
             Exulted India
           </p>
-          <h1 className="mt-5 text-4xl font-black leading-tight text-[#111827] sm:text-5xl lg:text-6xl">
+          <h1 className="mt-8 text-2xl font-bold leading-tight text-[#111827] sm:text-2xl lg:text-2xl">
             Certificate
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base font-semibold leading-7 text-slate-600 sm:text-lg">

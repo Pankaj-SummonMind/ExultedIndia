@@ -12,6 +12,8 @@ import {
   useUpdateHomePageMutation,
 } from "../../services/api";
 import CreateHomePageForm from "../../components/HomePageForm.jsx/CreateHomePageForm";
+import Loader from "../../components/loader/Loader";
+import toast from "react-hot-toast";
 
 const INITIAL_HERO_CARD = {
   id: "hero-card",
@@ -79,15 +81,23 @@ const cardBaseClass =
 function HomePageScreen() {
   const {
     data: homePageResponse,
-    isLoading,
+    isLoading:ishomeLoading,
     error,
   } = useGetHomePageQuery();
-  const [updateHomePage] = useUpdateHomePageMutation();
+  const [updateHomePage,{isLoading:isUpdateLoading}] = useUpdateHomePageMutation();
   const [activeForm, setActiveForm] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [pageState, setPageState] = useState(INITIAL_HOME_PAGE_STATE);
 
   console.log("home page response in home page screen:", homePageResponse);
+
+  const isLoading = ishomeLoading || isUpdateLoading;
+
+  useEffect(() => {
+      if (error) {
+        toast.error(error?.data?.message || "Internal server error");
+      }
+    }, [error]);
 
   const homePageData = useMemo(
     () => getHomePageSource(homePageResponse),
@@ -111,15 +121,22 @@ function HomePageScreen() {
   };
 
   const submitHomePageUpdate = async (payload, transformState) => {
-    const response = await updateHomePage(payload).unwrap();
-    const nextData = getHomePageSource(response);
-
-    if (nextData) {
-      const normalizedState = normalizeHomePageState(nextData);
-
-      setPageState(
-        transformState ? transformState(normalizedState) : normalizedState,
-      );
+    try {
+      const response = await updateHomePage(payload).unwrap();
+      const nextData = getHomePageSource(response);
+  
+      if (nextData) {
+        const normalizedState = normalizeHomePageState(nextData);
+  
+        setPageState(
+          transformState ? transformState(normalizedState) : normalizedState,
+        );
+      }
+      console.log("home page update response:", response);
+      toast.success(response?.message || "Home page updated successfully!");
+    } catch (error) {
+      console.error("Error updating home page:", error);
+      toast.error(error?.data?.message || "Failed to update home page. Please try again.");
     }
   };
 
@@ -238,17 +255,18 @@ function HomePageScreen() {
     await submitHomePageUpdate(payload);
   };
 
-  if (isLoading) {
-    return (
-      <section className="flex min-h-[70vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
-      </section>
-    );
-  }
+  // if (ishomeLoading || isUpdateLoading) {
+  //   return (
+  //     <section className="flex min-h-[70vh] items-center justify-center">
+  //       <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
+  //     </section>
+  //   );
+  // }
 
   if (!homePageData && !showCreateForm) {
     return (
       <section className="flex min-h-[calc(100vh-160px)] flex-col gap-6">
+        <Loader isLoading={isLoading} />
         <div className="flex mt-5 justify-center">
           <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-lg sm:p-8">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
@@ -267,12 +285,12 @@ function HomePageScreen() {
               </svg>
             </div>
 
-            <h2 className="mt-6 text-2xl font-bold text-slate-800">
+            <h2 className="mt-3 text-xl font-bold text-slate-800">
               No Home Page Data Found
             </h2>
 
             {error && error?.status !== 404 ? (
-              <p className="mt-3 text-sm leading-6 text-red-500 sm:text-base">
+              <p className="mt-3 text-sm leading-6 text-red-500 sm:text-sm">
                 {error?.data?.message || "Unable to load home page data."}
               </p>
             ) : null}
@@ -280,7 +298,7 @@ function HomePageScreen() {
             <button
               type="button"
               onClick={() => setShowCreateForm(true)}
-              className="mt-8 inline-flex items-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700"
+              className="mt-3 inline-flex items-center rounded-2xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700"
             >
               + Create Home Page
             </button>
@@ -314,6 +332,7 @@ function HomePageScreen() {
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+
       <div className="relative overflow-hidden rounded-[34px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f8fafc_100%)] p-4 sm:p-5">
         <div className="grid gap-5 xl:grid-cols-2">
           <ContentCard
@@ -700,7 +719,7 @@ function ContentCard({
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-600">
             Home Page
           </p>
-          <h2 className="mt-2 text-xl font-bold text-slate-900">{heading}</h2>
+          <h2 className="mt-2 text-lg font-bold text-slate-900">{heading}</h2>
         </div>
 
         <button

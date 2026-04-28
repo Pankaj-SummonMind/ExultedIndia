@@ -1,7 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PencilLine, Plus, RefreshCcw } from "lucide-react";
 import AboutUsPageForm from "../../components/HomePageForm.jsx/AboutUsPageForm/AboutUsPageForm";
 import { useGetAboutUsQuery } from "../../services/api";
+import Loader from "../../components/loader/Loader";
+import toast from "react-hot-toast";
 
 const cardBaseClass =
   "relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_50px_rgba(15,23,42,0.08)] backdrop-blur sm:p-6";
@@ -33,18 +35,24 @@ function AboutUsPageScreen() {
     [aboutUsData],
   );
 
-  if (isLoading) {
-    return (
-      <section className="flex min-h-[70vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-sky-100 border-t-sky-600" />
-          <p className="text-sm font-medium text-slate-500">
-            About Us content loading...
-          </p>
-        </div>
-      </section>
-    );
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error(error?.data?.message || "Internal server error");
+    }
+  }, [error]);
+
+  // if (isLoading) {
+  //   return (
+  //     <section className="flex min-h-[70vh] items-center justify-center">
+  //       <div className="flex flex-col items-center gap-4">
+  //         <div className="h-12 w-12 animate-spin rounded-full border-4 border-sky-100 border-t-sky-600" />
+  //         <p className="text-sm font-medium text-slate-500">
+  //           About Us content loading...
+  //         </p>
+  //       </div>
+  //     </section>
+  //   );
+  // }
 
   if (isFormVisible) {
     return (
@@ -62,13 +70,14 @@ function AboutUsPageScreen() {
   if (!hasAboutUsData) {
     return (
       <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+        <Loader isLoading={isLoading} />
         <div className="rounded-[34px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f8fafc_100%)] p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)] sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               {/* <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">
                 About Us Page
               </p> */}
-              <h1 className="mt-3 text-3xl font-bold text-slate-900">
+              <h1 className="mt-3 text-xl font-bold text-slate-900">
                 Create your About Us content
               </h1>
               <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
@@ -97,7 +106,7 @@ function AboutUsPageScreen() {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">
             Admin Preview
           </p>
-          <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
+          <h1 className="mt-2 text-xl font-bold text-slate-900 sm:text-xl">
             About Us
           </h1>
         </div>
@@ -334,7 +343,7 @@ function ImagePreview({ src, alt, className = "" }) {
 
 function PreviewPoint({ title, detail }) {
   return (
-    <div className="rounded-[24px] border border-slate-200/80 bg-slate-50/80 p-4">
+    <div className="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-4">
       <p className="text-sm font-semibold text-slate-800">{title}</p>
       <p className="mt-2 text-sm leading-6 text-slate-500">{detail}</p>
     </div>

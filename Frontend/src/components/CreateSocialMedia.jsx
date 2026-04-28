@@ -1,6 +1,8 @@
 
 import { useEffect, useState } from "react";
 import { useCreateSocialMediaMutation, useUpdateSocialMediaMutation } from "../services/api";
+import toast from "react-hot-toast";
+import Loader from "./loader/Loader";
 // import { api } from "../../services/api";
 
 const EMPTY_FORM = {
@@ -16,12 +18,14 @@ function CreateSocialMedia({
 //   refetch,
 }) {
 
-  const[createSocialMedia,{isLoading}] =  useCreateSocialMediaMutation() 
+  const[createSocialMedia,{isLoading:isCreateLoading}] =  useCreateSocialMediaMutation() 
   const[updateSocialMedia,{isLoading:isUpdateLoading}] = useUpdateSocialMediaMutation()
 
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isLoading = isCreateLoading || isUpdateLoading;
 
   const apiBaseUrl = String(import.meta.env.VITE_API_URL || "").replace(
     /\/$/,
@@ -71,17 +75,19 @@ function CreateSocialMedia({
                 value:trimmedValue
             })
             console.log("res after updating Value",res )
+            toast.success(res?.message || "Account updated successfully");
         }
         else{
             const res = await createSocialMedia({
               key: trimmedKey,
               value: trimmedValue,
             }).unwrap();
+            toast.success(res?.message || "Account created successfully");
             console.log("res after creating account",res)
         }
     //   await refetch();
     } catch (error) {
-      setFormError(error.message || "Something went wrong");
+      toast.error(error?.message || "Failed to save account. Please try again.");
       console.log("error while handling social Media : ",error )
     } finally {
       setIsSubmitting(false);
@@ -93,6 +99,7 @@ function CreateSocialMedia({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-[3px]">
+      <Loader isLoading={isLoading} />
       <div className="w-full max-w-lg overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.20)]">
         <div className="border-b border-blue-100 bg-linear-to-r from-white via-blue-50 to-slate-50 px-5 py-5 sm:px-6">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-400">

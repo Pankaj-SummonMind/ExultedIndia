@@ -84,10 +84,10 @@ function ClientsSubCategory() {
             <p className="inline-flex rounded-full border border-blue-200 bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-blue-600 shadow-sm backdrop-blur">
               {subCategory?.category_Id?.categories_name}
             </p>
-            <h1 className="mt-5 text-4xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-6xl">
+            <h1 className="mt-5 text-xl font-black leading-tight text-slate-950 sm:text-xl lg:text-2xl">
               {subCategory?.name}
             </h1>
-            <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base lg:text-lg lg:leading-8">
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base lg:text-lg lg:leading-7">
               {subCategory?.description}
             </p>
 
@@ -106,10 +106,10 @@ function ClientsSubCategory() {
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-600">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-600">
               Related Products
             </p>
-            <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
+            <h2 className="mt-2 text-xl font-black text-slate-950 sm:text-xl">
               Explore {subCategory?.name}
             </h2>
           </div>
@@ -159,17 +159,17 @@ function ProductCard({ product, index, onOpen }) {
           className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.48))]" />
-        <span className="absolute left-4 top-4 rounded-full border border-white/40 bg-white/85 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-blue-700 shadow-sm backdrop-blur">
+        {/* <span className="absolute left-4 top-4 rounded-full border border-white/40 bg-white/85 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-blue-700 shadow-sm backdrop-blur">
           {String(index + 1).padStart(2, "0")}
-        </span>
+        </span> */}
       </button>
 
-      <div className="flex flex-1 flex-col justify-between p-4">
+      <div className="flex flex-1 flex-col justify-between p-3">
         <div>
-          <h3 className="line-clamp-2 min-h-12 text-lg font-black leading-6 text-slate-950">
+          <h3 className="line-clamp-2 min-h-8 text-base font-black leading-6 text-slate-950">
             {title}
           </h3>
-          <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">
+          <p className=" line-clamp-3 text-sm leading-6 text-slate-600">
             {description}
           </p>
         </div>
@@ -177,7 +177,7 @@ function ProductCard({ product, index, onOpen }) {
         <button
           type="button"
           onClick={onOpen}
-          className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-4 text-sm font-black text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
+          className="mt-4 inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
         >
           View More
           <ArrowUpRightIcon className="h-4 w-4" />

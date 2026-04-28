@@ -5,6 +5,8 @@ import {
   useGetSubCategoriesQuery,
   useUpdateProductMutation,
 } from "../services/api";
+import toast from "react-hot-toast";
+import Loader from "./loader/Loader";
 
 const initialFormState = {
   id: "",
@@ -24,12 +26,13 @@ function CreateProduct({
   setIsCreateModalOpen,
   mode = "create",
   initialData = null,
+  productImages = [],
 }) {
-  const [addProduct, { isLoading }] = useAddProductMutation();
+  const [addProduct, { isLoading:addProductLoading, }] = useAddProductMutation();
   const [updateProduct, { isLoading: isUpdateLoading }] =
   useUpdateProductMutation();
-  const { data: categoryData } = useGetCategoriesQuery();
-  const { data: subCategoryData } = useGetSubCategoriesQuery();
+  const { data: categoryData, isLoading: isCategoryLoading,error: categoryError } = useGetCategoriesQuery();
+  const { data: subCategoryData, isLoading: isSubCategoryLoading,error: subCategoryError } = useGetSubCategoriesQuery();
   console.log("category data:", categoryData);
   console.log("subCategory Data", subCategoryData);
 
@@ -38,7 +41,14 @@ function CreateProduct({
   const [subCategorySearch, setSubCategorySearch] = useState("");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
-  console.log("initial data ", initialData);
+  console.log("initial data ", initialData,productImages);
+  const isLoading = addProductLoading || isUpdateLoading || isCategoryLoading || isSubCategoryLoading;
+
+  useEffect(() => {
+    if (categoryError || subCategoryError) {
+      toast.error("Internal Server Error:");
+    }
+  }, [categoryError, subCategoryError]);
 
   const categoryOptions = useMemo(
     () =>
@@ -48,6 +58,8 @@ function CreateProduct({
       })) || [],
     [categoryData],
   );
+
+  
 
   const subCategoryOptions = useMemo(
     () =>
@@ -83,7 +95,7 @@ function CreateProduct({
                 value: item.value || "",
               }))
             : [{ key: "", value: "" }],
-        images: initialData.images || [],
+        images: productImages|| [],
       });
 
       setCategorySearch(initialData.product_category?.categories_name || "");
@@ -263,6 +275,7 @@ function CreateProduct({
       if (mode === "create") {
         const res = await addProduct(payload).unwrap();
         console.log("Created:", res);
+        toast.success(res.message || "Product created successfully");
       }
 
       // UPDATE
@@ -273,23 +286,26 @@ function CreateProduct({
         }).unwrap();
 
         console.log("Updated:", res);
+        toast.success(res.message || "Product updated successfully");
       }
 
       onShowList();
     } catch (error) {
       console.log(error);
+      toast.error(error.data?.message || "An error occurred. Please try again.");
     }
   };
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+      <Loader isLoading={isLoading} />
       <div className="rounded-4xl border border-blue-100 bg-linear-to-br from-white via-blue-50 to-slate-50 p-5 shadow-[0_18px_45px_rgba(59,130,246,0.10)] sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-blue-400">
               Product Workspace
             </p>
-            <h1 className="mt-2 text-2xl font-bold text-slate-800 sm:text-3xl">
+            <h1 className="mt-2 text-xl font-bold text-slate-800 sm:text-xl">
               {mode === "create" ? "Create Product" : "Update Product"}
             </h1>
             {/* <p className="mt-3 text-sm leading-6 text-slate-500 sm:text-base">

@@ -1,17 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetUserByidQuery } from "../../../services/api";
+import Loader from "../../../components/loader/Loader";
 
 function UserById() {
   const navigate = useNavigate();
   const { id } = useParams();
   // const {data , isLoading,error} = useGetCategoriesByIdQuery(id);
   // const [deleteCategories,{isLoading:isDeleteLoading}] = useDeleteCategoriesMutation()
-  const {data : userData} = useGetUserByidQuery(id)
+  const {data : userData, isLoading,error} = useGetUserByidQuery(id)
   const [category, setCategory] = useState({});
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   console.log("id inside getcategoryByid:",id )
   console.log("data for id :",userData)
+
+  useEffect(() => {
+    if (error) {
+      console.log("error while fetching category by id:", error);
+    }
+  }, [error]);
 
   useEffect(() => {
     setCategory({
@@ -58,7 +65,7 @@ function FeatureStarIcon({ className }) {
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-6">
   <div className="rounded-4xl border border-blue-100 bg-linear-to-br from-white via-blue-50 to-slate-50 p-4 shadow-[0_18px_45px_rgba(59,130,246,0.10)] sm:p-6 lg:p-8">
-    
+    <Loader isLoading={isLoading} />
     {/* Header */}
     <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
       <div>
