@@ -7,6 +7,7 @@ import {
   useGetHomePageQuery,
 } from "../../services/api";
 import { Helmet } from "react-helmet-async";
+import Loader from "../../components/loader/Loader";
 
 const heroImage =
   "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=80";
@@ -138,19 +139,27 @@ const testimonials = [
 const quickLinks = ["Products", "About", "Certificates", "Contact"];
 
 function ClientHomeScreen() {
-  const { data: categories } = useGetCategoriesQuery();
-  const { data: HomeScreenData } = useGetHomePageQuery();
-  const { data: certificates } = useGetAllCertificatesQuery();
-  const { data: aboutUsData } = useGetAboutUsQuery();
+  const { data: categories,isLoading:isCategoriesLoading,error:categoriesError } = useGetCategoriesQuery();
+  const { data: HomeScreenData,isLoading:isHomeScreenLoading,error:homeScreenError } = useGetHomePageQuery();
+  const { data: certificates,isLoading:isCertificatesLoading,error:certificatesError } = useGetAllCertificatesQuery();
+  const { data: aboutUsData,isLoading:isAboutUsLoading,error:aboutUsError } = useGetAboutUsQuery();
   console.log("about us data : ", aboutUsData);
+
+
+
+  const isLoading = isCategoriesLoading || isHomeScreenLoading || isCertificatesLoading || isAboutUsLoading;
+  const error = categoriesError || homeScreenError || certificatesError || aboutUsError;
 
   const home = HomeScreenData?.data;
   const aboutUs = aboutUsData?.data;
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  
   // const [previewCertificate, setPreviewCertificate] = useState(null);
-
+  
   return (
     <div className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
+      {/* <LoadingScreen /> */}
+      <Loader isLoading={isLoading} />
 
       <Helmet>
         <title>Exulted India | Batteries, UPS & EV Chargers</title>
@@ -158,10 +167,8 @@ function ClientHomeScreen() {
         <meta name="keywords" content="Exaulted India, power systems, EV chargers, batteries, inverters, online UPS, generators, transformers, certifications, pan-India service" />
       </Helmet>
 
-
       <SeoBlock />
       <LocalAnimationStyles />
-      {/* <LoadingScreen /> */}
 
       <FloatingParticles />
       <HeroSection data={home?.hero} />

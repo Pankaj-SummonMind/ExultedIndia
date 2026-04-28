@@ -188,42 +188,59 @@ function CompanyOverview({ AboutUsData }) {
   );
 }
 
-function SplitInfoSection({AboutUsData, eyebrow}) {
-  // const ImageIcon = section.Icon;
-
+function SplitInfoSection({ AboutUsData, eyebrow }) {
   return (
-    <article
-      className="grid overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_24px_90px_rgba(15,91,191,0.1)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_34px_110px_rgba(15,91,191,0.16)] lg:grid-cols-2"
-      // style={{ animationDelay: `${index * 120}ms` }}
-    >
-      <div className="relative min-h-80 overflow-hidden">
-        <img
-          src={AboutUsData?.image?.url}
-          alt="mission image"
-          loading="lazy"
-          className="h-full w-full object-cover transition duration-700 hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.48),rgba(96,165,250,0.18),rgba(34,197,94,0.12))]" />
-      </div>
+    <section className="grid gap-5 lg:grid-cols-[1fr_0.95fr] lg:gap-6">
+      {/* Image Card */}
+      <div className="overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
+        <div className="relative h-62.5 sm:h-80 lg:h-80">
+          <img
+            src={AboutUsData?.image?.url}
+            alt={eyebrow}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
 
-      <div className="relative flex items-center bg-[#111827] p-6 text-white sm:p-8 lg:p-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,rgba(96,165,250,0.24),transparent_32%),radial-gradient(circle_at_20%_82%,rgba(34,197,94,0.18),transparent_28%)]" />
-        <div className="relative">
-          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25">
-            {/* <ImageIcon className="h-7 w-7" /> */}
-          </div>
-          <p className="mt-6 text-xs font-black uppercase tracking-[0.24em] text-emerald-300">
-            {AboutUsData?.heading}
-          </p>
-          <h2 className="mt-3 text-lg font-black leading-tight sm:text-lg">
-            {AboutUsData?.subHeading}
-          </h2>
-          <p className="mt-2 text-sm leading-7 text-slate-300 sm:text-base">
-            {AboutUsData?.detail}
-          </p>
+          {/* Bottom White Button */}
+          {/* <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-auto sm:w-[72%]">
+            <div className="rounded-2xl bg-white px-5 py-4 shadow-lg">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-900 sm:text-sm">
+                Explore Our Values →
+              </p>
+            </div>
+          </div> */}
         </div>
       </div>
-    </article>
+
+      {/* Content Card */}
+      <div className="rounded-[26px] border border-slate-200 bg-[#F8F8F8] px-5 py-6 shadow-[0_14px_40px_rgba(15,23,42,0.06)] sm:px-7 sm:py-8 lg:px-8 lg:py-9">
+        <div className="flex items-start gap-3">
+          {/* <h2 className="text-2xl font-black leading-tight text-black sm:text-[30px]">
+            {eyebrow}
+          </h2> */}
+
+          <div className="mt-1 grid h-9 w-9 place-items-center rounded-full border-2 border-black text-base">
+            💡
+          </div>
+        </div>
+
+        {AboutUsData?.heading && (
+          <p className="mt-5 text-base font-bold uppercase tracking-[0.22em] text-sky-600">
+            {AboutUsData?.heading}
+          </p>
+        )}
+
+        {AboutUsData?.subHeading && (
+          <h3 className="mt-2 text-base font-bold leading-7 text-slate-900">
+            {AboutUsData?.subHeading}
+          </h3>
+        )}
+
+        <p className="mt-5 text-sm leading-7 text-slate-600 sm:text-[15px]">
+          {AboutUsData?.detail}
+        </p>
+      </div>
+    </section>
   );
 }
 

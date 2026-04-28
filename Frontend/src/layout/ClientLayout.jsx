@@ -297,17 +297,17 @@ const activeSubCategories = useMemo(() => {
               <NavLink
                 to="/contact"
                 onClick={closeMobileMenu}
-                className="rounded-xl border border-blue-200 px-4 py-3 text-center text-sm font-bold text-blue-700 transition hover:bg-blue-50"
+                className="rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
               >
-                Get Quote
+                Get in touch
               </NavLink>
-              <NavLink
+              {/* <NavLink
                 to="/admin"
                 onClick={closeMobileMenu}
                 className="rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
               >
                 Partner Login
-              </NavLink>
+              </NavLink> */}
             </div>
           </div>
         </div>

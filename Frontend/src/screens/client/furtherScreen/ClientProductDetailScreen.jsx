@@ -132,70 +132,69 @@ function ClientProductDetailScreen() {
       <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="rounded-[30px] border border-blue-100 bg-white/90 p-4 shadow-[0_22px_70px_rgba(15,91,191,0.10)] backdrop-blur sm:p-5">
-            <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_52%,#f8fafc_100%)]">
-                <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
-                  <span className="rounded-full border border-white/75 bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.24em] text-slate-500 shadow-sm backdrop-blur">
-                    Product Gallery
-                  </span>
+           <div className="space-y-4">
+  <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_52%,#f8fafc_100%)]">
+    <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
+      {/* <span className="rounded-full border border-white/75 bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.24em] text-slate-500 shadow-sm backdrop-blur">
+        Product Gallery
+      </span> */}
 
-                  {galleryImages.length > 1 ? (
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={handlePreviousImage}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-white"
-                        aria-label="Show previous product image"
-                      >
-                        <ArrowLeftIcon className="h-5 w-5" />
-                      </button>
+      {galleryImages.length > 1 ? (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handlePreviousImage}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-white"
+          >
+            <ArrowLeftIcon className="h-5 w-5" />
+          </button>
 
-                      <button
-                        type="button"
-                        onClick={handleNextImage}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-white"
-                        aria-label="Show next product image"
-                      >
-                        <ArrowRightIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
+          <button
+            type="button"
+            onClick={handleNextImage}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-white"
+          >
+            <ArrowRightIcon className="h-5 w-5" />
+          </button>
+        </div>
+      ) : null}
+    </div>
 
-                <div className="flex min-h-75 items-center justify-center p-6 sm:min-h-115 sm:p-8">
-                  <img
-                    src={galleryImages[currentImageIndex]}
-                    alt={product?.product_name || "Product image"}
-                    className="max-h-105 w-full rounded-3xl object-contain sm:max-h-130"
-                  />
-                </div>
-              </div>
+    {/* Main Image Fixed Size */}
+    <div className="flex h-[420px] w-full items-center justify-center p-6 sm:h-[520px] sm:p-8">
+      <img
+        src={galleryImages[currentImageIndex]}
+        alt={product?.product_name || "Product image"}
+        className="h-full w-full object-contain"
+      />
+    </div>
+  </div>
 
-              {galleryImages.length > 1 ? (
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-                  {galleryImages.map((image, index) => (
-                    <button
-                      key={`${image}-${index}`}
-                      type="button"
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={[
-                        "group overflow-hidden rounded-[22px] border bg-slate-50 transition",
-                        currentImageIndex === index
-                          ? "border-blue-400 shadow-[0_12px_32px_rgba(59,130,246,0.18)]"
-                          : "border-slate-200 hover:border-blue-200",
-                      ].join(" ")}
-                      aria-label={`Show product image ${index + 1}`}
-                    >
-                      <img
-                        src={image}
-                        alt={`${product?.product_name || "Product"} ${index + 1}`}
-                        className="h-24 w-full object-cover transition duration-300 group-hover:scale-105 sm:h-28"
-                      />
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
+  {/* Thumbnail Images */}
+  {galleryImages.length > 1 ? (
+    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+      {galleryImages.map((image, index) => (
+        <button
+          key={`${image}-${index}`}
+          type="button"
+          onClick={() => setCurrentImageIndex(index)}
+          className={[
+            "group flex h-24 w-full items-center justify-center overflow-hidden rounded-[22px] border bg-slate-50 transition sm:h-28",
+            currentImageIndex === index
+              ? "border-blue-400 shadow-[0_12px_32px_rgba(59,130,246,0.18)]"
+              : "border-slate-200 hover:border-blue-200",
+          ].join(" ")}
+        >
+          <img
+            src={image}
+            alt={`${product?.product_name || "Product"} ${index + 1}`}
+            className="h-full w-full object-contain p-2 transition duration-300 group-hover:scale-105"
+          />
+        </button>
+      ))}
+    </div>
+  ) : null}
+</div>
           </div>
 
           <div className="rounded-[30px] border border-blue-100 bg-white px-5 py-6 shadow-[0_22px_70px_rgba(15,91,191,0.10)] sm:px-7 sm:py-8">

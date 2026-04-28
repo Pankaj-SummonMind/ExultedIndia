@@ -3,15 +3,6 @@ import { NavLink } from "react-router-dom";
 import { useGetCategoriesQuery } from "../../services/api";
 import { Helmet } from "react-helmet-async";
 
-const categoryImages = [
-  "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=1200&q=80",
-];
-
 const categoryCopy = {
   battery:
     "High endurance energy storage built for dependable backup, renewable integration, and long operating life across demanding power environments.",
@@ -37,8 +28,6 @@ function ClientsProductScreen() {
     return [];
   }, [data]);
 
-  console.log("Fetched categories:", categories);
-
   return (
     <main className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
       <Helmet>
@@ -48,22 +37,39 @@ function ClientsProductScreen() {
       </Helmet>
 
       <BackgroundDecor />
-      {/* <section className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
-        <div className="max-w-3xl">
-          <p className="inline-flex rounded-full border border-blue-200 bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-blue-500 shadow-sm backdrop-blur">
-            Product Categories
-          </p>
-          <h1 className="mt-5 text-4xl font-black leading-tight text-[#111827] sm:text-5xl">
-            Engineered power solutions for modern India.
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">
-            Explore Exaulted India's premium range of batteries, inverters,
-            transformers, online UPS, gensets, and power ecosystem products.
-          </p>
+      {/* <section className="relative mx-auto max-w-7xl px-4 pt-8 pb-18 sm:px-6 lg:px-8 lg:pt-12">
+        <div className="overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/80 p-6 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8">
+          <div className="flex flex-col gap-6">
+            <div className="max-w-3xl">
+              <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-blue-700">
+                Categories
+              </span>
+              <h1 className="mt-4 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl lg:text-[2.1rem]">
+                Explore our product categories
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-[15px]">
+                Reliable power solutions, presented in a cleaner and more
+                compact browsing experience for every screen size.
+              </p>
+            </div>
+
+            {!isLoading && !isError && categories.length > 0 ? (
+              <div className="-mx-2 flex gap-3 overflow-x-auto px-2 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {categories.map((category) => (
+                  <span
+                    key={`pill-${category._id || category.categories_name}`}
+                    className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm"
+                  >
+                    {category.categories_name}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
         </div>
       </section> */}
 
-      <section className="relative mx-auto max-w-7xl px-4 mt-4 pb-18 sm:px-6 lg:px-8">
+      <section className="mt-10 relative mx-auto max-w-7xl px-4 pb-18 sm:px-6 lg:px-8">
         {isLoading ? <CategorySkeletons /> : null}
 
         {!isLoading && isError ? <ErrorState error={error} /> : null}
@@ -73,7 +79,7 @@ function ClientsProductScreen() {
         ) : null}
 
         {!isLoading && !isError && categories.length > 0 ? (
-          <div className="grid gap-8 lg:gap-10">
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {categories.map((category, index) => (
               <CategoryPanel
                 key={category._id || category.categories_name}
@@ -89,88 +95,78 @@ function ClientsProductScreen() {
 }
 
 function CategoryPanel({ category, index }) {
-  const imageOnLeft = index % 2 === 0;
   const title = category.categories_name;
   const subCategories = Array.isArray(category.subCategories)
     ? category.subCategories
     : [];
-  const description = category.categories_description;
+  const description =
+    category.categories_description ||
+    getCategoryDescription(title, subCategories.length);
 
   return (
-    <article className="group relative overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_24px_90px_rgba(15,91,191,0.1)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_34px_110px_rgba(15,91,191,0.16)]">
-      <div
-        className={[
-          "absolute inset-0 opacity-95",
-          imageOnLeft
-            ? "bg-[linear-gradient(90deg,rgba(255,255,255,0.06),rgba(17,24,39,0.96)_50%,rgba(17,24,39,1))]"
-            : "bg-[linear-gradient(90deg,rgba(17,24,39,1),rgba(17,24,39,0.96)_50%,rgba(255,255,255,0.06))]",
-        ].join(" ")}
-      />
-
-      <div
-        className={[
-          "relative grid h-130 lg:grid-cols-2",
-          imageOnLeft ? "" : "lg:[&_.category-image]:order-2",
-        ].join(" ")}
-      >
-        {/* IMAGE */}
-        <div className="category-image relative h-full overflow-hidden bg-blue-50">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_28px_80px_rgba(37,99,235,0.16)]">
+      <div className="relative">
+        <div className="absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),transparent)]" />
+        <div className="absolute right-4 top-4 z-10 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-700 shadow-sm backdrop-blur">
+          {String(index + 1).padStart(2, "0")}
+        </div>
+        <div className="overflow-hidden bg-slate-100">
           <img
-            src={category.image.url}
+            src={category.image?.url}
             alt={`${title} category by Exaulted India`}
             loading="lazy"
-            className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+            className="h-52 w-full object-cover transition duration-700 group-hover:scale-105 sm:h-56"
           />
         </div>
+      </div>
 
-        {/* CONTENT */}
-        <div className="relative flex h-full items-center bg-[#111827] p-6 sm:p-8 lg:p-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(96,165,250,0.24),transparent_32%),radial-gradient(circle_at_20%_82%,rgba(34,197,94,0.18),transparent_28%)]" />
-
-          <div className="relative flex h-full max-w-xl flex-col justify-center">
-            <div className="flex items-center gap-3">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25">
-                <BoltIcon className="h-6 w-6" />
-              </span>
-            </div>
-
-            <h2 className="mt-5 text-3xl font-black leading-tight text-white sm:text-4xl">
-              {title}
-            </h2>
-
-            <p className="mt-5 text-sm leading-7 text-slate-300 sm:text-base line-clamp-6">
-              {description}
-            </p>
-
-            {subCategories.length ? (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {subCategories.slice(0, 5).map((subCategory) => (
-                  <NavLink
-                    key={subCategory._id || subCategory.name}
-                    to={`/products/subcategory/${subCategory._id}`}
-                    className="rounded-full border border-white/10 bg-white/8 px-3 py-2 text-xs font-bold text-slate-200 backdrop-blur transition hover:border-blue-300 hover:bg-blue-400/20 hover:text-white"
-                  >
-                    {subCategory.name}
-                  </NavLink>
-                ))}
-
-                {subCategories.length > 5 ? (
-                  <span className="rounded-full border border-white/10 bg-white/8 px-3 py-2 text-xs font-bold text-slate-300">
-                    +{subCategories.length - 5} more
-                  </span>
-                ) : null}
-              </div>
-            ) : null}
-
-            <NavLink
-              to={`/products/category/${category._id}`}
-              className="mt-8 inline-flex w-fit items-center gap-2 rounded-full bg-blue-400 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-400/25 transition hover:-translate-y-0.5 hover:bg-blue-500"
-            >
-              View More
-              <ArrowUpRightIcon className="h-4 w-4" />
-            </NavLink>
-          </div>
+      <div className="relative flex flex-1 flex-col p-5 sm:p-6">
+        <div className="flex items-center justify-between gap-3">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-inner shadow-blue-100">
+            <BoltIcon className="h-5 w-5" />
+          </span>
+          {subCategories.length ? (
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold text-slate-600">
+              {subCategories.length} subcategories
+            </span>
+          ) : null}
         </div>
+
+        <h2 className="mt-4 text-lg font-bold leading-snug text-slate-900 sm:text-xl">
+          {title}
+        </h2>
+
+        <p className="mt-3 text-sm leading-6 text-slate-600 line-clamp-4">
+          {description}
+        </p>
+
+        {subCategories.length ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {subCategories.slice(0, 3).map((subCategory) => (
+              <NavLink
+                key={subCategory._id || subCategory.name}
+                to={`/products/subcategory/${subCategory._id}`}
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+              >
+                {subCategory.name}
+              </NavLink>
+            ))}
+
+            {subCategories.length > 3 ? (
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-500">
+                +{subCategories.length - 3} more
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+
+        <NavLink
+          to={`/products/category/${category._id}`}
+          className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-600"
+        >
+          Learn More
+          <ArrowUpRightIcon className="h-4 w-4" />
+        </NavLink>
       </div>
     </article>
   );
@@ -194,22 +190,22 @@ function getCategoryDescription(title, subCategoryCount) {
 
 function CategorySkeletons() {
   return (
-    <div className="grid gap-8">
-      {[1, 2, 3].map((item) => (
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      {[1, 2, 3, 4, 5, 6].map((item) => (
         <div
           key={item}
-          className="grid min-h-105 overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_24px_90px_rgba(15,91,191,0.08)] lg:grid-cols-2"
+          className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]"
         >
-          <div className="animate-pulse bg-blue-100" />
-          <div className="bg-[#111827] p-8">
-            <div className="h-12 w-12 animate-pulse rounded-2xl bg-white/10" />
-            <div className="mt-6 h-8 w-2/3 animate-pulse rounded-full bg-white/12" />
-            <div className="mt-5 space-y-3">
-              <div className="h-3 w-full animate-pulse rounded-full bg-white/10" />
-              <div className="h-3 w-5/6 animate-pulse rounded-full bg-white/10" />
-              <div className="h-3 w-3/4 animate-pulse rounded-full bg-white/10" />
+          <div className="h-52 animate-pulse bg-slate-200 sm:h-56" />
+          <div className="p-6">
+            <div className="h-10 w-10 animate-pulse rounded-2xl bg-slate-200" />
+            <div className="mt-4 h-5 w-2/3 animate-pulse rounded-full bg-slate-200" />
+            <div className="mt-4 space-y-3">
+              <div className="h-3 w-full animate-pulse rounded-full bg-slate-200" />
+              <div className="h-3 w-5/6 animate-pulse rounded-full bg-slate-200" />
+              <div className="h-3 w-4/6 animate-pulse rounded-full bg-slate-200" />
             </div>
-            <div className="mt-8 h-12 w-32 animate-pulse rounded-full bg-blue-400/30" />
+            <div className="mt-6 h-10 w-28 animate-pulse rounded-full bg-slate-200" />
           </div>
         </div>
       ))}
