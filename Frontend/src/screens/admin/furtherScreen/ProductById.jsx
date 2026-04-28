@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import CreateProduct from "../../../components/CreateProduct";
-import { useDeleteProductMutation, useGetProductByidQuery } from "../../../services/api";
+import {
+  useDeleteProductMutation,
+  useGetProductByidQuery,
+} from "../../../services/api";
 import Loader from "../../../components/loader/Loader";
 import toast from "react-hot-toast";
 
@@ -12,8 +15,13 @@ function ProductById() {
   const [category, setCategory] = useState({});
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const {data : productDetail, isLoading: isProductLoading,error} = useGetProductByidQuery(id)
-  const [deleteProduct,{isLoading: isDeleteLoading}] = useDeleteProductMutation()
+  const {
+    data: productDetail,
+    isLoading: isProductLoading,
+    error,
+  } = useGetProductByidQuery(id);
+  const [deleteProduct, { isLoading: isDeleteLoading }] =
+    useDeleteProductMutation();
   const [showCreateProduct, setShowCreateProduct] = useState(false);
   const isLoading = isProductLoading || isDeleteLoading;
   const productData = productDetail?.data;
@@ -28,10 +36,10 @@ function ProductById() {
           return item?.url || item?.path || item?.image || "";
         })
         .filter(Boolean),
-    [productData?.images]
+    [productData?.images],
   );
   // console.log("id inside getcategoryByid:",id )
-  console.log("data for id :",productDetail)
+  console.log("data for id :", productDetail);
 
   // useEffect(() => {
   //   setCategory({
@@ -48,15 +56,14 @@ function ProductById() {
     }
   }, [error]);
 
-
   const handleDelete = async () => {
     try {
-      const res = await deleteProduct(id).unwrap()
-      console.log("respone while deleting categories", res)
+      const res = await deleteProduct(id).unwrap();
+      console.log("respone while deleting categories", res);
       navigate("/admin/product");
       toast.success(res?.message || "Product deleted successfully");
     } catch (error) {
-      console.log("error: ", error)
+      console.log("error: ", error);
       toast.error(error?.data?.message || "Failed to delete product");
     }
   };
@@ -65,7 +72,6 @@ function ProductById() {
     const updatedCategory = updateCategory(id, formData);
     setCategory(updatedCategory);
     setIsUpdateOpen(false);
-
   };
 
   useEffect(() => {
@@ -78,7 +84,7 @@ function ProductById() {
     }
 
     setCurrentImageIndex((current) =>
-      current === 0 ? productImages.length - 1 : current - 1
+      current === 0 ? productImages.length - 1 : current - 1,
     );
   };
 
@@ -88,19 +94,20 @@ function ProductById() {
     }
 
     setCurrentImageIndex((current) =>
-      current === productImages.length - 1 ? 0 : current + 1
+      current === productImages.length - 1 ? 0 : current + 1,
     );
   };
 
   if (showCreateProduct) {
-      return <CreateProduct 
-      onShowList={() => setShowCreateProduct(false)} 
-      mode = "update"
-      initialData={productDetail.data}
-      productImages={productImages}
-      />;
-    }
-  
+    return (
+      <CreateProduct
+        onShowList={() => setShowCreateProduct(false)}
+        mode="update"
+        initialData={productDetail.data}
+        productImages={productImages}
+      />
+    );
+  }
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
@@ -136,7 +143,6 @@ function ProductById() {
             </button>
           </div>
         </div>
-
       </div>
 
       <div className="grid gap-5 xl:grid-cols-1">
@@ -218,7 +224,6 @@ function ProductById() {
                 </div>
               ) : null}
             </div>
-
             <div className="space-y-3">
               <DetailSection
                 title="Product Name"
@@ -227,7 +232,6 @@ function ProductById() {
                 <p className="text-xl font-bold tracking-tight text-slate-900 sm:text-xl">
                   {productData?.product_name || "N/A"}
                 </p>
-              
               </DetailSection>
 
               <div className="grid gap-2 sm:grid-cols-2">
@@ -255,7 +259,8 @@ function ProductById() {
                 icon={<InfoIcon className="h-5 w-5" />}
               >
                 <p className="text-sm leading-7 text-slate-600 sm:text-base">
-                  {productData?.description || "No description available for this product."}
+                  {productData?.description ||
+                    "No description available for this product."}
                 </p>
               </DetailSection>
 
@@ -320,6 +325,36 @@ function ProductById() {
                   <EmptyState label="No specifications available for this product." />
                 )}
               </DetailSection>
+
+              <DetailSection
+                title="Product Catalog"
+                icon={<CatalogIcon className="h-5 w-5" />}
+              >
+                {productData?.pdf?.url ? (
+                  <a
+                    href={productData.pdf.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex w-full items-center justify-between gap-3 rounded-3xl border border-blue-100 bg-white px-4 py-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-500">
+                        <PdfIcon className="h-5 w-5" />
+                      </span>
+
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate sm:max-w-65 md:max-w-[320px] lg:max-w-105">
+                          {productData.pdf.fileName || "Open product catalog"}
+                        </span>
+                      </span>
+                    </div>
+
+                    <ExternalLinkIcon className="h-4 w-4 shrink-0" />
+                  </a>
+                ) : (
+                  <EmptyState label="No product catalog PDF available." />
+                )}
+              </DetailSection>
             </div>
           </div>
         </div>
@@ -337,7 +372,6 @@ function ProductById() {
         //   subCategory: data?.data?.subCategories
         // }}
       /> */}
-
     </section>
   );
 }
@@ -508,6 +542,41 @@ function ImageGalleryIcon({ className }) {
       <circle cx="8.5" cy="10" r="1.5" />
       <path d="m21 15-4.5-4.5L10 17" />
       <path d="m3 15 4-4 4 4" />
+    </IconShell>
+  );
+}
+
+function CatalogIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+      <path d="M8 7h8" />
+      <path d="M8 11h6" />
+    </IconShell>
+  );
+}
+
+function PdfIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+      <path d="M14 2v6h6" />
+      <path d="M8 13h1.5a1.5 1.5 0 0 1 0 3H8v-5" />
+      <path d="M12 11v5h1.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 13.5 11Z" />
+      <path d="M17 11h2" />
+      <path d="M17 13.5h1.5" />
+      <path d="M17 16v-5" />
+    </IconShell>
+  );
+}
+
+function ExternalLinkIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
     </IconShell>
   );
 }

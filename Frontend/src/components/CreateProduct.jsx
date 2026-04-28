@@ -17,6 +17,7 @@ const initialFormState = {
   features: [""],
   specifications: [{ key: "", value: "" }],
   images: [],
+  pdf: null,
 };
 
 function CreateProduct({
@@ -96,6 +97,7 @@ function CreateProduct({
               }))
             : [{ key: "", value: "" }],
         images: productImages|| [],
+        pdf: initialData.pdf || null,
       });
 
       setCategorySearch(initialData.product_category?.categories_name || "");
@@ -234,6 +236,11 @@ function CreateProduct({
     updateField("images", selectedFiles);
   };
 
+  const handlePdfChange = (event) => {
+    const selectedFile = event.target.files?.[0] || null;
+    updateField("pdf", selectedFile);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -268,8 +275,14 @@ function CreateProduct({
 
       // images
       formData.images.forEach((file) => {
-        payload.append("images", file);
+        if (file instanceof File) {
+          payload.append("images", file);
+        }
       });
+
+      if (formData.pdf instanceof File) {
+        payload.append("pdf", formData.pdf);
+      }
 
       // CREATE
       if (mode === "create") {
@@ -428,10 +441,39 @@ function CreateProduct({
                     key={index}
                     className="rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700"
                   >
-                    {file.name}
-                    {mode === "create" ? `${file.name}` : `${file.url}`}
+                    {getUploadItemLabel(file, `Image ${index + 1}`)}
                   </span>
                 ))}
+              </div>
+            ) : null}
+          </FieldShell>
+
+          <FieldShell label="Product PDF" htmlFor="productPdf">
+            <label
+              htmlFor="productPdf"
+              className="flex min-h-30 cursor-pointer flex-col items-center justify-center rounded-[28px] border border-dashed border-blue-200 bg-slate-50 px-4 py-5 text-center transition hover:border-blue-300 hover:bg-blue-50"
+            >
+              <PdfIcon className="h-8 w-8 text-blue-400" />
+              <p className="mt-3 text-sm font-semibold text-slate-700">
+                Choose Product PDF
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                PDF file supported
+              </p>
+              <input
+                id="productPdf"
+                type="file"
+                accept="application/pdf,.pdf"
+                onChange={handlePdfChange}
+                className="hidden"
+              />
+            </label>
+
+            {formData.pdf ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700">
+                  {getPdfLabel(formData.pdf)}
+                </span>
               </div>
             ) : null}
           </FieldShell>
@@ -588,6 +630,22 @@ function CreateProduct({
       </form>
     </section>
   );
+}
+
+function getUploadItemLabel(item, fallbackLabel) {
+  if (item?.name) {
+    return item.name;
+  }
+
+  if (typeof item === "string") {
+    return item.split("/").pop() || fallbackLabel;
+  }
+
+  return item?.fileName || item?.url?.split("/").pop() || fallbackLabel;
+}
+
+function getPdfLabel(pdf) {
+  return getUploadItemLabel(pdf, "Selected PDF");
 }
 
 function SearchableSelect({
@@ -800,6 +858,20 @@ function ImageIcon({ className }) {
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <circle cx="8.5" cy="10" r="1.5" />
       <path d="m21 15-5-5L5 21" />
+    </IconShell>
+  );
+}
+
+function PdfIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+      <path d="M14 2v6h6" />
+      <path d="M7 15h1.5a1.5 1.5 0 0 0 0-3H7v6" />
+      <path d="M12 12v6h1.5a1.5 1.5 0 0 0 1.5-1.5v-3A1.5 1.5 0 0 0 13.5 12Z" />
+      <path d="M17 12h2" />
+      <path d="M17 15h1.5" />
+      <path d="M17 18v-6" />
     </IconShell>
   );
 }

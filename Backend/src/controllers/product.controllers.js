@@ -5,6 +5,14 @@ import Categories from "../models/categories.modal.js";
 import SubCategories from "../models/subCategories.modal.js";
 import mongoose from "mongoose";
 
+const buildLocalFileUrl = (req, file) =>
+  `${req.protocol}://${req.get("host")}/${file.path.replace(/\\/g, "/")}`;
+
+const validatePdfFile = (file) => {
+  if (file && file.mimetype !== "application/pdf") {
+    throw new ApiError(400, "Only PDF file is allowed");
+  }
+};
 
 const createProduct = async (req, res) => {
   try {
@@ -17,29 +25,36 @@ const createProduct = async (req, res) => {
       specifications,
     } = req.body;
 
-    console.log(product_name,
-      product_category,
-      product_subCategory,
-      description,
-      features,
-      specifications,)
     if (!product_name || !product_category || !product_subCategory) {
       throw new ApiError(400, "Required fields missing");
     }
 
-    // uploaded files
-    const images = req.files
-  ? req.files.map(file => {
-      const filePath = file.path.replace(/\\/g, "/");
+    // Images Upload (same old functionality)
+    const images = req.files?.images
+      ? req.files.images.map((file) => {
+          return {
+            url: buildLocalFileUrl(req, file),
+            public_id: "",
+          };
+        })
+      : [];
 
-      return {
-        url: `${req.protocol}://${req.get("host")}/${filePath}`,
-        public_id: ""
-      };
-    })
-  : [];
+    validatePdfFile(req.files?.pdf?.[0]);
 
-    console.log("Image URLs:", images);
+    // PDF Upload (new)
+    const pdf = req.files?.pdf?.[0]
+      ? {
+          url: buildLocalFileUrl(req, req.files.pdf[0]),
+          public_id: "",
+          fileName: req.files.pdf[0].originalname,
+        }
+      : {
+          url: "",
+          public_id: "",
+          fileName: "",
+        };
+
+    console.log("Received PDF file:", pdf);
 
     // validations
     const categoryExists = await Categories.findById(product_category);
@@ -48,37 +63,42 @@ const createProduct = async (req, res) => {
     const subCategoryExists = await SubCategories.findById(product_subCategory);
     if (!subCategoryExists) throw new ApiError(404, "Subcategory not found");
 
+    // normalize features
+    if (!features) {
+      features = [];
+    } else if (!Array.isArray(features)) {
+      features = [features];
+    }
+
+    // normalize specifications
     if (!specifications) {
-  specifications = [];
+      specifications = [];
     } else if (!Array.isArray(specifications)) {
       specifications = [specifications];
     }
 
-    specifications = specifications.map(item =>
-      typeof item === "string"
-        ? JSON.parse(item)
-        : item
+    specifications = specifications.map((item) =>
+      typeof item === "string" ? JSON.parse(item) : item
     );
 
-    // create product
     const product = await Product.create({
       product_name,
       product_category,
       product_subCategory,
       description,
-      features: features || [],
-      specifications: specifications || [],
-      images: images
+      features,
+      specifications,
+      images,
+      pdf,
     });
 
-    return res.status(201).json(
-      new ApiResponse(201, product, "Product created successfully")
-    );
-
+    return res
+      .status(201)
+      .json(new ApiResponse(201, product, "Product created successfully"));
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -86,32 +106,24 @@ const createProduct = async (req, res) => {
 async function getAllProducts(req, res) {
   try {
     const products = await Product.find({
-      deletedAt: null
-    })    
+      deletedAt: null,
+    })
       .populate("product_category", "categories_name")
       .populate("product_subCategory", "name")
       .select("-__v -updatedAt");
 
-    return res.status(200).json(
-      new ApiResponse(200, products, "Products fetched successfully")
-    );
-
-    console.log("products: ",products)
-
+    return res
+      .status(200)
+      .json(new ApiResponse(200, products, "Products fetched successfully"));
   } catch (error) {
-    console.error("Get All Products Error:", error);
-
     return res.status(error.statusCode || 500).json({
-      statusCode: error.statusCode || 500,
       success: false,
-      message: error.message || "Server Error"
+      message: error.message,
     });
   }
 }
 
-
 async function getProductById(req, res) {
-  console.log("get prduct by id function caLLED")
   try {
     const { id } = req.params;
 
@@ -127,17 +139,13 @@ async function getProductById(req, res) {
       throw new ApiError(404, "Product not found");
     }
 
-    return res.status(200).json(
-      new ApiResponse(200, product, "Product fetched successfully")
-    );
-
+    return res
+      .status(200)
+      .json(new ApiResponse(200, product, "Product fetched successfully"));
   } catch (error) {
-    console.error("Get Product By Id Error:", error);
-
     return res.status(error.statusCode || 500).json({
-      statusCode: error.statusCode || 500,
       success: false,
-      message: error.message || "Internal Server Error"
+      message: error.message,
     });
   }
 }
@@ -159,54 +167,42 @@ async function updateProduct(req, res) {
       specifications,
     } = req.body;
 
-    // validations only if values sent
     if (product_category) {
       const categoryExists = await Categories.findById(product_category);
-      if (!categoryExists) {
-        throw new ApiError(404, "Category not found");
-      }
+      if (!categoryExists) throw new ApiError(404, "Category not found");
     }
 
     if (product_subCategory) {
       const subCategoryExists =
         await SubCategories.findById(product_subCategory);
 
-      if (!subCategoryExists) {
-        throw new ApiError(404, "Subcategory not found");
-      }
+      if (!subCategoryExists) throw new ApiError(404, "Subcategory not found");
     }
 
-    // normalize features
     if (!features) {
       features = [];
     } else if (!Array.isArray(features)) {
       features = [features];
     }
 
-    // normalize specifications
     if (!specifications) {
       specifications = [];
     } else if (!Array.isArray(specifications)) {
       specifications = [specifications];
     }
 
-    specifications = specifications.map(item =>
+    specifications = specifications.map((item) =>
       typeof item === "string" ? JSON.parse(item) : item
     );
 
-    // uploaded files
-    const images = req.files
-      ? req.files.map((file) => {
-          const filePath = file.path.replace(/\\/g, "/");
-
+    const images = req.files?.images
+      ? req.files.images.map((file) => {
           return {
-            url: `${req.protocol}://${req.get("host")}/${filePath}`,
+            url: buildLocalFileUrl(req, file),
             public_id: "",
           };
         })
       : [];
-
-    console.log("Image URLs:", images);
 
     const updateData = {
       product_name,
@@ -217,8 +213,19 @@ async function updateProduct(req, res) {
       specifications,
     };
 
-    if (images) {
+    if (images.length > 0) {
       updateData.images = images;
+    }
+
+    // PDF update
+    if (req.files?.pdf?.[0]) {
+      validatePdfFile(req.files.pdf[0]);
+
+      updateData.pdf = {
+        url: buildLocalFileUrl(req, req.files.pdf[0]),
+        public_id: "",
+        fileName: req.files.pdf[0].originalname,
+      };
     }
 
     const product = await Product.findByIdAndUpdate(
@@ -226,7 +233,7 @@ async function updateProduct(req, res) {
       { $set: updateData },
       {
         returnDocument: "after",
-        runValidators: true
+        runValidators: true,
       }
     );
 
@@ -237,13 +244,12 @@ async function updateProduct(req, res) {
     return res.status(200).json({
       success: true,
       data: product,
-      message: "Product updated successfully"
+      message: "Product updated successfully",
     });
-
   } catch (error) {
-    return res.status(500).json({
+    return res.status(error.statusCode || 500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 }
@@ -259,23 +265,22 @@ async function deleteProduct(req, res) {
     const product = await Product.findByIdAndUpdate(
       id,
       { deletedAt: new Date() },
-      { returnDocument: "after", }
+      { returnDocument: "after" }
     );
 
     if (!product) {
       throw new ApiError(404, "Product not found");
     }
 
-    return res.status(200).json(
-      new ApiResponse(200, null, "Product deleted successfully")
-    );
-
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Product deleted successfully"));
   } catch (error) {
     return res.status(error.statusCode || 500).json({
       success: false,
-      message: error.message || "Internal Server Error"
+      message: error.message,
     });
-  } 
+  }
 }
 
 export {
@@ -283,5 +288,5 @@ export {
   getAllProducts,
   getProductById,
   updateProduct,
-  deleteProduct
-};  
+  deleteProduct,
+};

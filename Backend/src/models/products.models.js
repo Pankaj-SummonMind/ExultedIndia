@@ -25,7 +25,7 @@ const productSchema = new Schema(
       trim: true,
     },
 
-    // ✅ Multiple features (simple list)
+    // Multiple features
     features: [
       {
         type: String,
@@ -33,30 +33,51 @@ const productSchema = new Schema(
       },
     ],
 
-    // ✅ Specifications (key-value pairs)
+    // Specifications
     specifications: [
       {
         key: {
           type: String,
           required: true,
+          trim: true,
         },
         value: {
           type: String,
           required: true,
+          trim: true,
         },
       },
     ],
 
-    // ✅ Multiple images
+    // Multiple Images
     images: [
       {
         url: {
           type: String,
           required: true,
         },
-        public_id: String, // (for cloudinary or storage)
+        public_id: {
+          type: String,
+          default: "",
+        },
       },
     ],
+
+    // PDF File
+    pdf: {
+      url: {
+        type: String,
+        default: "",
+      },
+      public_id: {
+        type: String,
+        default: "",
+      },
+      fileName: {
+        type: String,
+        default: "",
+      },
+    },
 
     deletedAt: {
       type: Date,
@@ -64,10 +85,10 @@ const productSchema = new Schema(
     },
   },
   {
-    timestamps: true, // createdAt, updatedAt
+    timestamps: true,
   }
 );
 
 const Product = mongoose.model("Product", productSchema);
 
-export default Product ;
+export default Product;

@@ -1,13 +1,53 @@
 import { Router } from "express";
-import { createProduct, deleteProduct, getAllProducts, getProductById, updateProduct } from "../controllers/product.controllers.js";
+import {
+  createProduct,
+  deleteProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+} from "../controllers/product.controllers.js";
+
 import { upload } from "../middlewares/multer.middleware.js";
 
-const router = Router()
+const router = Router();
 
-router.post("/createProduct",upload.array("images",5),createProduct)
-router.get("/getProduct",getAllProducts)
-router.put("/:id",upload.array("images",5),updateProduct)
-router.delete("/:id",deleteProduct)
-router.get("/:id",getProductById)
+// create product (images + pdf)
+router.post(
+  "/createProduct",
+  (req, res, next) => {
+    upload.fields([
+      { name: "images", maxCount: 5 },
+      { name: "pdf", maxCount: 1 },
+    ])(req, res, function (err) {
+      if (err) return next(err);
+      next();
+    });
+  },
+  createProduct
+);
+
+// get all
+router.get("/getProduct", getAllProducts);
+
+// update product (images + pdf optional)
+router.put(
+  "/:id",
+  (req, res, next) => {
+    upload.fields([
+      { name: "images", maxCount: 5 },
+      { name: "pdf", maxCount: 1 },
+    ])(req, res, function (err) {
+      if (err) return next(err);
+      next();
+    });
+  },
+  updateProduct
+);
+
+// delete
+router.delete("/:id", deleteProduct);
+
+// get by id
+router.get("/:id", getProductById);
 
 export default router;

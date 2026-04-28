@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetProductByidQuery } from "../../../services/api";
+import {
+  useGetProductByidQuery,
+  useGetProductQuery,
+} from "../../../services/api";
 import { Helmet } from "react-helmet-async";
 
 const fallbackGalleryImages = [
@@ -13,8 +16,15 @@ function ClientProductDetailScreen() {
   const { id } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { data, isLoading, error } = useGetProductByidQuery(id);
+  const {
+    data: AllProductData,
+    isLoading: AllProductLoading,
+    error: AllProductError,
+  } = useGetProductQuery();
+  console.log("Fetched all products data:", AllProductData);
 
   const product = data?.data;
+  console.log("Fetched product detail:", product);
   const productImages = useMemo(() => getProductImages(product), [product]);
   const galleryImages = productImages.length
     ? productImages
@@ -25,6 +35,22 @@ function ClientProductDetailScreen() {
   const specifications = Array.isArray(product?.specifications)
     ? product.specifications.filter((item) => item?.key || item?.value)
     : [];
+  const relatedProducts = useMemo(() => {
+    const rows = Array.isArray(AllProductData?.data)
+      ? AllProductData.data
+      : Array.isArray(AllProductData)
+        ? AllProductData
+        : [];
+    const currentSubCategoryId = product?.product_subCategory?._id;
+
+    if (!currentSubCategoryId) return [];
+
+    return rows.filter(
+      (item) =>
+        item?._id !== product?._id &&
+        item?.product_subCategory?._id === currentSubCategoryId,
+    );
+  }, [AllProductData, product]);
 
   useEffect(() => {
     setCurrentImageIndex(0);
@@ -83,8 +109,17 @@ function ClientProductDetailScreen() {
     <main className="min-h-screen overflow-hidden bg-[#F5F9FF] text-slate-950">
       <Helmet>
         <title>{`${product?.product_name || "Product Detail"} | Exulted India`}</title>
-        <meta name="description" content={product?.description || "Explore the detailed specifications, features, and gallery of our premium product at Exulted India. Discover high-quality power solutions with certifications and pan-India service coverage for all your energy needs."} />
-        <meta name="keywords" content={`Exulted India, ${product?.product_name || "Product"}, product details, specifications, features, gallery, certifications, pan-India service`} />
+        <meta
+          name="description"
+          content={
+            product?.description ||
+            "Explore the detailed specifications, features, and gallery of our premium product at Exulted India. Discover high-quality power solutions with certifications and pan-India service coverage for all your energy needs."
+          }
+        />
+        <meta
+          name="keywords"
+          content={`Exulted India, ${product?.product_name || "Product"}, product details, specifications, features, gallery, certifications, pan-India service`}
+        />
       </Helmet>
       <section className="relative isolate overflow-hidden border-b border-blue-100">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.18),transparent_30%),linear-gradient(135deg,#ffffff_0%,#eff6ff_45%,#f8fafc_100%)]" />
@@ -132,69 +167,69 @@ function ClientProductDetailScreen() {
       <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="rounded-[30px] border border-blue-100 bg-white/90 p-4 shadow-[0_22px_70px_rgba(15,91,191,0.10)] backdrop-blur sm:p-5">
-           <div className="space-y-4">
-  <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_52%,#f8fafc_100%)]">
-    <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
-      {/* <span className="rounded-full border border-white/75 bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.24em] text-slate-500 shadow-sm backdrop-blur">
+            <div className="space-y-4">
+              <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_52%,#f8fafc_100%)]">
+                <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
+                  {/* <span className="rounded-full border border-white/75 bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.24em] text-slate-500 shadow-sm backdrop-blur">
         Product Gallery
       </span> */}
 
-      {galleryImages.length > 1 ? (
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handlePreviousImage}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-white"
-          >
-            <ArrowLeftIcon className="h-5 w-5" />
-          </button>
+                  {galleryImages.length > 1 ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handlePreviousImage}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-white"
+                      >
+                        <ArrowLeftIcon className="h-5 w-5" />
+                      </button>
 
-          <button
-            type="button"
-            onClick={handleNextImage}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-white"
-          >
-            <ArrowRightIcon className="h-5 w-5" />
-          </button>
-        </div>
-      ) : null}
-    </div>
+                      <button
+                        type="button"
+                        onClick={handleNextImage}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-sm transition hover:scale-105 hover:bg-white"
+                      >
+                        <ArrowRightIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
 
-    {/* Main Image Fixed Size */}
-    <div className="flex h-[420px] w-full items-center justify-center p-6 sm:h-[520px] sm:p-8">
-      <img
-        src={galleryImages[currentImageIndex]}
-        alt={product?.product_name || "Product image"}
-        className="h-full w-full object-contain"
-      />
-    </div>
-  </div>
+                {/* Main Image Fixed Size */}
+                <div className="flex h-105 w-full items-center justify-center p-6 sm:h-130 sm:p-8">
+                  <img
+                    src={galleryImages[currentImageIndex]}
+                    alt={product?.product_name || "Product image"}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              </div>
 
-  {/* Thumbnail Images */}
-  {galleryImages.length > 1 ? (
-    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-      {galleryImages.map((image, index) => (
-        <button
-          key={`${image}-${index}`}
-          type="button"
-          onClick={() => setCurrentImageIndex(index)}
-          className={[
-            "group flex h-24 w-full items-center justify-center overflow-hidden rounded-[22px] border bg-slate-50 transition sm:h-28",
-            currentImageIndex === index
-              ? "border-blue-400 shadow-[0_12px_32px_rgba(59,130,246,0.18)]"
-              : "border-slate-200 hover:border-blue-200",
-          ].join(" ")}
-        >
-          <img
-            src={image}
-            alt={`${product?.product_name || "Product"} ${index + 1}`}
-            className="h-full w-full object-contain p-2 transition duration-300 group-hover:scale-105"
-          />
-        </button>
-      ))}
-    </div>
-  ) : null}
-</div>
+              {/* Thumbnail Images */}
+              {galleryImages.length > 1 ? (
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                  {galleryImages.map((image, index) => (
+                    <button
+                      key={`${image}-${index}`}
+                      type="button"
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={[
+                        "group flex h-24 w-full items-center justify-center overflow-hidden rounded-[22px] border bg-slate-50 transition sm:h-28",
+                        currentImageIndex === index
+                          ? "border-blue-400 shadow-[0_12px_32px_rgba(59,130,246,0.18)]"
+                          : "border-slate-200 hover:border-blue-200",
+                      ].join(" ")}
+                    >
+                      <img
+                        src={image}
+                        alt={`${product?.product_name || "Product"} ${index + 1}`}
+                        className="h-full w-full object-contain p-2 transition duration-300 group-hover:scale-105"
+                      />
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
 
           <div className="rounded-[30px] border border-blue-100 bg-white px-5 py-6 shadow-[0_22px_70px_rgba(15,91,191,0.10)] sm:px-7 sm:py-8">
@@ -281,11 +316,171 @@ function ClientProductDetailScreen() {
                   <EmptyText label="No specifications available for this product." />
                 )}
               </ContentSection>
+              <ContentSection
+                title="Product Catalog"
+                icon={<CatalogIcon className="h-5 w-5" />}
+              >
+                {product?.pdf?.url ? (
+                  <a
+                    href={product.pdf.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex w-full items-center justify-between gap-3 rounded-3xl border border-blue-100 bg-white px-4 py-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-500">
+                        <PdfIcon className="h-5 w-5" />
+                      </span>
+
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate sm:max-w-65 md:max-w-[320px] lg:max-w-105">
+                          {product.pdf.fileName || "Open product catalog"}
+                        </span>
+                      </span>
+                    </div>
+
+                    <ExternalLinkIcon className="h-4 w-4 shrink-0" />
+                  </a>
+                ) : (
+                  <EmptyText label="No product catalog PDF available." />
+                )}
+              </ContentSection>
             </div>
           </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8">
+        <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-600">
+              Related Products
+            </p>
+            <h2 className="mt-2 text-xl font-black text-slate-950 sm:text-2xl">
+              Explore more in{" "}
+              {product?.product_subCategory?.name || "this range"}
+            </h2>
+          </div>
+        </div>
+
+        {AllProductLoading ? (
+          <RelatedProductsLoading />
+        ) : AllProductError ? (
+          <EmptyText label="Failed to load Related products." />
+        ) : relatedProducts.length ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+            {relatedProducts.map((relatedProduct, index) => (
+              <RelatedProductCard
+                key={relatedProduct?._id || index}
+                product={relatedProduct}
+                index={index}
+                onOpen={() =>
+                  navigate(`/products/product/${relatedProduct?._id}`)
+                }
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyText label="No related products available." />
+        )}
+      </section>
     </main>
+  );
+}
+
+function RelatedProductCard({ product, index, onOpen }) {
+  const image =
+    getProductImages(product)[0] ||
+    fallbackGalleryImages[index % fallbackGalleryImages.length];
+  const title = product?.product_name || "Product";
+  const description =
+    product?.description ||
+    "Premium Exulted India product designed for dependable power performance and long service life.";
+  const catalogUrl = product?.pdf?.url;
+
+  const handleCatalogOpen = () => {
+    if (!catalogUrl) return;
+    window.open(catalogUrl, "_blank", "noopener,noreferrer");
+  };
+
+  return (
+    <article className="group flex min-h-107.5 flex-col overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] transition duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.16)]">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="relative h-[58%] w-full overflow-hidden bg-blue-50 text-left"
+        aria-label={`View ${title}`}
+      >
+        <img
+          src={image}
+          alt={title}
+          loading="lazy"
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+      </button>
+
+      <div className="flex flex-1 flex-col justify-between p-4">
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-blue-500">
+            {product?.product_subCategory?.name || "Related Product"}
+          </p>
+          <h3 className="mt-2 line-clamp-2 min-h-12 text-base font-black leading-6 text-slate-950">
+            {title}
+          </h3>
+          <p className=" line-clamp-3 text-sm leading-6 text-slate-600">
+            {description}
+          </p>
+        </div>
+
+        <div className=" grid gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={onOpen}
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
+          >
+            View Product
+            <ArrowRightIcon className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={handleCatalogOpen}
+            disabled={!catalogUrl}
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-blue-200 bg-white px-4 text-sm font-semibold text-blue-700 transition hover:-translate-y-0.5 hover:bg-blue-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400 disabled:hover:translate-y-0 disabled:hover:bg-white"
+          >
+            View Catalog
+            <ExternalLinkIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function RelatedProductsLoading() {
+  return (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {[1, 2, 3, 4].map((item) => (
+        <div
+          key={item}
+          className="min-h-[430px] animate-pulse rounded-[24px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)]"
+        >
+          <div className="h-56 rounded-t-[24px] bg-blue-100 sm:h-60" />
+          <div className="p-4">
+            <div className="h-3 w-36 rounded-full bg-blue-100" />
+            <div className="mt-4 h-5 w-4/5 rounded-full bg-slate-100" />
+            <div className="mt-4 space-y-2">
+              <div className="h-3 w-full rounded-full bg-slate-100" />
+              <div className="h-3 w-5/6 rounded-full bg-slate-100" />
+              <div className="h-3 w-2/3 rounded-full bg-slate-100" />
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <div className="h-10 rounded-full bg-blue-100" />
+              <div className="h-10 rounded-full bg-slate-100" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -575,6 +770,41 @@ function AlertIcon({ className }) {
       <path d="M12 9v4" />
       <path d="M12 17h.01" />
       <path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z" />
+    </IconShell>
+  );
+}
+
+function CatalogIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+      <path d="M8 7h8" />
+      <path d="M8 11h6" />
+    </IconShell>
+  );
+}
+
+function PdfIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+      <path d="M14 2v6h6" />
+      <path d="M8 13h1.5a1.5 1.5 0 0 1 0 3H8v-5" />
+      <path d="M12 11v5h1.5a1.5 1.5 0 0 0 1.5-1.5v-2A1.5 1.5 0 0 0 13.5 11Z" />
+      <path d="M17 11h2" />
+      <path d="M17 13.5h1.5" />
+      <path d="M17 16v-5" />
+    </IconShell>
+  );
+}
+
+function ExternalLinkIcon({ className }) {
+  return (
+    <IconShell className={className}>
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
     </IconShell>
   );
 }
