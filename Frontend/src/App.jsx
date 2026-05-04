@@ -10,7 +10,7 @@ import UserById from "./screens/admin/furtherScreen/UserByid";
 import SocialMediaScreen from "./screens/admin/SocialMediaScreen";
 import ClientLayout from "./layout/ClientLayout";
 import ClientHomeScreen from "./screens/client/ClientHomeScreen";
-import ClientsProductScreen from "./screens/client/ClientsProductScreen";
+import ClientAllCategory from "./screens/client/ClientAllCategory";
 import AboutUs from "./screens/client/AboutUs";
 import ContactUsScreen from "./screens/client/ContactUsScreen";
 import ClientsCertificateScreen from "./screens/client/ClientsCertificateScreen";
@@ -22,6 +22,8 @@ import PagesScreen from "./screens/admin/PagesScreen";
 import SubCategoryScreen from "./screens/admin/SubCategoryScreen";
 import SubCategoryById from "./screens/admin/furtherScreen/SubCategoryById";
 import { Toaster } from "react-hot-toast";
+import PageNotFoundScreen from "./screens/client/PageNotFoundScreen";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
@@ -60,6 +62,7 @@ function App() {
         }}
       />
       <BrowserRouter>
+      <ScrollToTop />
         <Routes>
           {/* admin */}
           <Route path="/admin" element={<AdminLayout />}>
@@ -82,7 +85,7 @@ function App() {
           {/* client */}
           <Route path="/" element={<ClientLayout />}>
             <Route index element={<ClientHomeScreen />} />
-            <Route path="products" element={<ClientsProductScreen />} />
+            <Route path="products" element={<ClientAllCategory />} />
             <Route
               path="products/category/:id"
               element={<ClientCategoryProduct />}
@@ -98,6 +101,7 @@ function App() {
             <Route path="aboutus" element={<AboutUs />} />
             <Route path="certificates" element={<ClientsCertificateScreen />} />
             <Route path="contact" element={<ContactUsScreen />} />
+            <Route path="*" element={<PageNotFoundScreen />} />
           </Route>
         </Routes>
       </BrowserRouter>

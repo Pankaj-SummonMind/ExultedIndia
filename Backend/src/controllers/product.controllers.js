@@ -25,9 +25,18 @@ const createProduct = async (req, res) => {
       specifications,
     } = req.body;
 
-    if (!product_name || !product_category || !product_subCategory) {
-      throw new ApiError(400, "Required fields missing");
+    if (!product_name || !product_category || !product_subCategory || !description || !features || !specifications) {
+      throw new ApiError(400, "All fields Required");
     }
+
+    const exists = await Product.findOne({
+          product_name: { $regex: `^${product_name}$`, $options: "i" },
+          deletedAt: null
+        });
+    
+        if (exists) {
+          throw new ApiError(400, "Product with this name already exists");
+        }
 
     // Images Upload (same old functionality)
     const images = req.files?.images
@@ -39,7 +48,20 @@ const createProduct = async (req, res) => {
         })
       : [];
 
-    validatePdfFile(req.files?.pdf?.[0]);
+      if (images.length === 0) {
+        throw new ApiError(400, "At least one image is required");
+      }
+
+    const pdfFile = req.files?.pdf?.[0];
+
+    // ✅ First check existence
+    if (!pdfFile) {
+      throw new ApiError(400, "Product catalog PDF is required");
+    }
+
+    // ✅ Then validate
+    validatePdfFile(pdfFile);
+
 
     // PDF Upload (new)
     const pdf = req.files?.pdf?.[0]
@@ -54,7 +76,6 @@ const createProduct = async (req, res) => {
           fileName: "",
         };
 
-    console.log("Received PDF file:", pdf);
 
     // validations
     const categoryExists = await Categories.findById(product_category);
@@ -110,6 +131,7 @@ async function getAllProducts(req, res) {
     })
       .populate("product_category", "categories_name")
       .populate("product_subCategory", "name")
+      .sort({ createdAt: -1 })
       .select("-__v -updatedAt");
 
     return res
@@ -165,12 +187,38 @@ async function updateProduct(req, res) {
       description,
       features,
       specifications,
-    } = req.body;
+    } = req.body;  
 
+    if (!product_name || !product_category || !product_subCategory || !description || !features || !specifications) {
+      throw new ApiError(400, "All fields Required");
+    }
+
+    const singleProduct = await Product.findById(id);
+
+const newName = 
+product_name?.trim().toLowerCase();
+const currentName = singleProduct.
+product_name?.trim().toLowerCase();
+
+// 🔥 only if changed
+if (newName && newName !== currentName) {
+
+  const existingProduct = await Product.findOne({
+    product_name: { $regex: `^${product_name.trim()}$`, $options: "i" },
+    _id: { $ne: id }, 
+  });
+
+  if (existingProduct) {
+    throw new ApiError(400, "Product name already exists");
+  }
+}
+
+    
     if (product_category) {
       const categoryExists = await Categories.findById(product_category);
       if (!categoryExists) throw new ApiError(404, "Category not found");
     }
+    
 
     if (product_subCategory) {
       const subCategoryExists =
@@ -204,6 +252,7 @@ async function updateProduct(req, res) {
         })
       : [];
 
+
     const updateData = {
       product_name,
       product_category,
@@ -216,9 +265,11 @@ async function updateProduct(req, res) {
     if (images.length > 0) {
       updateData.images = images;
     }
+    
+    const pdfFile = req.files?.pdf?.[0];
 
     // PDF update
-    if (req.files?.pdf?.[0]) {
+    if (pdfFile) {
       validatePdfFile(req.files.pdf[0]);
 
       updateData.pdf = {

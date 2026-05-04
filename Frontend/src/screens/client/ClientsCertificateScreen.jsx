@@ -5,45 +5,9 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import { useGetAllCertificatesQuery } from "../../services/api";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
+import Loader from "../../components/loader/Loader";
 
-const fallbackCertificates = [
-  {
-    id: "iso-quality",
-    title: "ISO Quality Management",
-    image:
-      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "manufacturing-standard",
-    title: "Manufacturing Standard",
-    image:
-      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "safety-compliance",
-    title: "Safety Compliance",
-    image:
-      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "environment-standard",
-    title: "Environment Standard",
-    image:
-      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "product-testing",
-    title: "Product Testing",
-    image:
-      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "customer-assurance",
-    title: "Customer Assurance",
-    image:
-      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=900&q=80",
-  },
-];
 
 const collageClasses = [
   "sm:col-span-2 lg:col-span-2 lg:row-span-2",
@@ -57,13 +21,18 @@ const collageClasses = [
 function ClientsCertificateScreen() {
   const [activeCertificate, setActiveCertificate] = useState(null);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const {data:certificates,isLoading} = useGetAllCertificatesQuery()
-  console.log("certificates from api : ", certificates)
+  const {data:certificates,isLoading,error} = useGetAllCertificatesQuery()
 
   const certificateItems = useMemo(() => {
     const normalized = normalizeCertificates(certificates);
     return  normalized;
   }, [certificates]);
+
+  useEffect(() => {
+    if(error){
+      toast.error("Internal Server Error")
+    }
+  },[error])
 
   useEffect(() => {
     if (!activeCertificate) return undefined;
@@ -85,7 +54,7 @@ function ClientsCertificateScreen() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#F8FAFC] text-[#111827]">
-
+      <Loader isLoading={isLoading}/>
       <Helmet>
         <title>Certificates | Exulted India</title>
         <meta name="description" content="Explore Exulted India's certifications and standards that ensure the quality, safety, and reliability of our power products. Learn about our commitment to excellence and customer satisfaction." />
@@ -114,7 +83,6 @@ function ClientsCertificateScreen() {
       certificate={certificate}
       index={index}
       onOpen={() => setActiveIndex(index)}
-      // onClick={onOpen}
     />
   ))}
 </div>
@@ -136,13 +104,6 @@ function ClientsCertificateScreen() {
   }}
 />
       </section>
-
-      {/* {activeCertificate ? (
-        <CertificatePreview
-          certificate={activeCertificate}
-          onClose={() => setActiveCertificate(null)}
-        />
-      ) : null} */}
     </main>
   );
 }
@@ -187,48 +148,6 @@ function CertificateCard({ certificate, index, onOpen }) {
     </button>
   );
 }
-
-// function CertificatePreview({ certificate, onClose }) {
-//   return (
-//     <div className="fixed inset-0 z-90 flex items-center justify-center bg-[#111827]/86 px-4 py-6 backdrop-blur-md">
-//       <button
-//         type="button"
-//         aria-label="Close certificate preview"
-//         className="absolute inset-0 cursor-default"
-//         onClick={onClose}
-//       />
-
-//       <div className="relative z-10 flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-[30px] border border-white/20 bg-white shadow-[0_35px_120px_rgba(0,0,0,0.38)]">
-//         <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3 sm:px-5">
-//           <div className="min-w-0">
-//             <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-500">
-//               Certificate Preview
-//             </p>
-//             <h3 className="truncate text-base font-black text-[#111827] sm:text-lg">
-//               {certificate.title || "Certificate"}
-//             </h3>
-//           </div>
-//           <button
-//             type="button"
-//             onClick={onClose}
-//             className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-100"
-//             aria-label="Close"
-//           >
-//             <XIcon className="h-5 w-5" />
-//           </button>
-//         </div>
-
-//         <div className="flex min-h-0 flex-1 items-center justify-center bg-slate-950 p-3 sm:p-5">
-//           <img
-//             src={certificate.image}
-//             alt={certificate.title || "Certificate full preview"}
-//             className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 
 function CertificateBackground() {
   return (

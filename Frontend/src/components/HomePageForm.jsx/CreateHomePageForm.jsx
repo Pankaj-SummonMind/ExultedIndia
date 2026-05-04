@@ -404,49 +404,65 @@ function CreateHomePageForm({setShowCreateForm}) {
   };
 
   const handleImageSelect = (section, event) => {
-    const file = event.target.files?.[0];
+  const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+  if (!file) {
+    return;
+  }
 
-    if (!file.type.startsWith("image/")) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        [`${section}.image`]: "Please select a valid image file.",
-      }));
-      setFormError("Please fix the highlighted image fields.");
-      setSuccessMessage("");
-      return;
-    }
+  // ✅ TYPE VALIDATION
+  if (!file.type.startsWith("image/")) {
+    setFieldErrors((prev) => ({
+      ...prev,
+      [`${section}.image`]: "Please select a valid image file.",
+    }));
+    setFormError("Please fix the highlighted image fields.");
+    toast.error("Please select a valid image file.");
+    setSuccessMessage("");
+    return;
+  }
 
-    const previewUrl = URL.createObjectURL(file);
+  // ✅ SIZE VALIDATION (ADD THIS)
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
-    if (section === "heroCard") {
-      setFormData((prev) => ({
-        ...prev,
-        heroCard: {
-          ...prev.heroCard,
-          image: file,
-          previewUrl,
-        },
-      }));
-    }
+  if (file.size > MAX_SIZE) {
+    setFieldErrors((prev) => ({
+      ...prev,
+      [`${section}.image`]: "Image must be less than 10MB.",
+    }));
+    setFormError("Please fix the highlighted image fields.")
+    toast.error("Image must be less than 10MB.");
+    setSuccessMessage("");
+    return;
+  }
 
-    if (section === "heroDetail") {
-      setFormData((prev) => ({
-        ...prev,
-        heroDetail: {
-          ...prev.heroDetail,
-          image: file,
-          previewUrl,
-        },
-      }));
-    }
+  const previewUrl = URL.createObjectURL(file);
 
-    clearFieldError(`${section}.image`);
-    clearGlobalMessages();
-  };
+  if (section === "heroCard") {
+    setFormData((prev) => ({
+      ...prev,
+      heroCard: {
+        ...prev.heroCard,
+        image: file,
+        previewUrl,
+      },
+    }));
+  }
+
+  if (section === "heroDetail") {
+    setFormData((prev) => ({
+      ...prev,
+      heroDetail: {
+        ...prev.heroDetail,
+        image: file,
+        previewUrl,
+      },
+    }));
+  }
+
+  clearFieldError(`${section}.image`);
+  clearGlobalMessages();
+};
 
   const handleCategorySearchChange = (value) => {
     setCategorySearch(value);
@@ -707,10 +723,8 @@ function CreateHomePageForm({setShowCreateForm}) {
 
     try {
       setIsSubmitting(true);
-      console.log("payload to create home data:", payload);
       const res = await createHomePage(payload).unwrap()
 
-      console.log("response after creating home page :",res)
       setShowCreateForm(false);
       setSuccessMessage("Home page content created successfully.");
       setFormError("");
@@ -723,7 +737,6 @@ function CreateHomePageForm({setShowCreateForm}) {
       setFormError(
         error?.data?.message || error?.message || "Something went wrong.",
       );
-      console.log("erorr whle creating home page :",error)
     } finally {
       setIsSubmitting(false);
     }
@@ -1006,7 +1019,7 @@ function CreateHomePageForm({setShowCreateForm}) {
                               ? "Search and add more categories"
                               : "Search categories"
                           }
-                          className="min-w-[180px] flex-1 bg-transparent px-2 py-2 text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400"
+                          className="min-w-45 flex-1 bg-transparent px-2 py-2 text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400"
                         />
                       </div>
                     </div>
@@ -1462,7 +1475,7 @@ function CreateHomePageForm({setShowCreateForm}) {
 
 function SectionCard({ eyebrow, title, description, children }) {
   return (
-    <section className="overflow-hidden rounded-[32px] border border-slate-200/80 bg-white/95 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+    <section className="overflow-visible rounded-4xl border border-slate-200/80 bg-white/95 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
       <div className="border-b border-slate-200/80 bg-linear-to-r from-white via-slate-50 to-blue-50 px-5 py-5 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-500">
           {eyebrow}
@@ -1566,7 +1579,7 @@ function MessageBanner({ tone = "error", children }) {
       : "border-red-100 bg-red-50 text-red-500";
 
   return (
-    <div className={`rounded-[24px] border px-4 py-4 text-sm font-medium ${toneClassName}`}>
+    <div className={`rounded-3xl border px-4 py-4 text-sm font-medium ${toneClassName}`}>
       {children}
     </div>
   );

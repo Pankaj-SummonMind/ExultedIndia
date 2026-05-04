@@ -62,34 +62,49 @@ function HeroCardForm({ isOpen, onClose, activeHeroCard, onSubmit }) {
   };
 
   const handleImageChange = (event) => {
-    const file = event.target.files?.[0];
+  const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+  if (!file) {
+    return;
+  }
 
-    if (!file.type.startsWith("image/")) {
-      setFormError("Please select a valid image file.");
-      setFieldErrors((prev) => ({
-        ...prev,
-        image: "Please select a valid image file.",
-      }));
-      return;
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-
-    setFormData((prev) => ({
-      ...prev,
-      image: file,
-      previewUrl,
-    }));
+  // ✅ TYPE VALIDATION
+  if (!file.type.startsWith("image/")) {
+    setFormError("Please select a valid image file.");
     setFieldErrors((prev) => ({
       ...prev,
-      image: "",
+      image: "Please select a valid image file.",
     }));
-    setFormError("");
-  };
+    return;
+  }
+
+  // ✅ SIZE VALIDATION (ADD THIS)
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+  if (file.size > MAX_SIZE) {
+    setFormError("Image must be less than 10MB.");
+    setFieldErrors((prev) => ({
+      ...prev,
+      image: "Image must be less than 10MB.",
+    }));
+    return;
+  }
+
+  const previewUrl = URL.createObjectURL(file);
+
+  setFormData((prev) => ({
+    ...prev,
+    image: file,
+    previewUrl,
+  }));
+
+  setFieldErrors((prev) => ({
+    ...prev,
+    image: "",
+  }));
+
+  setFormError("");
+};
 
   const validateForm = () => {
     const nextErrors = {};
@@ -184,9 +199,7 @@ function HeroCardForm({ isOpen, onClose, activeHeroCard, onSubmit }) {
           <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
             {activeHeroCard ? "Update Hero Card" : "Add Hero Card"}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Manage the hero title, sub-heading, description, and banner image.
-          </p>
+
         </div>
 
         <form
@@ -277,7 +290,7 @@ function HeroCardForm({ isOpen, onClose, activeHeroCard, onSubmit }) {
                   <div className="flex min-h-56 flex-col items-center justify-center px-6 py-8 text-center">
                     <UploadIllustration />
                     <p className="mt-4 text-sm font-semibold text-slate-700">
-                      Click to upload hero image
+                      Image must be less then 10 mb,
                     </p>
                     <p className="mt-2 text-xs font-medium text-slate-400">
                       PNG, JPG, WEBP or any image format

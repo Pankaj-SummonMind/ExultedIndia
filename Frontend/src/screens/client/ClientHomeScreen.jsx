@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   useGetAboutUsQuery,
@@ -8,154 +8,27 @@ import {
 } from "../../services/api";
 import { Helmet } from "react-helmet-async";
 import Loader from "../../components/loader/Loader";
-
-const heroImage =
-  "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=80";
-
-const productVisuals = [
-  {
-    title: "Battery",
-    text: "High endurance energy storage for homes, solar systems, EV support, and industrial backup.",
-    image:
-      "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=800&q=80",
-    Icon: BatteryIcon,
-  },
-  {
-    title: "Inverter",
-    text: "Smart sine wave inverters engineered for stable output, low noise, and dependable runtime.",
-    image:
-      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80",
-    Icon: WaveIcon,
-  },
-  {
-    title: "Online UPS",
-    text: "Enterprise grade power continuity for offices, hospitals, data rooms, and critical equipment.",
-    image:
-      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
-    Icon: ServerIcon,
-  },
-  {
-    title: "Gensets / Generator",
-    text: "Rugged backup generation solutions tuned for reliability, fuel efficiency, and serviceability.",
-    image:
-      "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=800&q=80",
-    Icon: EngineIcon,
-  },
-  {
-    title: "Transformers",
-    text: "Industrial transformers designed for safe distribution, efficient conversion, and long life.",
-    image:
-      "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80",
-    Icon: GridIcon,
-  },
-];
-
-const stats = [
-  { value: "5+ Lakh", label: "Users", delay: "0ms" },
-  { value: "5,000", label: "Products", delay: "120ms" },
-  { value: "Pan India", label: "Support", delay: "240ms" },
-  { value: "Since", label: "2017", delay: "360ms" },
-];
-
-const reasons = [
-  {
-    title: "In-house R&D",
-    text: "Rapid product development with tight quality control.",
-    Icon: LabIcon,
-  },
-  {
-    title: "Made in India",
-    text: "Built for Indian grid conditions, climates, and duty cycles.",
-    Icon: FlagIcon,
-  },
-  {
-    title: "Widest Product Range",
-    text: "Battery, inverter, UPS, gensets, transformers, and accessories.",
-    Icon: LayersIcon,
-  },
-  {
-    title: "High Performance",
-    text: "Efficient conversion, clean output, and reliable runtime.",
-    Icon: GaugeIcon,
-  },
-  {
-    title: "Custom Solutions",
-    text: "Application-specific systems for dealers, enterprises, and OEMs.",
-    Icon: ToolIcon,
-  },
-  {
-    title: "Warranty Support",
-    text: "Responsive service network with practical ownership support.",
-    Icon: ShieldIcon,
-  },
-];
-
-const cities = [
-  { name: "Delhi NCR", x: "50%", y: "28%" },
-  { name: "Lucknow", x: "58%", y: "38%" },
-  { name: "Patna", x: "70%", y: "44%" },
-  { name: "Bhopal", x: "48%", y: "54%" },
-  { name: "Ahmedabad", x: "34%", y: "52%" },
-  { name: "Hyderabad", x: "55%", y: "70%" },
-  { name: "Bengaluru", x: "50%", y: "82%" },
-];
-
-const testimonials = [
-  {
-    name: "Rohit Sharma",
-    role: "EV Fleet Partner",
-    quote:
-      "The charger and backup ecosystem feels premium, stable, and easy to service. Their response time has been excellent.",
-  },
-  {
-    name: "Aarav Electricals",
-    role: "Channel Distributor",
-    quote:
-      "Exaulted India gives us a strong product range under one roof. The finish, packaging, and support make a real difference.",
-  },
-  {
-    name: "Neha Verma",
-    role: "Industrial Buyer",
-    quote:
-      "We wanted custom UPS and transformer support for a facility rollout. The team understood the requirement quickly.",
-  },
-];
-
-// const certificates = [
-//   {
-//     title: "ISO 9001",
-//     text: "Quality Management",
-//     color: "from-blue-500 to-cyan-400",
-//   },
-//   {
-//     title: "CE Certified",
-//     text: "Safety Compliance",
-//     color: "from-emerald-500 to-teal-400",
-//   },
-//   { title: "MSME", text: "Made in India", color: "from-slate-700 to-blue-500" },
-//   { title: "RoHS", text: "Eco Standards", color: "from-green-500 to-lime-400" },
-// ];
-
-const quickLinks = ["Products", "About", "Certificates", "Contact"];
+import toast from "react-hot-toast";
 
 function ClientHomeScreen() {
   const { data: categories,isLoading:isCategoriesLoading,error:categoriesError } = useGetCategoriesQuery();
   const { data: HomeScreenData,isLoading:isHomeScreenLoading,error:homeScreenError } = useGetHomePageQuery();
   const { data: certificates,isLoading:isCertificatesLoading,error:certificatesError } = useGetAllCertificatesQuery();
   const { data: aboutUsData,isLoading:isAboutUsLoading,error:aboutUsError } = useGetAboutUsQuery();
-  console.log("about us data : ", aboutUsData);
-
 
 
   const isLoading = isCategoriesLoading || isHomeScreenLoading || isCertificatesLoading || isAboutUsLoading;
   const error = categoriesError || homeScreenError || certificatesError || aboutUsError;
 
+  useEffect(() => {
+      if (error) {
+        toast.error("All data not fetched Sucessfully. Internal Server Error");
+      }
+    }, [error]);
+
   const home = HomeScreenData?.data;
   const aboutUs = aboutUsData?.data;
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
-  
-  // const [previewCertificate, setPreviewCertificate] = useState(null);
-  
+  const [activeTestimonial, setActiveTestimonial] = useState(0);  
   return (
     <div className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
       {/* <LoadingScreen /> */}
@@ -179,7 +52,6 @@ function ClientHomeScreen() {
       <CoverageSection data={home?.locations} />
       <CertificatesSection
         certificates={certificates?.data || []}
-        // onPreview={setPreviewCertificate}
       />
       <Testimonials
         activeIndex={activeTestimonial}
@@ -187,14 +59,6 @@ function ClientHomeScreen() {
         data={home?.testimonials}
       />
       <CtaBanner joinUs={home?.joinUs} />
-      {/* <Footer /> */}
-      {/* 
-      {previewCertificate ? (
-        <CertificatePreview
-          certificate={previewCertificate}
-          onClose={() => setPreviewCertificate(null)}
-        />
-      ) : null} */}
     </div>
   );
 }
@@ -217,98 +81,57 @@ function SeoBlock() {
 
 function HeroSection({ data }) {
   return (
-    <section className="relative min-h-[calc(100vh-72px)] overflow-hidden bg-slate-950">
+    <section className="relative min-h-[calc(100vh-72px)] overflow-hidden bg-blue-300">
       <img
         src={data?.image?.url}
         alt="EV charging station with modern electric mobility infrastructure"
-        className="absolute inset-0 h-full w-full object-cover opacity-52 motion-safe:animate-[heroZoom_18s_ease-in-out_infinite_alternate]"
+        className="absolute inset-0 h-full w-full object-strach "
       />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,24,39,0.88),rgba(17,24,39,0.56),rgba(37,99,235,0.14)),radial-gradient(circle_at_72%_30%,rgba(34,197,94,0.24),transparent_30%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.25),rgba(0,0,0,0.15),rgba(0,0,0,0.05))]" />
 
-      <div className="relative mx-auto grid min-h-[calc(100vh-72px)] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:px-8">
-        <div className="max-w-3xl motion-safe:animate-[slideUp_700ms_ease-out_both]">
-          <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-cyan-100 shadow-2xl backdrop-blur-xl">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.9)]" />
-            Exaulted India
-          </p>
+      <div className="relative mx-auto grid min-h-[calc(100vh-72px)] max-w-7xl items-start gap-10 px-4 pt-20 pb-16 sm:px-6 sm:pt-24 lg:px-8 lg:pt-24">
+  
+  <div className="max-w-3xl mx-auto text-center motion-safe:animate-[slideUp_700ms_ease-out_both]">
+    
+    <p className="inline-flex items-center justify-center  text-2xl font-bold uppercase tracking-[0.22em] text-violet-900 ">
+      Exaulted India
+    </p>
 
-          <h2 className="mt-7 max-w-3xl text-2xl font-black leading-[1.03] text-white sm:text-2xl lg:text-2xl">
-            {data?.title}
-          </h2>
-          <p className="mt-3 max-w-2xl text-lg leading-7 text-slate-200 sm:text-lg">
-            {data?.subTitle}
-          </p>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            {data?.detail}
-          </p>
+    <h2 className="mt-7 text-2xl font-black leading-[1.1] text-white sm:text-3xl lg:text-4xl">
+      {data?.title}
+    </h2>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <NavLink
-              to="/products"
-              className="rounded-full bg-blue-400 px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_18px_45px_rgba(96,165,250,0.35)] transition hover:-translate-y-1 hover:bg-blue-500"
-            >
-              Explore Products
-            </NavLink>
-            <NavLink
-              to="/contact"
-              className="rounded-full border border-white/25 bg-white/10 px-6 py-3 text-center text-sm font-semibold text-white backdrop-blur-xl transition hover:-translate-y-1 hover:border-emerald-300 hover:bg-emerald-400/15"
-            >
-              Contact Us
-            </NavLink>
-          </div>
-        </div>
+    <p className="mt-4 text-base leading-7 text-white font-semibold sm:text-xl">
+      {data?.subTitle}
+    </p>
 
-        {/* <div className="relative mx-auto w-full max-w-lg motion-safe:animate-[floatIn_900ms_ease-out_180ms_both]">
-          <div className="absolute -inset-6 rounded-full bg-gradient-to-br from-blue-400/28 via-emerald-300/20 to-transparent blur-3xl" />
-          <div className="relative rounded-[32px] border border-white/20 bg-white/12 p-4 shadow-[0_35px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
-            <div className="rounded-[26px] bg-white p-5">
-              <div className="relative overflow-hidden rounded-[22px] bg-[#111827] p-5 text-white">
-                <div className="absolute right-5 top-5 h-28 w-28 rounded-full bg-blue-400/20 blur-2xl" />
-                <div className="relative flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-300">
-                      DC Fast Charger
-                    </p>
-                    <h3 className="mt-2 text-2xl font-black">EVC Prime 60</h3>
-                  </div>
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white">
-                    <BoltIcon className="h-6 w-6" />
-                  </div>
-                </div>
+    <p className="mt-3 text-sm leading-6  text-blue-900 font-semibold sm:text-base">
+      {data?.detail}
+    </p>
 
-                <div className="relative mt-7 grid grid-cols-[0.72fr_1fr] gap-5">
-                  <div className="h-72 rounded-[24px] border border-white/10 bg-gradient-to-b from-slate-800 to-slate-950 p-4 shadow-2xl motion-safe:animate-[softFloat_4s_ease-in-out_infinite]">
-                    <div className="h-11 rounded-xl bg-blue-400/90" />
-                    <div className="mt-5 h-28 rounded-2xl border border-emerald-300/30 bg-white/8 p-3">
-                      <div className="h-2 w-16 rounded-full bg-emerald-300" />
-                      <div className="mt-3 h-2 w-24 rounded-full bg-white/25" />
-                      <div className="mt-2 h-2 w-20 rounded-full bg-white/18" />
-                    </div>
-                    <div className="mx-auto mt-8 h-20 w-10 rounded-t-full border-x-4 border-t-4 border-blue-300/60" />
-                  </div>
+    <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+      <NavLink
+        to="/products"
+        className="rounded-full bg-blue-400 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(96,165,250,0.35)] transition hover:-translate-y-1 hover:bg-blue-500"
+      >
+        Explore Products
+      </NavLink>
 
-                  <div className="space-y-3 self-center">
-                    <HeroMetric label="Output" value="60 kW" />
-                    <HeroMetric label="Efficiency" value="96%" />
-                    <HeroMetric label="Protection" value="IP54" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
-      </div>
+    </div>
+
+  </div>
+</div>
     </section>
   );
 }
 
 function ProductDetail({ data }) {
   return (
-    <section className="relative min-h-[calc(100vh-72px)] overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
+    <section className="relative min-h-[calc(100vh-72px)] overflow-hidden px-4 py-15 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center">
         {/* LEFT IMAGE */}
         <div className="relative z-10 shrink-0 lg:-mr-20">
-          <div className="h-137.5 w-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+          <div className="h-130.5 w-90 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
             <img
               src={data?.image?.url}
               alt="Product Side"
@@ -322,22 +145,25 @@ function ProductDetail({ data }) {
           <div className="absolute -inset-6 rounded-full bg-linear-to-br from-blue-400/28 via-emerald-300/20 to-transparent blur-3xl" />
 
           <div className="relative rounded-4xl border border-white/20 bg-white/12 p-4 shadow-[0_35px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
-            <div className="rounded-[26px] bg-white p-5">
-              <div className="relative overflow-hidden rounded-[22px] bg-[#111827] p-5 text-white">
+            {/* <div className="rounded-[26px] bg-white p-5"> */}
+              <div className="relative overflow-hidden rounded-[22px] bg-white p-5 text-violet-900">
                 <div className="absolute right-5 top-5 h-28 w-28 rounded-full bg-blue-400/20 blur-2xl" />
 
                 <div className="relative flex items-start justify-between gap-4">
-                  <div>
-                    {/* <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-300">
-                      DC Fast Charger
-                    </p> */}
-                    <h3 className="mt-2 text-xl font-black">{data?.title}</h3>
-                  </div>
+  
+  {/* TEXT AREA */}
+  <div className="min-w-0 flex-1">
+    <h3 className="mt-2 text-xl font-black wrap-break-word leading-snug">
+      {data?.title}
+    </h3>
+  </div>
 
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white">
-                    <BoltIcon className="h-6 w-6" />
-                  </div>
-                </div>
+  {/* ICON AREA */}
+  <div className="shrink-0 grid h-12 w-12 place-items-center rounded-2xl bg-emerald-400 text-white">
+    <BoltIcon className="h-6 w-6" />
+  </div>
+
+</div>
 
                 <div className="relative mt-7 grid grid-cols-[0.72fr_1fr] gap-5">
                   <div className="h-72 rounded-3xl border border-white/10 bg-linear-to-b from-slate-800 to-slate-950 p-4 shadow-2xl motion-safe:animate-[softFloat_4s_ease-in-out_infinite]">
@@ -368,7 +194,7 @@ function ProductDetail({ data }) {
                   </div>
                 </div>
               </div>
-            </div>
+            {/* </div> */}
           </div>
         </div>
 
@@ -388,11 +214,11 @@ function ProductDetail({ data }) {
 
 function HeroMetric({ label, value }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+    <div className="rounded-2xl border border-blue-400 bg-white/8 p-4 backdrop-blur ">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-800">
         {label}
       </p>
-      <p className="mt-1 text-base font-black text-white">{value}</p>
+      <p className="mt-1 text-base font-black text-black">{value}</p>
     </div>
   );
 }
@@ -423,43 +249,43 @@ function StatsSection({ data }) {
 function ProductShowcase({ data }) {
   return (
     <SectionShell
-      eyebrow="Product Showcase"
+      // eyebrow="Product Showcase"
       title={data?.title}
       action={<NavLinkButton to="/products" label="Explore Range" />}
     >
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
-        {data?.categories?.slice(0, 5).map((category, index) => (
+      {/* CENTER CONTENT */}
+      <div className="text-center max-w-3xl mx-auto mb-10" />
+
+      {/* GRID */}
+      <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-center gap-5">
+        {data?.categories?.slice(0, 6).map((category) => (
           <article
             key={category._id}
-            className="group overflow-hidden rounded-[26px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)] transition duration-500 hover:-translate-y-2 hover:border-blue-300 hover:shadow-[0_28px_90px_rgba(15,91,191,0.18)]"
-            style={{ animationDelay: `${index * 90}ms` }}
+            className="w-full sm:w-[48%] lg:w-[30%] group flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-300 hover:shadow-md hover:-translate-y-1"
           >
-            <div className="relative h-48 overflow-hidden">
-              <img
-                src={category.image?.url}
-                alt={`${category.categories_name} product by Exaulted India`}
-                loading="lazy"
-                className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-[#111827]/74 via-transparent to-transparent" />
-            </div>
-
-            <div className="p-5">
-              <h3 className="text-base font-black text-[#111827]">
+            {/* LEFT CONTENT */}
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg font-bold text-slate-900 leading-snug line-clamp-2">
                 {category.categories_name}
               </h3>
 
-              <p className="mt-3 text-sm leading-6 text-slate-600 line-clamp-4">
-                {category.categories_description}
-              </p>
-
               <NavLink
                 to={`/products/category/${category._id}`}
-                className="mt-2 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-600 transition group-hover:bg-blue-400 group-hover:text-white"
+                className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-blue-600 transition group-hover:gap-2"
               >
-                Learn More
+                Explore
                 <ArrowUpRightIcon className="h-4 w-4" />
               </NavLink>
+            </div>
+
+            {/* RIGHT IMAGE */}
+            <div className="shrink-0 w-40 h-30 rounded-xl overflow-hidden ">
+              <img
+                src={category.image?.url}
+                alt={category.categories_name}
+                loading="lazy"
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+              />
             </div>
           </article>
         ))}
@@ -467,20 +293,17 @@ function ProductShowcase({ data }) {
     </SectionShell>
   );
 }
-
 function WhyChooseUs({ data }) {
   return (
     <section className="bg-white">
       <SectionShell eyebrow="Exulted India" title={data?.title}>
+        <div className="text-center max-w-3xl mx-auto mb-10" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {data?.points.map((item) => (
             <article
               key={item.label}
               className="group rounded-3xl border border-blue-100 bg-linear-to-br from-white to-blue-50/45 p-6 shadow-[0_18px_55px_rgba(15,91,191,0.08)] transition duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_24px_70px_rgba(16,185,129,0.12)]"
             >
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25 transition group-hover:bg-emerald-400">
-                {/* <item.Icon className="h-6 w-6" /> */}
-              </div>
               <h3 className="mt-3 text-sm font-black text-[#111827]">
                 {item.label}
               </h3>
@@ -498,6 +321,7 @@ function WhyChooseUs({ data }) {
 function CoverageSection({ data }) {
   return (
     <SectionShell eyebrow="Pan India Coverage" title={data?.title}>
+      <div className="text-center max-w-3xl mx-auto mb-10" />
       <div className="grid gap-8 rounded-[30px] border border-blue-100 bg-white/80 p-5 shadow-[0_24px_80px_rgba(15,91,191,0.1)] backdrop-blur-xl lg:grid-cols-[0.92fr_1.08fr] lg:p-8 ">
         {/* LEFT CONTENT */}
         <div >
@@ -520,34 +344,10 @@ function CoverageSection({ data }) {
           <div className="relative">
             {/* INDIA IMAGE */}
             <img
-              src="https://www.dronepwr.com/wp-content/uploads/India-Map-Location-Drone-Power.svg"
+              src="https://th.bing.com/th/id/R.ff7920c1036af05ee65ccf1c9af91266?rik=FHVlZskTqE8I8Q&riu=http%3a%2f%2fimgvisuals.com%2fcdn%2fshop%2fproducts%2fanimated-world-map-with-pins-267288.gif%3fv%3d1698899562&ehk=8SyCjCgN0UG9JHNblXgHrTBEb2Fg3t1UITlApzPgDXA%3d&risl=&pid=ImgRaw&r=0"
               alt="India Map"
-              className="w-full object-contain"
+              className="w-full object-cover"
             />
-
-            {/* CITY POINTERS */}
-            {/* {data?.locations.map((city) => (
-              <button
-                key={city.name}
-                type="button"
-                className="group absolute -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  left: city.x,
-                  top: city.y,
-                }}
-              >
-                Ping Effect
-                <span className="absolute inset-0 h-5 w-5 rounded-full bg-emerald-400/40 animate-ping" />
-
-                Dot
-                <span className="relative block h-4 w-4 rounded-full border-2 border-white bg-blue-600 shadow-lg" />
-
-                Tooltip
-                <span className="pointer-events-none absolute left-1/2 top-6 z-10 w-max -translate-x-1/2 rounded-full bg-[#111827] px-3 py-1 text-xs font-bold text-white opacity-0 transition group-hover:opacity-100">
-                  {city.name}
-                </span>
-              </button>
-            ))} */}
           </div>
         </div>
       </div>
@@ -562,6 +362,7 @@ function Testimonials({ activeIndex, onChange, data }) {
   return (
     <section className="bg-[#111827]">
       <SectionShell eyebrow="Customer Review" title={active?.title} dark>
+        <div className="text-center max-w-3xl mx-auto mb-10" /><div className="text-center max-w-3xl mx-auto mb-10" />
         <div className="rounded-[30px] border border-white/10 bg-white/8 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.25)] backdrop-blur-xl sm:p-8">
           <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
             {/* Left Side */}
@@ -617,12 +418,12 @@ function CertificatesSection({ certificates = [], onPreview }) {
       title="Quality, safety, and compliance presented with confidence."
       action={<NavLinkButton to="/certificates" label="All Certificates" />}
     >
+      <div className="text-center max-w-3xl mx-auto mb-10" />
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {certificates.map((certificate) => (
           <button
             key={certificate._id}
             type="button"
-            // onClick={() => onPreview(certificate)}
             className="group overflow-hidden rounded-3xl border border-blue-100 bg-white text-left shadow-[0_18px_55px_rgba(15,91,191,0.08)] transition hover:-translate-y-1 hover:shadow-[0_24px_80px_rgba(15,91,191,0.15)]"
           >
             {/* IMAGE */}
@@ -639,10 +440,6 @@ function CertificatesSection({ certificates = [], onPreview }) {
               <p className="text-lg font-black text-slate-800">
                 {certificate.certificate_name}
               </p>
-
-              {/* <p className="mt-3 text-sm font-bold text-blue-600 transition group-hover:text-emerald-600">
-                Preview Certificate
-              </p> */}
             </div>
           </button>
         ))}
@@ -684,7 +481,6 @@ function CertificatePreview({ certificate, onClose }) {
 }
 
 function CtaBanner({ joinUs }) {
-  // console.log("Join Us Data:", joinUs);
   return (
     <SectionShell>
       <div className="relative overflow-hidden rounded-4xl bg-[#111827] p-8 text-white shadow-[0_28px_100px_rgba(17,24,39,0.22)] sm:p-10 lg:p-12">
@@ -713,77 +509,6 @@ function CtaBanner({ joinUs }) {
     </SectionShell>
   );
 }
-
-// function Footer() {
-//   return (
-//     <footer className="border-t border-blue-100 bg-white">
-//       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_0.62fr_1fr] lg:px-8">
-//         <div>
-//           <div className="flex items-center gap-3">
-//             <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-400 text-white shadow-lg shadow-blue-400/25">
-//               <BoltIcon className="h-6 w-6" />
-//             </div>
-//             <div>
-//               <p className="text-lg font-black text-[#111827]">Exaulted India</p>
-//               <p className="text-xs font-bold uppercase tracking-[0.22em] text-blue-500">
-//                 Future Power Systems
-//               </p>
-//             </div>
-//           </div>
-//           <p className="mt-5 max-w-sm text-sm leading-6 text-slate-600">
-//             Battery, inverter, transformer, online UPS, gensets, and EV charger
-//             manufacturing with Pan India support.
-//           </p>
-//           <div className="mt-5 flex gap-3">
-//             {["in", "f", "x"].map((item) => (
-//               <a
-//                 key={item}
-//                 href="/"
-//                 className="grid h-10 w-10 place-items-center rounded-full border border-blue-100 text-sm font-black text-blue-600 transition hover:bg-blue-400 hover:text-white"
-//                 aria-label={`Social link ${item}`}
-//               >
-//                 {item}
-//               </a>
-//             ))}
-//           </div>
-//         </div>
-
-//         <div>
-//           <p className="text-sm font-black uppercase tracking-[0.18em] text-[#111827]">
-//             Quick Links
-//           </p>
-//           <div className="mt-5 grid gap-3">
-//             {quickLinks.map((item) => (
-//               <NavLink
-//                 key={item}
-//                 to={`/${item.toLowerCase() === "products" ? "products" : item.toLowerCase()}`}
-//                 className="text-sm font-semibold text-slate-600 transition hover:text-blue-600"
-//               >
-//                 {item}
-//               </NavLink>
-//             ))}
-//           </div>
-//           <div className="mt-7 space-y-2 text-sm text-slate-600">
-//             <p>
-//               <span className="font-bold text-[#111827]">Phone:</span> +91 98765 43210
-//             </p>
-//             <p>
-//               <span className="font-bold text-[#111827]">Email:</span> info@exaultedindia.com
-//             </p>
-//             <p>
-//               <span className="font-bold text-[#111827]">Support:</span> Pan India
-//             </p>
-//           </div>
-//         </div>
-
-//         <InquiryForm />
-//       </div>
-//       <div className="border-t border-blue-100 px-4 py-5 text-center text-xs font-semibold text-slate-500">
-//         © 2026 Exaulted India. All rights reserved.
-//       </div>
-//     </footer>
-//   );
-// }
 
 function InquiryForm() {
   return (
@@ -832,7 +557,7 @@ function SectionShell({
   return (
     <section
       className={[
-        "relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8",
+        "relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8",
         className,
       ].join(" ")}
     >
@@ -852,7 +577,7 @@ function SectionShell({
             {title ? (
               <h2
                 className={[
-                  "mt-1 max-w-3xl text-xl font-black leading-tight sm:text-xl",
+                  "mt-1 max-w-3xl text-xl font-bold leading-tight sm:text-3xl",
                   dark ? "text-white" : "text-[#111827]",
                 ].join(" ")}
               >

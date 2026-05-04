@@ -24,13 +24,11 @@ function CreateSubCategory({
   mode = "create",
   setIsCreateModalOpen,
 }) {
-  // console.log("initialData: ",initialData)
   const [createSubCategories, { isLoading: isCreateLoading }] =
     useCreateSubCategoriesMutation();
   const [updateSubCategories, { isLoading: isUpdateLoading }] =
     useUpdateSubCategoriesMutation();
   const { data: categoriesResponse ,isLoading: isCategoriesLoading,error } = useGetCategoriesQuery();
-  // console.log("categoriesResponse: ", categoriesResponse);
 
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
@@ -41,12 +39,6 @@ function CreateSubCategory({
   const categoryMenuRef = useRef(null);
   const isUpdateMode = mode === "update";
   const isLoading = isCreateLoading || isUpdateLoading || isCategoriesLoading;
-
-  // useEffect(() => {
-  //   if (error) {
-  //     toast.error("Failed to load categories. Please try again.");
-  //   }
-  // }, [error]);
 
   const categoryOptions = useMemo(
     () =>
@@ -125,6 +117,16 @@ function CreateSubCategory({
 
     if (!file.type.startsWith("image/")) {
       setFormError("Please select a valid image file.");
+      toast.error("Please select a valid image file.");
+      return;
+    }
+
+    // ✅ SIZE VALIDATION (ADD THIS)
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+    if (file.size > MAX_SIZE) {
+      setFormError("Image must be less than 10MB.");
+      toast.error("Image must be less than 10MB.");
       return;
     }
 
@@ -141,7 +143,6 @@ function CreateSubCategory({
   };
 
   const handleCategorySelect = (category) => {
-    console.log("Selected category: ", category);
     setFormError("");
     setFormData((prev) => ({
       ...prev,
@@ -213,22 +214,13 @@ function CreateSubCategory({
 
     try {
       if (isUpdateMode) {
-        console.log("Submitting update with data:", {
-          id: formData.id,
-          subCategories_Name: submitData.get("subCategories_Name"),
-          subCategories_Description: submitData.get("subCategories_Description"),
-          category_Id: submitData.get("category_Id"),
-          image: submitData.get("image"),
-        });
         const res = await updateSubCategories({
           id: formData.id,
           body: submitData,
         }).unwrap();
-        console.log("Update response:", res);
         toast.success(res?.message || "Sub category updated successfully.");
       } else {
         const res = await createSubCategories(submitData).unwrap();
-        console.log("Create response:", res);
         toast.success(res?.message || "Sub category created successfully.");
       }
 
@@ -237,7 +229,6 @@ function CreateSubCategory({
       setFormError(
         error?.data?.message || error?.message || "Something went wrong.",
       );
-      console.log("error while submitting sub category:", error);
       toast.error(
         error?.data?.message || error?.message || "Failed to submit sub category.",
       );  
@@ -245,7 +236,7 @@ function CreateSubCategory({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 sm:p-6">
       <Loader isLoading={isLoading} />
       <button
         type="button"
@@ -257,9 +248,6 @@ function CreateSubCategory({
       <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.20)]">
         <div className="flex items-start justify-between gap-4 border-b border-blue-100 bg-linear-to-r from-white via-blue-50 to-slate-50 px-5 py-5 sm:px-6">
           <div>
-            {/* <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-400">
-              {isUpdateMode ? "Update Sub Category" : "Sub Category Modal"}
-            </p> */}
             <h2 className="mt-2 text-lg font-bold text-slate-800 sm:text-lg">
               {isUpdateMode ? "Update Sub Category" : "Create Sub Category"}
             </h2>
@@ -398,9 +386,9 @@ function CreateSubCategory({
                         <p className="text-sm font-semibold text-slate-700">
                           Click to replace image
                         </p>
-                        {/* <p className="text-xs text-slate-500">
-                          Best results with a sharp and category-specific image.
-                        </p> */}
+                        <p className="text-xs text-slate-500">
+                          Image must be less then 10 mb.
+                        </p>
                       </div>
                     </div>
                   ) : (
@@ -409,9 +397,6 @@ function CreateSubCategory({
                       <span className="text-sm font-semibold text-slate-700">
                         Click to upload image
                       </span>
-                      {/* <span className="mt-1 text-xs text-slate-500">
-                        Recommended: high-quality square or landscape image
-                      </span> */}
                     </div>
                   )}
                 </div>

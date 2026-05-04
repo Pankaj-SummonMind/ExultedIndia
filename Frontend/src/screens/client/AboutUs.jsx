@@ -1,68 +1,32 @@
 import { Helmet } from "react-helmet-async";
 import { useGetAboutUsQuery } from "../../services/api";
-
-const heroImage =
-  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80";
-const factoryImage =
-  "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=1200&q=80";
-const workerImage =
-  "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80";
-const researchImage =
-  "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&w=1200&q=80";
-const visionImage =
-  "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1200&q=80";
-const chargerImage =
-  "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=900&q=80";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import Loader from "../../components/loader/Loader";
 
 const overviewStats = [
-  { value: "120+", label: "Associated Team", Icon: UsersIcon },
-  { value: "250+", label: "Dealers Across India", Icon: MapIcon },
-  { value: "1000+", label: "Production Capacity", Icon: FactoryIcon },
-  { value: "5 Lakh+", label: "Happy Customers", Icon: HeartIcon },
+  {Icon: UsersIcon },
+  {Icon: MapIcon },
+  {Icon: FactoryIcon },
+  {Icon: HeartIcon },
 ];
 
-const heroStats = [
-  { value: "2017", label: "Established" },
-  { value: "5L+", label: "Customers" },
-  { value: "250+", label: "Dealers" },
-];
-
-const splitSections = [
-  {
-    eyebrow: "Mission",
-    title: "To create a greener future powered by sustainable mobility.",
-    text: "We design practical, efficient, and durable power products that help accelerate cleaner transportation and dependable energy access for real-world Indian conditions.",
-    image: workerImage,
-    imageAlt: "Worker assembling electrical power equipment",
-    Icon: LeafIcon,
-  },
-  {
-    eyebrow: "Our Research",
-    title: "Research-led battery and power electronics innovation.",
-    text: "Exulted India has invested heavily in the research of Battery and Power Electronics Products over a decade. Its research has been extensive, considering numerous alternatives before developing products that best suit customers across Asia, Africa, Middle East, and worldwide markets. Exulted India remains committed to the evolving alternative energy market and state of the art clean energy technology.",
-    image: researchImage,
-    imageAlt: "Researcher testing power electronics products",
-    Icon: LabIcon,
-  },
-  {
-    eyebrow: "Vision",
-    title: "Quality guidance, clean energy, and opportunity for every region.",
-    text: "To give quality guidance in even the most common and distant areas, because innovators can be found anywhere. To upgrade the younger generation and prepare them for market opportunities. To make medical services reasonable and available for all areas of society, and to ensure progress remains sustainable by investing in clean energy sources.",
-    image: visionImage,
-    imageAlt: "Future electric mobility charging infrastructure",
-    Icon: EyeIcon,
-  },
-];
 
 function AboutUs() {
-   const { data } = useGetAboutUsQuery();
-   console.log("about us data : ",data)
+   const { data,isLoading,error } = useGetAboutUsQuery();
    const AboutUsData = data?.data;
    const missionData = AboutUsData?.mission;
    const researchData = AboutUsData?.research;
     const visionData = AboutUsData?.vision;
+
+    useEffect(() => {
+      if(error){
+        toast.error("Internal Server Error.")
+      }
+    },[error])
   return (
     <main className="relative overflow-hidden bg-[#F8FAFC] text-[#111827]">
+      <Loader isLoading={isLoading} />
       <Helmet>
         <title>About Us | Exulted India</title>
         <meta name="description" content="Learn about Exulted India's mission, vision, and commitment to sustainable energy solutions. Discover our journey, values, and dedication to providing high-quality power products for a greener future." />
@@ -75,9 +39,9 @@ function AboutUs() {
       <CompanyOverview AboutUsData={AboutUsData}/>
 
       <section className="relative mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:px-8">
-          <SplitInfoSection AboutUsData={missionData} eyebrow="Mission"/>
-          <SplitInfoSection AboutUsData={researchData} eyebrow="Our Research"/>
-          <SplitInfoSection AboutUsData={visionData} eyebrow="Vision"/>
+          <SplitInfoSection AboutUsData={missionData} eyebrow="Mission" Icon={LeafIcon}/>
+          <SplitInfoSection AboutUsData={researchData} eyebrow="Our Research" Icon={LabIcon}/>
+          <SplitInfoSection AboutUsData={visionData} eyebrow="Vision" Icon={EyeIcon}/>
       </section>
     </main>
   );
@@ -92,7 +56,7 @@ function HeroAbout({AboutUsData}) {
           <p className="inline-flex rounded-full border border-blue-200 bg-white/75 px-3 py-2 text-xs font-bold uppercase tracking-[0.26em] text-blue-500 shadow-sm backdrop-blur">
             About Us
           </p>
-          <h1 className="mt-6 max-w-3xl text-2xl font-black leading-tight text-[#111827] sm:text-2xl lg:text-2xl">
+          <h1 className="mt-6 max-w-3xl text-3xl font-black leading-tight text-[#111827] sm:text-3xl lg:text-3xl">
             {AboutUsData?.hero?.heading}
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
@@ -178,9 +142,19 @@ function CompanyOverview({ AboutUsData }) {
 
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {AboutUsData?.companyStats.map((stat, index) => (
-              <OverviewStat key={stat.key} stat={stat} delay={index * 120} />
-            ))}
+            {AboutUsData?.companyStats.map((stat, index) => {
+    const StatIcon =
+      overviewStats[index]?.Icon || Users;
+
+    return (
+      <OverviewStat
+        key={stat.key}
+        stat={stat}
+        delay={index * 120}
+        Icon={StatIcon}
+      />
+    );
+  })}
           </div>
         </div>
       </div>
@@ -188,9 +162,9 @@ function CompanyOverview({ AboutUsData }) {
   );
 }
 
-function SplitInfoSection({ AboutUsData, eyebrow }) {
+function SplitInfoSection({ AboutUsData, eyebrow,Icon }) {
   return (
-    <section className="grid gap-5 lg:grid-cols-[1fr_0.95fr] lg:gap-6">
+    <section className="grid items-start gap-5 lg:grid-cols-[1fr_0.95fr] lg:gap-6">
       {/* Image Card */}
       <div className="overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
         <div className="relative h-62.5 sm:h-80 lg:h-80">
@@ -201,27 +175,15 @@ function SplitInfoSection({ AboutUsData, eyebrow }) {
             className="h-full w-full object-cover"
           />
 
-          {/* Bottom White Button */}
-          {/* <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-auto sm:w-[72%]">
-            <div className="rounded-2xl bg-white px-5 py-4 shadow-lg">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-900 sm:text-sm">
-                Explore Our Values →
-              </p>
-            </div>
-          </div> */}
         </div>
       </div>
 
       {/* Content Card */}
       <div className="rounded-[26px] border border-slate-200 bg-[#F8F8F8] px-5 py-6 shadow-[0_14px_40px_rgba(15,23,42,0.06)] sm:px-7 sm:py-8 lg:px-8 lg:py-9">
         <div className="flex items-start gap-3">
-          {/* <h2 className="text-2xl font-black leading-tight text-black sm:text-[30px]">
-            {eyebrow}
-          </h2> */}
-
-          <div className="mt-1 grid h-9 w-9 place-items-center rounded-full border-2 border-black text-base">
-            💡
-          </div>
+          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-400  text-white shadow-lg shadow-blue-400/25 transition hover:bg-blue-400">
+                  <Icon className="h-6 w-6" />
+                </div> 
         </div>
 
         {AboutUsData?.heading && (
@@ -258,8 +220,7 @@ function GlassStat({ item, delay }) {
   );
 }
 
-function  OverviewStat({ stat, delay }) {
-  // const StatIcon = stat.Icon;
+function  OverviewStat({ stat, delay, Icon }) {
 
   return (
     <div
@@ -267,7 +228,7 @@ function  OverviewStat({ stat, delay }) {
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="grid h-11 w-11 place-items-center rounded-2xl bg-blue-50 text-blue-500 transition group-hover:bg-blue-400 group-hover:text-white">
-        {/* <StatIcon className="h-5 w-5" /> */}
+        <Icon className="h-5 w-5" />
       </div>
       <p className="mt-4 text-lg font-black text-[#111827]">{stat.value}</p>
       <p className="mt-1 text-sm font-semibold text-slate-500">{stat.key}</p>

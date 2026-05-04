@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useCreateSocialMediaMutation, useUpdateSocialMediaMutation } from "../services/api";
 import toast from "react-hot-toast";
 import Loader from "./loader/Loader";
-// import { api } from "../../services/api";
 
 const EMPTY_FORM = {
   id:"",
@@ -15,7 +14,6 @@ function CreateSocialMedia({
   isOpen,
   onClose,
   activeAccount,
-//   refetch,
 }) {
 
   const[createSocialMedia,{isLoading:isCreateLoading}] =  useCreateSocialMediaMutation() 
@@ -67,14 +65,12 @@ function CreateSocialMedia({
     setIsSubmitting(true);
 
     try {
-        console.log("form data:",formData);
         if(activeAccount){
             const res = await updateSocialMedia({
                 id : formData.id,
                 key:trimmedKey,
                 value:trimmedValue
             })
-            console.log("res after updating Value",res )
             toast.success(res?.message || "Account updated successfully");
         }
         else{
@@ -83,12 +79,9 @@ function CreateSocialMedia({
               value: trimmedValue,
             }).unwrap();
             toast.success(res?.message || "Account created successfully");
-            console.log("res after creating account",res)
         }
-    //   await refetch();
     } catch (error) {
       toast.error(error?.message || "Failed to save account. Please try again.");
-      console.log("error while handling social Media : ",error )
     } finally {
       setIsSubmitting(false);
       onClose();

@@ -11,7 +11,6 @@ const cardBaseClass =
 function ContactPageScreen() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const { data, isLoading,error } = useGetContactsQuery();
-  console.log("contact data", data);
 
   useEffect(() => {
     if (error) {
@@ -19,36 +18,12 @@ function ContactPageScreen() {
     }
   }, [error]);
 
-  // const contacts = useMemo(() => {
-  //   if (Array.isArray(data?.data)) {
-  //     return data.data;
-  //   }
-
-  //   if (data?.data) {
-  //     return [data.data];
-  //   }
-
-  //   return [];
-  // }, [data]);
 
   const contactData = data?.data ;
   const hasContactData = Boolean(contactData);
   const mode = hasContactData ? "update" : "create";
   const actionLabel = hasContactData ? "Update Contact" : "Create Contact";
   const ActionIcon = hasContactData ? PencilLine : Plus;
-
-  // if (isLoading) {
-  //   return (
-  //     <section className="flex min-h-[70vh] items-center justify-center">
-  //       <div className="flex flex-col items-center gap-4">
-  //         <div className="h-12 w-12 animate-spin rounded-full border-4 border-sky-100 border-t-sky-600" />
-  //         <p className="text-sm font-medium text-slate-500">
-  //           Contact content loading...
-  //         </p>
-  //       </div>
-  //     </section>
-  //   );
-  // }
 
   if (isFormVisible) {
     return (
@@ -123,11 +98,6 @@ function ContactPageScreen() {
   </button>
 </div>
 
-      {/* {error ? (
-        <div className="rounded-3xl border border-red-100 bg-red-50 px-5 py-4 text-sm font-medium text-red-500">
-          {error?.data?.message || "Latest contact data refresh nahi ho paya."}
-        </div>
-      ) : null} */}
 
       <div className="relative overflow-hidden rounded-[34px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f8fafc_100%)] p-4 sm:p-5">
         <div className="grid gap-5 xl:grid-cols-2">
@@ -178,15 +148,6 @@ function ContactPageScreen() {
                   Map Location
                 </p>
                 {contactData?.mapLocation ? (
-                  // <a
-                  //   href={contactData.mapLocation}
-                  //   target="_blank"
-                  //   rel="noreferrer"
-                  //   className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-sky-600 transition hover:text-sky-700"
-                  // >
-                  //   Open map location
-                  //   <ExternalLinkIcon className="h-4 w-4" />
-                  // </a>
                   <iframe
             title="Exulted India office location at Vegas Mall, Dwarka Sector 14, New Delhi"
             src={contactData.mapLocation}
@@ -194,9 +155,6 @@ function ContactPageScreen() {
             referrerPolicy="no-referrer-when-downgrade"
             className="h-full w-full mt-2 inline-flex items-center gap-2 text-sm font-semibold text-sky-600 transition hover:text-sky-700"
           />
-          //   Open map location
-          //   <ExternalLinkIcon className="h-4 w-4" />
-          // </iframe>
                 ) : (
                   <p className="mt-2 text-base font-semibold leading-7 text-slate-800">
                     Not available

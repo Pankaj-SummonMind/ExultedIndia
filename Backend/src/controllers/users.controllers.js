@@ -21,7 +21,6 @@ async function registerUser(req,res,next){
     })
 
     const createdUser = await User.findById(newUser._id).select("-_id name mobileNumber email message createdAt")
-    console.log("created user: ", createdUser);
 
     if(!createdUser){
       throw new ApiError(500,"somthing went wrong while registering user")
@@ -31,7 +30,6 @@ async function registerUser(req,res,next){
         new ApiResponse(200,createdUser, "User registered Successfully")
     )
   } catch (error) {
-    console.log("error in creating user backend ",error)
     return res.status(error.statusCode).json({
       statusCode: error.statusCode,
       success : error.success,
@@ -50,7 +48,6 @@ async function getAllUsers(req, res) {
       throw new ApiError(404,"No users found ")
     }
 
-    console.log(users)
 
     return res.status(200).json(
       new ApiResponse(
@@ -61,7 +58,6 @@ async function getAllUsers(req, res) {
     );
 
   } catch (error) {
-    console.error("Get All Users Error:", error);
 
     return res.status(error.statusCode || 500).json({
       success: false,
@@ -94,7 +90,6 @@ async function getUserById(req, res) {
     );
 
   } catch (error) {
-    console.error("Get User By Id Error:", error);
 
     return res.status(error.statusCode || 500).json({
       success: false,

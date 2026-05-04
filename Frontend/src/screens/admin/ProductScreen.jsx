@@ -9,7 +9,6 @@ import toast from "react-hot-toast";
 function ProductScreen() {
   const navigate = useNavigate();
   const {data : allProduct, isLoading,error} = useGetProductQuery()
-  console.log(allProduct);
   const [showCreateProduct, setShowCreateProduct] = useState(false);
 
   useEffect(() => {
@@ -120,10 +119,6 @@ function ProductScreen() {
           <p className="text-lg font-semibold text-slate-700">
             No Product Found
           </p>
-
-          {/* <p className="mt-2 text-sm leading-6 text-slate-500">
-            Currently there are no categories available.
-          </p> */}
         </div>
       </td>
     </tr>

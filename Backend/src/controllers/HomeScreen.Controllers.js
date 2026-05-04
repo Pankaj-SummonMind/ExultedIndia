@@ -21,15 +21,6 @@ const createHomePage = async (req, res) => {
       testimonials,
       joinUs,
     } = req.body;
-    console.log("Received data:", {
-      hero,
-      heroDetail,
-      homeCategory,
-      whyChooseUs,
-      locations,
-      testimonials,
-      joinUs,
-    }); 
 
     const alreadyExist = await HomePage.findOne();
 

@@ -1,29 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGetContactsQuery, useRegisterUserMutation } from "../../services/api";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
+import Loader from "../../components/loader/Loader";
 
-const officeAddress =
-  "694 Office Unit, Vegas Mall, Dwarka Sector -14, New Delhi -110078, INDIA";
 
 const contactCards = [
   {
-    label: "Phone Number",
-    value: "1800-8899-410",
-    href: "tel:18008899410",
     Icon: PhoneIcon,
     tone: "bg-blue-50 text-blue-600 border-blue-100",
   },
   {
-    label: "WhatsApp",
-    value: "+91 1800-8899-410",
-    href: "https://wa.me/9118008899410",
     Icon: WhatsappIcon,
     tone: "bg-emerald-50 text-emerald-600 border-emerald-100",
   },
   {
-    label: "Email",
-    value: "sales@exultedindia.com",
-    href: "mailto:sales@exultedindia.com",
     Icon: MailIcon,
     tone: "bg-cyan-50 text-cyan-600 border-cyan-100",
   },
@@ -43,12 +34,19 @@ const initialErrorState = {
 };
 
 function ContactUsScreen() {
-  const {data,isLoading,error} = useGetContactsQuery();
+  const {data,isLoading:isFetching,error} = useGetContactsQuery();
   const [registerUser,{isLoading: isRegistering}] = useRegisterUserMutation();
   const contactInfo = data?.data ;
-  console.log("contact info", contactInfo);
   const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState(initialErrorState);
+
+  const isLoading = isFetching || isRegistering;
+
+  useEffect(() => {
+    if(error){
+      toast.error("Internal Server Error")
+    }
+  },[error])
 
   const updateField = (field, value) => {
     setFormData((current) => ({
@@ -112,12 +110,11 @@ function ContactUsScreen() {
 
     try {
       const response = await registerUser(payload).unwrap();
-      console.log("user create response:", response);
+      toast.success(response?.message || "Registration Succesfull")
       resetForm();
-      // setIsCreateModalOpen?.(false);
-      // onClose();
+      
     } catch (error) {
-      console.log("error while creating user:", error);
+      toast.error(error?.message || "Something went wrong, Please Try again" )
     }
   };
 
@@ -128,7 +125,8 @@ function ContactUsScreen() {
         <meta name="description" content="Get in touch with Exulted India for inquiries, support, or to learn more about our power products and services. Contact us via phone, WhatsApp, email, or visit our office at Vegas Mall, Dwarka Sector 14, New Delhi." />
         <meta name="keywords" content="Exulted India contact, customer support, inquiries, phone number, WhatsApp, email, office address, Vegas Mall contact" />
       </Helmet>
-      <BackgroundDecor />
+      <Loader isLoading={isLoading}/>
+      {/* <BackgroundDecor /> */}
       <section className="relative">
         <div className="h-85 w-full overflow-hidden border-b border-blue-100 bg-blue-50 sm:h-107.5 lg:h-130">
           <iframe
@@ -143,11 +141,9 @@ function ContactUsScreen() {
 
       <section className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="-mt-24 grid gap-4 sm:grid-cols-2 lg:-mt-28 lg:grid-cols-3">
-          {/* {contactCards.map((card, index) => ( */}
             <ContactCard  card={contactCards[0]} contactInfo={contactInfo} label={"Phone Number"}  value = {contactInfo?.phoneNumber}  />
             <ContactCard  card={contactCards[1]} contactInfo={contactInfo} label={"WhatsApp"}  value = {contactInfo?.whatappNumber }/>
             <ContactCard  card={contactCards[2]} contactInfo={contactInfo} label={"Email"}  value = {contactInfo?.email} />
-          {/* ))} */}
         </div>
 
         <div className="mt-10 grid gap-7 lg:mt-14 lg:grid-cols-[0.92fr_1.08fr]">
@@ -166,11 +162,7 @@ function ContactCard({ card, contactInfo, label,value }) {
 
   return (
     <a
-      // href={card.href}
-      // target={card.href.startsWith("http") ? "_blank" : undefined}
-      // rel={card.href.startsWith("http") ? "noreferrer" : undefined}
       className="group rounded-[26px] border border-white/80 bg-white/92 p-5 shadow-[0_22px_80px_rgba(15,91,191,0.13)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_30px_95px_rgba(15,91,191,0.18)] motion-safe:animate-[contactFadeUp_650ms_ease-out_both]"
-      // style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-center gap-4">
         <span
@@ -213,10 +205,6 @@ function GetInTouchCard({ contactInfo }) {
         <div className="mt-8 space-y-6">
           <InfoBlock title="Address">
             <p>{contactInfo?.address}</p>
-            {/* <p>694 Office Unit,</p>
-            <p>Vegas Mall, Dwarka Sector -14,</p>
-            <p>New Delhi -110078</p>
-            <p>INDIA</p> */}
           </InfoBlock>
 
           <InfoBlock title="Email">

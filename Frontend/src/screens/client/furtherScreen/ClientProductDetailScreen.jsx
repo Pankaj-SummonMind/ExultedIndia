@@ -5,30 +5,25 @@ import {
   useGetProductQuery,
 } from "../../../services/api";
 import { Helmet } from "react-helmet-async";
-
-const fallbackGalleryImages = [
-  "https://images.unsplash.com/photo-1581092160607-ee22731d8ca7?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
-];
+import toast from "react-hot-toast";
 
 function ClientProductDetailScreen() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { data, isLoading, error } = useGetProductByidQuery(id);
+  const { data, isLoading:isProductByIdFetching, error : productByidError  } = useGetProductByidQuery(id);
   const {
     data: AllProductData,
     isLoading: AllProductLoading,
     error: AllProductError,
   } = useGetProductQuery();
-  console.log("Fetched all products data:", AllProductData);
 
   const product = data?.data;
-  console.log("Fetched product detail:", product);
+  const error = productByidError || AllProductError;
+  const isLoading = isProductByIdFetching || AllProductLoading;
+
   const productImages = useMemo(() => getProductImages(product), [product]);
-  const galleryImages = productImages.length
-    ? productImages
-    : fallbackGalleryImages;
+  const galleryImages = productImages;
   const features = Array.isArray(product?.features)
     ? product.features.filter(Boolean)
     : [];
@@ -51,6 +46,12 @@ function ClientProductDetailScreen() {
         item?.product_subCategory?._id === currentSubCategoryId,
     );
   }, [AllProductData, product]);
+
+  useEffect(() => {
+    if(error) {
+      toast.error("Internal Server Error")
+    }
+  },[error])
 
   useEffect(() => {
     setCurrentImageIndex(0);
@@ -80,10 +81,7 @@ function ClientProductDetailScreen() {
     return (
       <main className="min-h-screen bg-[#F5F9FF] px-4 py-12 sm:px-6 lg:px-8">
         <StatusPanel
-          title="Product detail load nahi ho paayi"
-          description={`Backend response check karein ya thodi der baad retry karein.${
-            error?.status ? ` Status: ${error.status}` : ""
-          }`}
+          title="Failed To Load Prdouct Detail"
           tone="error"
           actionLabel="Back to products"
           onAction={() => navigate("/products")}
@@ -97,7 +95,6 @@ function ClientProductDetailScreen() {
       <main className="min-h-screen bg-[#F5F9FF] px-4 py-12 sm:px-6 lg:px-8">
         <StatusPanel
           title="Product not found"
-          description="Requested product detail available nahi hai. Products listing se dobara open karke check karein."
           actionLabel="Back to products"
           onAction={() => navigate("/products")}
         />
@@ -106,7 +103,7 @@ function ClientProductDetailScreen() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#F5F9FF] text-slate-950">
+    <main className="min-h-screen overflow-x-hidden bg-[#F5F9FF] text-slate-950">
       <Helmet>
         <title>{`${product?.product_name || "Product Detail"} | Exulted India`}</title>
         <meta
@@ -126,53 +123,15 @@ function ClientProductDetailScreen() {
         <div className="absolute -left-24 top-10 h-48 w-48 rounded-full bg-blue-200/25 blur-3xl sm:h-72 sm:w-72" />
         <div className="absolute -right-20 top-20 h-44 w-44 rounded-full bg-cyan-200/30 blur-3xl sm:h-64 sm:w-64" />
 
-        {/* <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-blue-200 hover:text-blue-700"
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-            Back
-          </button>
-
-          <div className="mt-6 max-w-4xl">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-blue-600">
-              Product Detail
-            </p>
-            <h1 className="mt-4 text-3xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-6xl">
-              {product?.product_name || "Unnamed Product"}
-            </h1>
-
-            <div className="mt-5 flex flex-wrap gap-3">
-              <InfoPill icon={<CategoryIcon className="h-4 w-4" />}>
-                {product?.product_category?.categories_name || "Uncategorized"}
-              </InfoPill>
-              <InfoPill icon={<SubCategoryIcon className="h-4 w-4" />}>
-                {product?.product_subCategory?.name || "No sub category"}
-              </InfoPill>
-              <InfoPill icon={<GalleryIcon className="h-4 w-4" />}>
-                {productImages.length || 0} Image{productImages.length === 1 ? "" : "s"}
-              </InfoPill>
-            </div>
-
-            <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
-              {product?.description ||
-                "This product detail screen is ready to showcase core information, gallery previews, and technical highlights in a clean professional layout."}
-            </p>
-          </div>
-        </div> */}
+        
       </section>
 
       <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="rounded-[30px] border border-blue-100 bg-white/90 p-4 shadow-[0_22px_70px_rgba(15,91,191,0.10)] backdrop-blur sm:p-5">
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_52%,#f8fafc_100%)]">
                 <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
-                  {/* <span className="rounded-full border border-white/75 bg-white/90 px-3 py-1 text-[11px] font-black uppercase tracking-[0.24em] text-slate-500 shadow-sm backdrop-blur">
-        Product Gallery
-      </span> */}
 
                   {galleryImages.length > 1 ? (
                     <div className="flex items-center gap-2">
@@ -196,7 +155,7 @@ function ClientProductDetailScreen() {
                 </div>
 
                 {/* Main Image Fixed Size */}
-                <div className="flex h-105 w-full items-center justify-center p-6 sm:h-130 sm:p-8">
+                <div className="flex  min-h-65 sm:min-h-105 w-full items-center justify-center p-6  sm:p-8">
                   <img
                     src={galleryImages[currentImageIndex]}
                     alt={product?.product_name || "Product image"}
@@ -368,7 +327,7 @@ function ClientProductDetailScreen() {
         ) : AllProductError ? (
           <EmptyText label="Failed to load Related products." />
         ) : relatedProducts.length ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {relatedProducts.map((relatedProduct, index) => (
               <RelatedProductCard
                 key={relatedProduct?._id || index}
@@ -390,8 +349,7 @@ function ClientProductDetailScreen() {
 
 function RelatedProductCard({ product, index, onOpen }) {
   const image =
-    getProductImages(product)[0] ||
-    fallbackGalleryImages[index % fallbackGalleryImages.length];
+    getProductImages(product)[0];
   const title = product?.product_name || "Product";
   const description =
     product?.description ||
@@ -404,53 +362,32 @@ function RelatedProductCard({ product, index, onOpen }) {
   };
 
   return (
-    <article className="group flex min-h-107.5 flex-col overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] transition duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.16)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_80px_rgba(37,99,235,0.16)]">
       <button
         type="button"
         onClick={onOpen}
-        className="relative h-[58%] w-full overflow-hidden bg-blue-50 text-left"
+        className="relative  w-full overflow-hidden bg-blue-50 text-left"
         aria-label={`View ${title}`}
       >
         <img
           src={image}
           alt={title}
           loading="lazy"
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          className="h-52 w-full object-fit transition duration-500 group-hover:scale-105"
         />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.48))]" />
       </button>
 
-      <div className="flex flex-1 flex-col justify-between p-4">
+      <div className="flex flex-1 flex-col justify-between p-5">
         <div>
-          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-blue-500">
-            {product?.product_subCategory?.name || "Related Product"}
-          </p>
-          <h3 className="mt-2 line-clamp-2 min-h-12 text-base font-black leading-6 text-slate-950">
+          <h3 className="mt-2 line-clamp-2  text-base font-black leading-6 text-slate-950">
             {title}
           </h3>
-          <p className=" line-clamp-3 text-sm leading-6 text-slate-600">
+          <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">
             {description}
           </p>
         </div>
 
-        <div className=" grid gap-3 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={onOpen}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
-          >
-            View Product
-            <ArrowRightIcon className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={handleCatalogOpen}
-            disabled={!catalogUrl}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-blue-200 bg-white px-4 text-sm font-semibold text-blue-700 transition hover:-translate-y-0.5 hover:bg-blue-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400 disabled:hover:translate-y-0 disabled:hover:bg-white"
-          >
-            View Catalog
-            <ExternalLinkIcon className="h-4 w-4" />
-          </button>
-        </div>
       </div>
     </article>
   );
@@ -462,9 +399,9 @@ function RelatedProductsLoading() {
       {[1, 2, 3, 4].map((item) => (
         <div
           key={item}
-          className="min-h-[430px] animate-pulse rounded-[24px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)]"
+          className="min-h-107.5 animate-pulse rounded-3xl border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.08)]"
         >
-          <div className="h-56 rounded-t-[24px] bg-blue-100 sm:h-60" />
+          <div className="h-56 rounded-3xl bg-blue-100 sm:h-60" />
           <div className="p-4">
             <div className="h-3 w-36 rounded-full bg-blue-100" />
             <div className="mt-4 h-5 w-4/5 rounded-full bg-slate-100" />
@@ -527,7 +464,7 @@ function InfoPill({ icon, children }) {
 
 function EmptyText({ label }) {
   return (
-    <p className="rounded-[20px] border border-dashed border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-500">
+    <p className="rounded-[20px] border border-dashed border-slate-200 bg-slate-50 px-4 py-4 font-black text-slate-500 ">
       {label}
     </p>
   );
@@ -535,7 +472,6 @@ function EmptyText({ label }) {
 
 function StatusPanel({
   title,
-  description,
   tone = "default",
   actionLabel,
   onAction,
@@ -561,10 +497,7 @@ function StatusPanel({
           <GalleryIcon className="h-7 w-7" />
         )}
       </div>
-      <h1 className="mt-5 text-2xl font-black text-slate-950">{title}</h1>
-      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-600">
-        {description}
-      </p>
+      <h1 className="mt-5 text-xl font-black text-slate-950">{title}</h1>
 
       {actionLabel ? (
         <button

@@ -34,15 +34,12 @@ function CreateProduct({
   useUpdateProductMutation();
   const { data: categoryData, isLoading: isCategoryLoading,error: categoryError } = useGetCategoriesQuery();
   const { data: subCategoryData, isLoading: isSubCategoryLoading,error: subCategoryError } = useGetSubCategoriesQuery();
-  console.log("category data:", categoryData);
-  console.log("subCategory Data", subCategoryData);
 
   const [formData, setFormData] = useState(initialFormState);
   const [categorySearch, setCategorySearch] = useState("");
   const [subCategorySearch, setSubCategorySearch] = useState("");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
-  console.log("initial data ", initialData,productImages);
   const isLoading = addProductLoading || isUpdateLoading || isCategoryLoading || isSubCategoryLoading;
 
   useEffect(() => {
@@ -232,14 +229,55 @@ function CreateProduct({
   };
 
   const handleImagesChange = (event) => {
-    const selectedFiles = Array.from(event.target.files || []);
-    updateField("images", selectedFiles);
-  };
+  const files = Array.from(event.target.files || []);
+
+  if (!files.length) return;
+
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_FILES = 5;
+
+  //  limit number of images
+  if (files.length > MAX_FILES) {
+    toast.error(`You can upload maximum ${MAX_FILES} images`);
+    return;
+  }
+
+  //  validate each file
+  for (let file of files) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Only image files are allowed");
+      return;
+    }
+
+    if (file.size > MAX_SIZE) {
+      toast.error(`Image must be less then 10 MB`);
+      return;
+    }
+  }
+
+  //  all valid
+  updateField("images", files);
+};
 
   const handlePdfChange = (event) => {
-    const selectedFile = event.target.files?.[0] || null;
-    updateField("pdf", selectedFile);
-  };
+  const file = event.target.files?.[0];
+
+  if (!file) return;
+
+  const MAX_SIZE = 10 * 1024 * 1024; // 5MB
+
+  if (file.type !== "application/pdf") {
+    toast.error("Only PDF file allowed");
+    return;
+  }
+
+  if (file.size > MAX_SIZE) {
+    toast.error("PDF must be less than 10MB");
+    return;
+  }
+
+  updateField("pdf", file);
+};
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -287,7 +325,6 @@ function CreateProduct({
       // CREATE
       if (mode === "create") {
         const res = await addProduct(payload).unwrap();
-        console.log("Created:", res);
         toast.success(res.message || "Product created successfully");
       }
 
@@ -298,13 +335,11 @@ function CreateProduct({
           body: payload,
         }).unwrap();
 
-        console.log("Updated:", res);
         toast.success(res.message || "Product updated successfully");
       }
 
       onShowList();
     } catch (error) {
-      console.log(error);
       toast.error(error.data?.message || "An error occurred. Please try again.");
     }
   };
@@ -321,11 +356,7 @@ function CreateProduct({
             <h1 className="mt-2 text-xl font-bold text-slate-800 sm:text-xl">
               {mode === "create" ? "Create Product" : "Update Product"}
             </h1>
-            {/* <p className="mt-3 text-sm leading-6 text-slate-500 sm:text-base">
-              Build a complete product entry with searchable category fields,
-              rich description, repeatable features, specifications, and
-              multiple images in one clean responsive form.
-            </p> */}
+
           </div>
 
           <button
@@ -347,7 +378,6 @@ function CreateProduct({
           <FieldShell
             label="Product Name"
             htmlFor="productName"
-            // helperText="Add a clean and customer-friendly product title."
           >
             <input
               id="productName"
@@ -364,7 +394,6 @@ function CreateProduct({
           <SearchableSelect
             id="productCategory"
             label="Product Category"
-            // helperText="Search and select the best matching category."
             searchValue={categorySearch}
             selectedValue={formData.category}
             placeholder="Search category..."
@@ -386,7 +415,6 @@ function CreateProduct({
           <SearchableSelect
             id="productSubCategory"
             label="Sub Category"
-            // helperText="Search within the selected category."
             searchValue={subCategorySearch}
             selectedValue={formData.subCategory}
             placeholder={
@@ -411,7 +439,7 @@ function CreateProduct({
           <FieldShell
             label="Product Image"
             htmlFor="productImages"
-            // helperText="Select one or more product images."
+            helperText="Image must be less then 10 mb ."
           >
             <label
               htmlFor="productImages"
@@ -482,7 +510,6 @@ function CreateProduct({
         <FieldShell
           label="Description"
           htmlFor="productDescription"
-          //   helperText="Use this area for a longer and more detailed description."
         >
           <textarea
             id="productDescription"
@@ -496,7 +523,6 @@ function CreateProduct({
 
         <DynamicPanel
           title="Features"
-          //   description="Add multiple product features with the same smooth add/remove flow."
           actionLabel="Add More"
           actionIcon={<PlusIcon className="h-4 w-4" />}
           onAction={addFeature}
@@ -540,7 +566,6 @@ function CreateProduct({
 
         <DynamicPanel
           title="Specifications"
-          //   description="Create key-value specification pairs for technical details."
           actionLabel="Add More"
           actionIcon={<PlusIcon className="h-4 w-4" />}
           onAction={addSpecification}

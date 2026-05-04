@@ -20,7 +20,6 @@ function UserScreen() {
   const onClose = () => {
     setIsOpen(false)
   }
-  console.log("user data :",userRows)
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
       <Loader isLoading={isLoading} />
@@ -117,8 +116,6 @@ function UserScreen() {
               isOpen={isOpen}
               onClose={() => setIsOpen(false)}
               setIsCreateModalOpen={setIsOpen}
-              // onSubmit={handleCreateCategory}
-              // mode="create"
             />
     </section>
   );

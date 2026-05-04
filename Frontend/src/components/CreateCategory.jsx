@@ -65,8 +65,19 @@ function CreateCategory({
 
     if (!file.type.startsWith("image/")) {
       setFormError("Please select a valid image file.");
+      toast.error("Please select a valid image file.");
       return;
     }
+
+     // ✅ SIZE VALIDATION (ADD THIS)
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+  if (file.size > MAX_SIZE) {
+    setFormError("Image must be less than 10MB.");
+    toast.error("Image must be less than 10MB.");
+    return;
+  }
+
 
     setFormError("");
     setFormData((prev) => ({
@@ -130,19 +141,15 @@ function CreateCategory({
 
     try {
       if (isUpdateMode) {
-        // submitData.append("id", formData.id);
-        console.log("Submitting update", submitData.get("categories_name"), submitData.get("categories_description"), submitData.get("image"));
         const response = await updateCategories({
             id: formData.id,
             body: submitData
           }).unwrap();
 
-          console.log(response);
           toast.success(response?.message)
 
         }else {
         const response = await createCategories(submitData).unwrap();
-        console.log("create category response:", response);
         toast.success(response?.message)
       }
 
@@ -151,7 +158,6 @@ function CreateCategory({
       setFormError(
         error?.data?.message || error?.message || "Something went wrong.",
       );
-      console.log("error while submitting category:", error);
       toast.error(error?.data?.message || error?.message || "Something went wrong.");
     }
   };
@@ -169,9 +175,6 @@ function CreateCategory({
       <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-4xl border border-blue-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.20)]">
         <div className="flex items-start justify-between gap-4 border-b border-blue-100 bg-linear-to-r from-white via-blue-50 to-slate-50 px-5 py-5 sm:px-6">
           <div>
-            {/* <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-400">
-              {isUpdateMode ? "Update Category" : "Category Modal"}
-            </p> */}
             <h2 className="mt-2 text-lg font-bold text-slate-800 sm:text-lg">
               {isUpdateMode ? "Update Category" : "Create Category"}
             </h2>
@@ -257,9 +260,9 @@ function CreateCategory({
                         <p className="text-sm font-semibold text-slate-700">
                           Click to replace image
                         </p>
-                        {/* <p className="text-xs text-slate-500">
-                          Best results with a sharp product or category banner.
-                        </p> */}
+                        <p className="text-xs text-slate-500">
+                          Image must be less then 10 mb
+                        </p>
                       </div>
                     </div>
                   ) : (
@@ -268,9 +271,9 @@ function CreateCategory({
                       <span className="text-sm font-semibold text-slate-700">
                         Click to upload image
                       </span>
-                      {/* <span className="mt-1 text-xs text-slate-500">
-                        Recommended size: high-quality square or landscape image
-                      </span> */}
+                      <span className="mt-1 text-xs text-slate-500">
+                        Image must be less then 10 mb
+                      </span>
                     </div>
                   )}
                 </div>

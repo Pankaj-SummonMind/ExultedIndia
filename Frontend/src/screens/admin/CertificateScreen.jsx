@@ -9,17 +9,10 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import Loader from "../../components/loader/Loader";
 import toast from "react-hot-toast";
-// import {trash} from "lucide-react"
-// import {
-//   useDeleteCertificateMutation,
-//   useGetAllCertificateQuery,
-//   useGetAllCertificatesQuery,
-// } from "../../services/api";
 
 function CertificateScreen() {
   const [deleteCertificate,{isLoading:isDeleteLoading}] = useDeleteCertificateMutation();
   const { data, isLoading:isCertificateLoading,error:fetchingError } = useGetAllCertificatesQuery();
-  console.log("data from getAllCertificates api : ", data);
   const isLoading = isCertificateLoading || isDeleteLoading;
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,12 +23,6 @@ function CertificateScreen() {
   const certificates = useMemo(() => {
     return Array.isArray(data?.data) ? data.data : [];
   }, [data]);
-
-  // const filteredCertificates = useMemo(() => {
-  //   return certificates.filter((item) =>
-  //     item.certificate_name?.toLowerCase().includes(searchTerm.toLowerCase()),
-  //   );
-  // }, [certificates, searchTerm]);
 
   const openCreate = () => {
     setActiveCertificate(null);
@@ -52,18 +39,13 @@ function CertificateScreen() {
   };
 
   const onDelete = async (item) => {
-    // if (!window.confirm("Are you sure you want to delete this certificate?"))
-    //   return;
-    console.log(item)
     try {
       const res = await deleteCertificate({
         id: item._id,
       }).unwrap();
       toast.success(res?.message || "Certificate deleted successfully");
-      console.log("res after deleting certificate :", res);
     } catch (error) {
       toast.error(error?.data?.message || "Failed to delete certificate");
-      console.log("error : ", error);
     }
   };
 
@@ -82,13 +64,6 @@ function CertificateScreen() {
           </div>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-            {/* <input
-              type="text"
-              placeholder="Search certificate..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-12 w-full rounded-2xl border border-blue-100 bg-white px-4 text-sm font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:ring-4 focus:ring-blue-100 sm:w-72"
-            /> */}
 
             <button
               onClick={openCreate}

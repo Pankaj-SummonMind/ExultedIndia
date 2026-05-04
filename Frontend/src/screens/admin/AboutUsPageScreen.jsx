@@ -15,11 +15,9 @@ function AboutUsPageScreen() {
     error,
     isLoading,
   } = useGetAboutUsQuery();
-  console.log("About Us API response:", data,"error:", error);  
 
   const aboutUsData = data?.data || null;
   const hasAboutUsData = Boolean(aboutUsData);
-  // const isNotFound = error?.status === 404;
   const mode = hasAboutUsData ? "update" : "create";
   const actionLabel = hasAboutUsData ? "Update About Us" : "Create About Us";
   const ActionIcon = hasAboutUsData ? PencilLine : Plus;
@@ -41,19 +39,6 @@ function AboutUsPageScreen() {
     }
   }, [error]);
 
-  // if (isLoading) {
-  //   return (
-  //     <section className="flex min-h-[70vh] items-center justify-center">
-  //       <div className="flex flex-col items-center gap-4">
-  //         <div className="h-12 w-12 animate-spin rounded-full border-4 border-sky-100 border-t-sky-600" />
-  //         <p className="text-sm font-medium text-slate-500">
-  //           About Us content loading...
-  //         </p>
-  //       </div>
-  //     </section>
-  //   );
-  // }
-
   if (isFormVisible) {
     return (
       <AboutUsPageForm
@@ -74,9 +59,6 @@ function AboutUsPageScreen() {
         <div className="rounded-[34px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f8fafc_100%)] p-5 shadow-[0_18px_50px_rgba(15,23,42,0.05)] sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              {/* <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">
-                About Us Page
-              </p> */}
               <h1 className="mt-3 text-xl font-bold text-slate-900">
                 Create your About Us content
               </h1>
@@ -112,14 +94,6 @@ function AboutUsPageScreen() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          {/* <button
-            type="button"
-            onClick={() => refetch()}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:text-sky-700"
-          >
-            <RefreshCcw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-            Refresh
-          </button> */}
 
           <button
             type="button"
@@ -131,12 +105,6 @@ function AboutUsPageScreen() {
           </button>
         </div>
       </div>
-
-      {/* {error && !isNotFound ? (
-        <div className="rounded-[24px] border border-red-100 bg-red-50 px-5 py-4 text-sm font-medium text-red-500">
-          {error?.data?.message || "Latest About Us data refresh nahi ho paya."}
-        </div>
-      ) : null} */}
 
       <div className="relative overflow-hidden rounded-[34px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.12),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_28%),linear-gradient(180deg,#f8fbff_0%,#f8fafc_100%)] p-4 sm:p-5">
         <div className="grid gap-5 xl:grid-cols-2">
@@ -167,7 +135,7 @@ function AboutUsPageScreen() {
           alt={`About us hero preview ${index + 1}`}
           className={
             index === 0
-              ? "min-h-64 sm:col-span-2"
+              ? "min-h-64 sm:col-span-1"
               : "min-h-40"
           }
         />
@@ -196,7 +164,7 @@ function AboutUsPageScreen() {
     <ImagePreview
       src={getImageUrl(aboutUsData.companyOverview?.image)}
       alt="Company overview preview"
-      className="min-h-56"
+      className="min-h-56 h-100"
     />
   </div>
 </ContentCard>
@@ -220,7 +188,7 @@ function AboutUsPageScreen() {
           <SectionWithImage
             title="Vision"
             section={aboutUsData.vision}
-            className="xl:col-span-2"
+            className="xl:col-span-1"
             imageClassName="min-h-80"
           />
         </div>
@@ -336,7 +304,8 @@ function ImagePreview({ src, alt, className = "" }) {
     <div
       className={`overflow-hidden rounded-[26px] border border-slate-200 bg-slate-100 shadow-[0_16px_40px_rgba(148,163,184,0.16)] ${className}`.trim()}
     >
-      <img src={src} alt={alt} className="h-full w-full object-cover" />
+      <img src={src} alt={alt} className="h-100 w-full object-fit" />
+      
     </div>
   );
 }

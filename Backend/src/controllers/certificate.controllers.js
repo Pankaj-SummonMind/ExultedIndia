@@ -46,6 +46,7 @@ const createCertificate = async (req, res) => {
 async function getAllCertificates(req, res) {
   try {
     const certificates = await Certificate.find()
+      .sort({ createdAt: -1 })
       .select("-__v -updatedAt");
 
     return res.status(200).json(
@@ -53,7 +54,6 @@ async function getAllCertificates(req, res) {
     );
 
   } catch (error) {
-    console.error("Get All Certificates Error:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -82,7 +82,6 @@ async function getCertificateById(req, res) {
     );
 
   } catch (error) {
-    console.error("Get Certificate By Id Error:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -146,7 +145,6 @@ async function updateCertificate(req, res) {
 
 async function deleteCertificate(req, res) {
   try {
-    console.log("deleteCertificate controller called with body:", req.body);
     const { id } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {

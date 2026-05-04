@@ -89,8 +89,6 @@ function HomePageScreen() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [pageState, setPageState] = useState(INITIAL_HOME_PAGE_STATE);
 
-  console.log("home page response in home page screen:", homePageResponse);
-
   const isLoading = ishomeLoading || isUpdateLoading;
 
   useEffect(() => {
@@ -132,10 +130,8 @@ function HomePageScreen() {
           transformState ? transformState(normalizedState) : normalizedState,
         );
       }
-      console.log("home page update response:", response);
       toast.success(response?.message || "Home page updated successfully!");
     } catch (error) {
-      console.error("Error updating home page:", error);
       toast.error(error?.data?.message || "Failed to update home page. Please try again.");
     }
   };
@@ -255,14 +251,6 @@ function HomePageScreen() {
     await submitHomePageUpdate(payload);
   };
 
-  // if (ishomeLoading || isUpdateLoading) {
-  //   return (
-  //     <section className="flex min-h-[70vh] items-center justify-center">
-  //       <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
-  //     </section>
-  //   );
-  // }
-
   if (!homePageData && !showCreateForm) {
     return (
       <section className="flex min-h-[calc(100vh-160px)] flex-col gap-6">
@@ -365,7 +353,7 @@ function HomePageScreen() {
               <ImagePreview
                 src={heroCard.image}
                 alt="Hero section preview"
-                className="h-full min-h-72"
+                className="h-100 min-h-72"
               />
             </div>
           </ContentCard>
@@ -393,7 +381,7 @@ function HomePageScreen() {
             <ImagePreview
               src={heroDetailCard.image}
               alt="Hero detail preview"
-              className="mt-5 min-h-64"
+              className="mt-5 h-100 min-h-64"
             />
           </ContentCard>
 
@@ -791,7 +779,7 @@ function ImagePreview({ src, alt, className = "" }) {
     <div
       className={`overflow-hidden rounded-[26px] border border-slate-200 bg-slate-100 shadow-[0_16px_40px_rgba(148,163,184,0.16)] ${className}`.trim()}
     >
-      <img src={src} alt={alt} className="h-full w-full object-cover" />
+      <img src={src} alt={alt} className="h-full w-full object-fit" />
     </div>
   );
 }

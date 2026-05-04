@@ -107,7 +107,6 @@ const createAboutUs = async (req, res) => {
    GET ABOUT US
 --------------------------------------- */
 const getAboutUs = async (req, res) => {
-  console.log("Fetching AboutUs");
   try {
     const data = await AboutUs.findOne();
 

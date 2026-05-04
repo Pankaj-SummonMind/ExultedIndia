@@ -317,9 +317,6 @@ function ContactUsPageForm({
                   <p className="text-sm font-semibold text-slate-800">
                     Ready to {isUpdateMode ? "update" : "create"} Contact page content?
                   </p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    Ye form text payload ke through API par contact page details save karega.
-                  </p>
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row">

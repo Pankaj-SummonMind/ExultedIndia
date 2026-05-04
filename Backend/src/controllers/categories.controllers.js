@@ -8,16 +8,14 @@ import mongoose from "mongoose"
 async function createCategories(req, res) {
   try {
     const { categories_name, categories_description, } = req.body;
-    console.log("req.body in create category: ", req.body);
     if (!categories_name || !categories_description) {
       throw new ApiError(400, "Category and Description are required");
     }
 
     const exists = await Categories.findOne({
-      categories_name: categories_name.trim().toLowerCase(),
+      categories_name: { $regex: `^${categories_name}$`, $options: "i" },
       deletedAt: null
     });
-    console.log("existing category with same name:", exists);
 
     if (exists) {
       throw new ApiError(400, "Category with this name already exists");
@@ -38,14 +36,7 @@ async function createCategories(req, res) {
     };
 
 
-    // create subcategories
-    // const createdSubs = await SubCategories.insertMany(
-    //   subCategories.map((item) => ({
-    //     name: item.name.trim()
-    //   }))
-    // );
 
-    // const subIds = createdSubs.map((sub) => sub._id);
 
     const existing = await Categories.findOne({
       categories_name: categories_name.trim(),
@@ -62,16 +53,12 @@ async function createCategories(req, res) {
       image
     });
 
-    // const createdCategory = await Categories.findById(category._id)
-    //   .populate("subCategories", "name")
-    //   .select("-__v -updatedAt");
 
     return res.status(201).json(
       new ApiResponse(201, category, "Category created successfully")
     );
 
   } catch (error) {
-    console.log("error in create categories:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -86,7 +73,8 @@ async function getCategories(req, res) {
     const categories = await Categories.find({
       deletedAt: null
     })
-      .select("-__v ");
+    .sort({ createdAt: -1 })
+    .select("-__v ");
 
     if (categories.length === 0) {
       throw new ApiError(404, "No categories found");
@@ -97,7 +85,6 @@ async function getCategories(req, res) {
     );
 
   } catch (error) {
-    console.log("error in get categories:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -130,7 +117,6 @@ async function getCategoryById(req, res) {
     );
 
   } catch (error) {
-    console.log("error in get category by id:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -144,7 +130,6 @@ async function updateCategory(req, res) {
   try {
     const { id } = req.params;
     const { categories_name, categories_description } = req.body;
-    console.log("req.body in update category: ", categories_name, categories_description , id);
 
     // validate category id
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -157,6 +142,23 @@ async function updateCategory(req, res) {
       throw new ApiError(404, "No category found with this id");
     }
 
+    const newName = categories_name?.trim().toLowerCase();
+const currentName = category.categories_name?.trim().toLowerCase();
+
+// 🔥 only check if name changed
+if (newName && newName !== currentName) {
+
+  const existingCategory = await Categories.findOne({
+    categories_name: { $regex: `^${categories_name.trim()}$`, $options: "i" },
+    _id: { $ne: id },
+  });
+
+  if (existingCategory) {
+    throw new ApiError(400, "Category with this name already exists");
+  }
+}
+
+    
     // update category name
     if (categories_name?.trim()) {
       category.categories_name = categories_name.trim();
@@ -187,7 +189,6 @@ async function updateCategory(req, res) {
     );
 
   } catch (error) {
-    console.log("error in update category:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -216,18 +217,11 @@ async function deleteCategory(req, res) {
     category.deletedAt = new Date();
     await category.save();
 
-    // optional: soft delete all subcategories too
-    // await SubCategories.updateMany(
-    //   { _id: { $in: category.subCategories } },
-    //   { deletedAt: new Date() }
-    // );
-
     return res.status(200).json(
       new ApiResponse(200, null, "Category deleted successfully")
     );
 
   } catch (error) {
-    console.log("error in delete category:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,

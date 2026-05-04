@@ -9,7 +9,6 @@ function SubCategoryScreen() {
   const navigate = useNavigate();
   const { data: allSubCategories, isLoading,error } = useGetSubCategoriesQuery();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  console.log("all sub categories:", allSubCategories);
 
   useEffect(() => {
       if (error) {
@@ -53,21 +52,6 @@ function SubCategoryScreen() {
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
       {<Loader isLoading={isLoading} />}
-      {/* <div className="grid gap-4 md:grid-cols-3">
-        {stats.map((card) => (
-          <div
-            key={card.label}
-            className="rounded-[28px] border border-blue-100 bg-white px-5 py-5 shadow-[0_20px_50px_rgba(148,163,184,0.12)]"
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-blue-400">
-              {card.label}
-            </p>
-            <p className="mt-3 text-2xl font-bold text-slate-800">
-              {card.value}
-            </p>
-          </div>
-        ))}
-      </div> */}
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[30px] border border-blue-100 bg-white shadow-[0_20px_50px_rgba(148,163,184,0.12)]">
         <div className="flex flex-col gap-4 border-b border-blue-100 px-4 py-4 sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between">
@@ -75,10 +59,6 @@ function SubCategoryScreen() {
             <h2 className="text-lg font-bold text-slate-800 sm:text-xl">
               Sub Category Table
             </h2>
-            {/* <p className="mt-1 text-sm text-slate-500">
-              Manage sub categories with parent category mapping, description,
-              and images.
-            </p> */}
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -104,8 +84,6 @@ function SubCategoryScreen() {
                     </TableHeading>
                     <TableHeading>Sub Category Name</TableHeading>
                     <TableHeading>Category Name</TableHeading>
-                    {/* <TableHeading>Description</TableHeading> */}
-                    {/* <TableHeading>Image</TableHeading> */}
                     <TableHeading className="rounded-tr-3xl">
                       Created At
                     </TableHeading>
@@ -142,48 +120,26 @@ function SubCategoryScreen() {
                         className="group cursor-pointer transition hover:bg-blue-50/70"
                       >
                         <TableCell>
-                          <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs font-bold text-blue-700">
+                          <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs  text-blue-700">
                             {String(index + 1).padStart(2, "0")}
                           </span>
                         </TableCell>
 
 
                         <TableCell>
-                          <p className="font-semibold text-slate-700">
+                          <p className=" text-slate-700">
                             {row.name}
                           </p>
                         </TableCell>
 
                         <TableCell>
-                          <span className="inline-flex rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700">
+                          <span className="inline-flex rounded-full bg-blue-50 px-3 py-2 text-xs  text-blue-700">
                             {row.categoryName}
                           </span>
                         </TableCell>
-
-                        {/* <TableCell>
-                          <p className="max-w-sm text-sm leading-6 text-slate-500">
-                          {row.description || "No description available"}
-                          </p>
-                          </TableCell> */}
-
-                          {/* <TableCell>
-                            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-white">
-                              {row.image ? (
-                                <img
-                                  src={row.image}
-                                  alt={row.name}
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <span className="text-xs font-semibold text-slate-400">
-                                  N/A
-                                </span>
-                              )}
-                            </div>
-                          </TableCell> */}
                           
                         <TableCell>
-                          <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">
+                          <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm  text-slate-600">
                             {row.createdAt}
                           </span>
                         </TableCell>
@@ -225,7 +181,7 @@ function TableHeading({ children, className = "" }) {
   return (
     <th
       className={[
-        "border-b border-blue-100 bg-white px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-500",
+        "border-b border-blue-100 bg-white px-5 py-4 text-left text-xs font-bold uppercase tracking-[0.24em] text-slate-500",
         className,
       ].join(" ")}
     >

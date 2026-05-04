@@ -231,10 +231,6 @@ function HomeCategoryForm({
           <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
             {activeHomeCategory ? "Update Home Category" : "Add Home Category"}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Manage the section title and choose multiple categories for the home
-            page.
-          </p>
         </div>
 
         <form

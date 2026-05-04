@@ -1,22 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-// import { api } from "../../services/api";
 import CreateSocialMedia from "../../components/CreateSocialMedia";
 import {useDeleteSocialMediaMutation, useGetAllSocialMediaQuery } from "../../services/api";
 import Loader from "../../components/loader/Loader";
 import toast from "react-hot-toast";
 function SocialMediaScreen() {
-  // const {
-  //   data,
-  //   isLoading,
-  //   refetch,
-  // } = api.useGetAllSocialMediaQuery();
+
 
   const {data,isLoading:isFetching,error:fetchError}  = useGetAllSocialMediaQuery()
   const [deleteSocialMedia,{isLoading: isDeleting}] = useDeleteSocialMediaMutation()
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [activeAccount, setActiveAccount] = useState(null);
-  console.log("social media data :",data);
   const isLoading = isFetching || isDeleting;
 
   useEffect(() => {
@@ -57,10 +51,8 @@ function SocialMediaScreen() {
         id : item._id
       }).unwrap() 
       toast.success(res?.message || "Account deleted successfully");
-      console.log("res after deleting account :",res);
     } catch (error) {
       toast.error(error?.data?.message || "Failed to delete account");
-      console.log("error : ", error)
     }
   }
 

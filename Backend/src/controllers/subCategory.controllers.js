@@ -10,8 +10,17 @@ async function CreateSubCategories(req, res) {
     const { subCategories_Name, subCategories_Description, category_Id } = req.body;
 
     if (!subCategories_Name || !subCategories_Description || !category_Id) {
-      throw new ApiError(400, "Subcategory name, description, and category ID are required");
+      throw new ApiError(400, "Subcategory name, description, and category  are required");
     }
+  
+    const exists = await SubCategories.findOne({
+          name: { $regex: `^${subCategories_Name}$`, $options: "i" },
+          deletedAt: null
+        });
+    
+        if (exists) {
+          throw new ApiError(400, "subCategory with this name already exists");
+        }
 
     // Since a certificate only has one image in the schema `image: { url, public_id }`
     // We expect exactly one file.
@@ -27,15 +36,6 @@ async function CreateSubCategories(req, res) {
       public_id: "" // To be updated if using Cloudinary
     };
 
-
-    // create subcategories
-    // const createdSubs = await SubCategories.insertMany(
-    //   subCategories.map((item) => ({
-    //     name: item.name.trim()
-    //   }))
-    // );
-
-    // const subIds = createdSubs.map((sub) => sub._id);
 
     const subCategory = await SubCategories.create({
       name: subCategories_Name.trim(),
@@ -53,7 +53,7 @@ async function CreateSubCategories(req, res) {
     );
 
   } catch (error) {
-    console.log("error in create subcategories:", error);
+
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -73,6 +73,7 @@ async function getSubCategories(req, res) {
         match: { deletedAt: null },
         select: "_id categories_name"
       })
+      .sort({ createdAt: -1 })
       .select("-__v -updatedAt");
 
     return res.status(200).json(
@@ -80,7 +81,6 @@ async function getSubCategories(req, res) {
     );
 
   } catch (error) {
-    console.log("error in get subcategories:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -101,7 +101,6 @@ async function getSubCategoryById(req, res) {
     .populate("category_Id", "categories_name")
       .select("-__v -updatedAt");
 
-      console.log(subCategory);
 
     if (!subCategory) {
       throw new ApiError(404, "No subcategory found with this id");
@@ -112,7 +111,6 @@ async function getSubCategoryById(req, res) {
     );
 
   } catch (error) {
-    console.log("error in get category by id:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -126,7 +124,6 @@ async function updateSubCategory(req, res) {
   try {
     const { id } = req.params;
     const { subCategories_Name, subCategories_Description, category_Id } = req.body;
-    console.log("req.body in update subcategory: ", subCategories_Name, subCategories_Description , category_Id, id);
 
     // validate subcategory id
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -138,6 +135,19 @@ async function updateSubCategory(req, res) {
     if (!subCategory || subCategory.deletedAt !== null) {
       throw new ApiError(404, "No subcategory found with this id");
     }
+    const newName = subCategories_Name?.trim().toLowerCase();
+    const currentName = subCategory.name?.trim().toLowerCase();
+
+    if (newName && newName !== currentName) {
+      const existingCategory = await SubCategories.findOne({
+            name: { $regex: `^${subCategories_Name}$`, $options: "i" },
+            _id: { $ne: id },
+          });
+      
+          if (existingCategory) {
+            throw new ApiError(404, "subCategory with this name already exists");
+    }
+        }
 
     // update subcategory name
     if (subCategories_Name?.trim()) {
@@ -173,7 +183,6 @@ async function updateSubCategory(req, res) {
     );
 
   } catch (error) {
-    console.log("error in update subcategory:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -202,18 +211,12 @@ async function deleteSubCategory(req, res) {
     subCategory.deletedAt = new Date();
     await subCategory.save();
 
-    // optional: soft delete all subcategories too
-    // await SubCategories.updateMany(
-    //   { _id: { $in: category.subCategories } },
-    //   { deletedAt: new Date() }
-    // );
 
     return res.status(200).json(
       new ApiResponse(200, null, "Subcategory deleted successfully")
     );
 
   } catch (error) {
-    console.log("error in delete subcategory:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,

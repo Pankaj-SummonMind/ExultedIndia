@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRegisterUserMutation } from "../services/api";
 import toast from "react-hot-toast";
+import Loader from "./loader/Loader";
 
 const initialFormState = {
   name: "",
@@ -104,20 +105,18 @@ function CreateUser({
 
     try {
       const response = await registerUser(payload).unwrap();
-      console.log("user create response:", response);
       toast.success(response?.message || "User created successfully!");
       resetForm();
       setIsCreateModalOpen?.(false);
       onClose();
     } catch (error) {
       toast.error(error?.data?.message || "Failed to create user. Please try again.");
-      console.log("error while creating user:", error);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5">
-      <Loader isLoading={isLoading} />
+      {/* <Loader isLoading={isLoading} /> */}
       <button
         type="button"
         aria-label="Close create user modal"
@@ -130,16 +129,11 @@ function CreateUser({
           <div className="flex items-start justify-between gap-4">
             
             <div className="flex-1 text-left sm:pt-1">
-              {/* <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-400">
-                User Modal
-              </p> */}
+
               <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
                 Create User
               </h2>
-              {/* <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                Add user details with a clean, responsive form that stays centered
-                across screen sizes.
-              </p> */}
+
             </div>
 
             <button

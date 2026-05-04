@@ -5,51 +5,9 @@ import {
   useGetSubCategoriesQuery,
 } from "../../../services/api";
 import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
-const batteryDescription =
-  "Exulted India offers energy efficient Batteries uniquely designed as bigger electrolyte reserve volume requires less topping up during service periods. Deep Cycle Design. Extra thick tubular plates with superfine grain structure, minimizes grid corrosion at high temperature. Exulted is offering Tubular batteries in the variants of 150Ah, 200Ah, 220Ah, 240Ah of 12V as per the requirements.";
-
-const heroImages = {
-  battery:
-    "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=85",
-  inverter:
-    "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1800&q=85",
-  transformer:
-    "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1800&q=85",
-  ups: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1800&q=85",
-  default:
-    "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=1800&q=85",
-};
-
-const subCategoryImages = [
-  {
-    key: "vrla",
-    image:
-      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    key: "tubular",
-    image:
-      "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    key: "lithium",
-    image:
-      "https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    key: "automotive",
-    image:
-      "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=900&q=80",
-  },
-];
-
-const fallbackCardImages = [
-  "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1565043666747-69f6646db940?auto=format&fit=crop&w=900&q=80",
-];
 
 function ClientCategoryProduct() {
   const navigate = useNavigate();
@@ -57,10 +15,14 @@ function ClientCategoryProduct() {
   const { data, isLoading, error } = useGetCategoriesByIdQuery(id);
   const { data: allSubCategories, isLoading: subCatogriesLoading } =
     useGetSubCategoriesQuery();
-  console.log("Fetched all sub categories data:", allSubCategories);
+
+  useEffect(() => {
+    if(error){
+      toast.error("Internal Server Error")
+    }
+  },[error])
 
   const category = data?.data || {};
-  console.log("Fetched category data:", category);
   const categoryName = category?.categories_name || "Power Solutions";
 
   const subCategories = useMemo(() => {
@@ -68,7 +30,6 @@ function ClientCategoryProduct() {
 
     return list.filter((item) => item.category_Id?._id === id);
   }, [allSubCategories, id]);
-  console.log("Fetched sub categories data:", subCategories);
 
   const heroImage = category?.image?.url;
 
@@ -86,60 +47,58 @@ function ClientCategoryProduct() {
           <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-red-50 text-red-500">
             <AlertIcon className="h-7 w-7" />
           </div>
-          <h1 className="mt-5 text-2xl font-black text-slate-950">
-            Category load nahi ho paayi
+          <h1 className="mt-5 text-xl font-bold text-slate-950">
+            Failed To load category 
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-600">
-            Backend response check karein ya thodi der baad retry karein.
-            {error?.status ? ` Status: ${error.status}` : ""}
-          </p>
+
         </div>
       </main>
     );
   }
 
   return (
-    <main className="overflow-hidden bg-[#F8FAFC] text-slate-950">
+    <main className="overflow-x-hidden bg-[#F8FAFC] text-slate-950">
       <Helmet>
         <title>{`${categoryName} | Exulted India`}</title>
         <meta name="description" content={category?.categories_description || `Explore our range of ${categoryName} at Exulted India. Discover high-quality products, certifications, and pan-India service coverage for all your power needs.`} />
         <meta name="keywords" content={`Exulted India, ${categoryName}, power solutions, product range, certifications, pan-India service`} />
       </Helmet>
 
-      <section className="relative flex min-h-[calc(100vh-72px)] w-full items-center overflow-hidden bg-slate-950">
+      <section className="relative w-full overflow-x-hidden bg-linear-to-r from-blue-300 via-blue-100 to-white">
+  
+  <div className="mx-auto grid grid-cols-1 max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-16">
+    
+    {/* LEFT CONTENT */}
+    <div className="max-w-xl w-full">
+      
+      <h1 className="text-2xl sm:text-3xl font-black leading-tight text-black wrap-break-words">
+        {categoryName}
+      </h1>
+
+      <p className="mt-4 text-sm sm:text-base leading-7 font-bold text-black max-w-full sm:max-w-md wrap-break-words">
+        {category?.categories_description}
+      </p>
+
+    </div>
+
+    {/* RIGHT IMAGE */}
+    <div className="flex items-center justify-center">
+      
+      <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
+        
+        <div className="absolute -inset-4 blur-2xl rounded-full" />
+
         <img
           src={heroImage}
-          alt={`${categoryName} category`}
-          className="absolute inset-0 h-full w-full object-cover"
+          alt={categoryName}
+          className="relative w-full h-55 sm:h-65 md:h-80 lg:h-95 object-contain"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.94)_0%,rgba(15,23,42,0.78)_42%,rgba(15,23,42,0.22)_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.1),rgba(15,23,42,0.72))]" />
+      </div>
 
-        <div className="relative mx-auto w-full max-w-7xl px-4 py-18 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <p className="inline-flex rounded-full border border-white/16 bg-white/10 px-4 py-2 text-xs  uppercase tracking-[0.24em] text-blue-100 backdrop-blur">
-              Exulted India Range
-            </p>
-            <h1 className="mt-6 text-4xl font-black leading-tight text-white sm:text-2xl lg:text-2xl">
-              {categoryName}
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-8 text-slate-100 sm:text-base">
-              {category?.categories_description}
-            </p>
+    </div>
 
-            {/* <div className="mt-8 flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur">
-                <GridIcon className="h-4 w-4" />
-                {subCategories.length || 0} Sub Categories
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur">
-                <ShieldIcon className="h-4 w-4" />
-                Deep Cycle Design
-              </span>
-            </div> */}
-          </div>
-        </div>
-      </section>
+  </div>
+</section>
 
       <section className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -151,13 +110,10 @@ function ClientCategoryProduct() {
               {categoryName}
             </h2>
           </div>
-          {/* <p className="max-w-xl text-sm leading-6 text-slate-600">
-            Choose a product family to view matched catalog and products.
-          </p> */}
         </div>
 
         {subCategories.length ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {subCategories.map((subCategory, index) => (
               <SubCategoryCard
                 key={subCategory._id || subCategory.name}
@@ -172,13 +128,10 @@ function ClientCategoryProduct() {
             <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-blue-50 text-blue-600">
               <GridIcon className="h-7 w-7" />
             </div>
-            <h3 className="mt-5 text-2xl font-black text-slate-950">
+            <h3 className="mt-5 text-xl font-black text-slate-950">
               No sub categories found
             </h3>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-600">
-              Backend me sub categories add hote hi yahan cards automatic show
-              honge.
-            </p>
+            
           </div>
         )}
       </section>
@@ -187,8 +140,9 @@ function ClientCategoryProduct() {
 }
 
 function SubCategoryCard({ subCategory, index, onOpen }) {
-  const title = subCategory?.name || "Sub Category";
+  const title = subCategory?.name ;
   const image = subCategory?.image.url;
+  const description = subCategory?.description;
 
   return (
     <article
@@ -198,53 +152,27 @@ function SubCategoryCard({ subCategory, index, onOpen }) {
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") onOpen();
       }}
-      className="group flex `h-107.5 cursor-pointer flex-col overflow-hidden rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] outline-none transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.18)] focus-visible:ring-4 focus-visible:ring-blue-200"
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] outline-none transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.18)] focus-visible:ring-4 focus-visible:ring-blue-200"
     >
-      <div className="relative h-[68%] w-full overflow-hidden bg-blue-50">
+      <div className="relative overflow-hidden bg-slate-100">
         <img
           src={image}
           alt={title}
           loading="lazy"
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-108"
+          className="h-52 w-full object-fit transition duration-700 group-hover:scale-108 sm:h-56"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.04),rgba(15,23,42,0.54))]" />
-        {/* <span className="absolute left-4 top-4 rounded-full border border-white/35 bg-white/82 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-blue-700 shadow-sm backdrop-blur">
-          {String(index + 1).padStart(2, "0")}
-        </span> */}
       </div>
 
-      <div className="flex flex-1 flex-col justify-between p-4">
-        <div>
-          <h3 className="line-clamp-2 min-h-10 text-base font-black leading-6 text-slate-950">
-            {title}
-          </h3>
-          {/* <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Premium Power Range
-          </p> */}
-        </div>
+      <div className="relative flex flex-1 flex-col p-5 sm:p-6">
 
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onOpen();
-            }}
-            className="inline-flex min-h-8 items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-3 text-xs font-bold text-blue-700 transition hover:border-blue-500 hover:bg-blue-100"
-          >
-            View Catalogue
-          </button>
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onOpen();
-            }}
-            className="inline-flex min-h-8 items-center justify-center rounded-full bg-blue-600 px-3 text-xs font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
-          >
-            Sub Categories
-          </button>
-        </div>
+        <h2 className=" text-lg font-bold leading-snug text-slate-900 sm:text-lg">
+          {title}
+        </h2>
+
+        <p className="mt-1 text-sm leading-6 text-slate-600 line-clamp-3">
+          {description}
+        </p>
       </div>
     </article>
   );
@@ -288,19 +216,6 @@ function LoadingState() {
   );
 }
 
-function getHeroImage(categoryName) {
-  const key = String(categoryName || "").toLowerCase();
-  const matchedKey = Object.keys(heroImages).find((item) => key.includes(item));
-  return heroImages[matchedKey] || heroImages.default;
-}
-
-function getSubCategoryImage(name, index) {
-  const key = String(name || "").toLowerCase();
-  const matched = subCategoryImages.find((item) => key.includes(item.key));
-  return (
-    matched?.image || fallbackCardImages[index % fallbackCardImages.length]
-  );
-}
 
 function IconShell({ className, children }) {
   return (

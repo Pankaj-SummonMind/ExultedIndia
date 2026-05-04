@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { ChartBarStacked,ChartColumnStacked,Wallpaper,BookUser,ShieldCheck } from "lucide-react";
 
 const sidebarItems = [
   {
@@ -20,7 +21,7 @@ const sidebarItems = [
     id: "subcategory",
     label: "Sub Category",
     to: "/admin/subcategory",
-    Icon: FolderTreeIcon,
+    Icon: SubCategoryIcon,
     available: true,
   },
   {
@@ -41,21 +42,21 @@ const sidebarItems = [
     id: "pages",
     label: "Pages",
     to: "/admin/pages",
-    Icon: UsersIcon,
+    Icon: WallpaperIcon,
     available: true,
   },
   {
     id: "Social Media",
     label: "Social Media",
     to: "/admin/socialmedia",
-    Icon: UsersIcon,
+    Icon: BookUserIcon,
     available: true,
   },
   {
     id: "certificate",
     label: "Certificates",
     to: "/admin/certificate",
-    Icon: UsersIcon,
+    Icon: CertificateIcon,
     available: true,
   },
 ];
@@ -106,8 +107,8 @@ function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-100 text-slate-800">
-      <div className="relative flex min-h-screen">
+    <div className="h-screen overflow-hidden bg-linear-to-br from-slate-50 via-white to-blue-100 text-slate-800">
+      <div className="relative flex h-full">
         {isMobile && isSidebarOpen ? (
           <button
             type="button"
@@ -169,7 +170,7 @@ function AdminLayout() {
               const content = (
                 <>
                   <item.Icon className={iconClasses} />
-                  <div className="flex flex-1 items-center justify-between gap-2">
+                  <div className="flex h-full flex-1 flex-col overflow-hidden">
                     <span className="text-sm font-semibold">{item.label}</span>
                     {!item.available ? (
                       <span
@@ -214,7 +215,7 @@ function AdminLayout() {
           </nav>
         </aside>
 
-        <div className="flex min-h-screen flex-1 flex-col lg:pl-0">
+        <div className="flex h-full flex-1 flex-col overflow-hidden lg:pl-0">
           <header className="sticky top-0 z-20 border-b border-blue-100 bg-white/85 px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -241,12 +242,11 @@ function AdminLayout() {
             </div>
           </header>
 
-          <main className="flex-1">
-            {/* p-4 sm:p-6 lg:p-4 */}
-            <div className="min-h-[calc(100vh-112px)] rounded-[28px] border border-white/80 bg-white/80 p-4 shadow-[0_20px_60px_rgba(148,163,184,0.14)] backdrop-blur sm:p-6">
-              <Outlet />
-            </div>
-          </main>
+          <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 lg:px-8">
+  <div className="rounded-[28px] border border-white/80 bg-white/80 p-4 shadow-[0_20px_60px_rgba(148,163,184,0.14)] backdrop-blur sm:p-6">
+    <Outlet />
+  </div>
+</main>
         </div>
       </div>
     </div>
@@ -287,15 +287,7 @@ function LayoutDashboardIcon({ className }) {
 
 function FolderTreeIcon({ className }) {
   return (
-    <IconShell className={className}>
-      <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H10l2 2h6.5A2.5 2.5 0 0 1 21 7.5v1" />
-      <path d="M7 13v-2.5A1.5 1.5 0 0 1 8.5 9h7A1.5 1.5 0 0 1 17 10.5V13" />
-      <path d="M7 13h10" />
-      <path d="M7 13v4" />
-      <path d="M17 13v4" />
-      <rect x="4" y="17" width="6" height="4" rx="1" />
-      <rect x="14" y="17" width="6" height="4" rx="1" />
-    </IconShell>
+    <ChartColumnStacked className={className} />
   );
 }
 
@@ -337,6 +329,22 @@ function XIcon({ className }) {
       <path d="m6 6 12 12" />
     </IconShell>
   );
+}
+
+function SubCategoryIcon({ className }) {
+  return <ChartBarStacked className={className} />;
+}
+
+function WallpaperIcon({ className }) {
+  return <Wallpaper className={className} />;
+}
+
+function BookUserIcon({ className }) {
+  return <BookUser className={className} />
+}
+
+function CertificateIcon({ className }) {
+  return <ShieldCheck className={className} />
 }
 
 export default AdminLayout;

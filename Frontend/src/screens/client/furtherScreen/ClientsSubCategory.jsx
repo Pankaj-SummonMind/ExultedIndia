@@ -6,30 +6,30 @@ import {
   useGetSubCategoryByIdQuery,
 } from "../../../services/api";
 import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
+import toast from "react-hot-toast"
 
-const subCategoryDescription =
-  "The Exulted Tubular battery is a robust and reliable energy storage solution designed to deliver exceptional performance in various applications. This battery utilizes advanced tubular technology, ensuring superior resilience and longer life compared to conventional batteries. Its unique design incorporates tubular positive plates, which enhance the battery's efficiency and charge retention capabilities. With excellent deep-cycling capabilities, the Exulted Tubular battery is an ideal choice for backup power systems, renewable energy storage, and UPS applications. Its dependable performance and low maintenance requirements make it a trusted option for both residential and industrial use, providing uninterrupted power supply and peace of mind.";
-
-const fallbackImages = [
-  "https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1581092335878-2d9ff86ca2bf?auto=format&fit=crop&w=900&q=80",
-];
 
 function ClientsSubCategory() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data, isLoading } = useGetSubCategoryByIdQuery(id);
+  const { data, isLoading:isSubCategoryLoading,error:subCategoryByIdError } = useGetSubCategoryByIdQuery(id);
   const {
     data: allProduct,
     isLoading: isProductLoading,
-    error,
+    error : productError,
   } = useGetProductQuery();
-  console.log("data", allProduct);
 
   const subCategory = data?.data;
-  console.log("subcategory", subCategory);
+
+  const error  = productError || subCategoryByIdError;
+  const isLoading  = isProductLoading || isSubCategoryLoading ;
+
+  useEffect(() => {
+    if(error){
+      toast.error("Internal Server error")
+    }
+  },[error])
 
   const products = useMemo(() => {
     const rows = Array.isArray(allProduct?.data)
@@ -52,10 +52,7 @@ function ClientsSubCategory() {
     return (
       <main className="bg-[#F8FAFC] px-4 py-12 sm:px-6 lg:px-8">
         <StateCard
-          title="Products load nahi ho paaye"
-          description={`Backend response check karein ya thodi der baad retry karein.${
-            error?.status ? ` Status: ${error.status}` : ""
-          }`}
+          title="Failed to load Product "
           tone="error"
         />
       </main>
@@ -63,7 +60,7 @@ function ClientsSubCategory() {
   }
 
   return (
-    <main className="overflow-hidden bg-[#F8FAFC] text-slate-950">
+    <main className="overflow-x-hidden bg-[#F8FAFC] text-slate-950">
 
       <Helmet>
         <title>{`${subCategory?.name} | Exulted India`}</title>
@@ -72,36 +69,38 @@ function ClientsSubCategory() {
       </Helmet>
 
 
-      <section className="relative border-b border-blue-100 bg-white">
-        <img
-          src={subCategory?.image.url}
-          alt={`${subCategory?.name} category`}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(219,234,254,0.78),rgba(255,255,255,0.92)_45%,rgba(240,253,244,0.76))]" />
-        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-18 lg:px-8">
-          <div className="max-w-4xl">
-            <p className="inline-flex rounded-full border border-blue-200 bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-blue-600 shadow-sm backdrop-blur">
-              {subCategory?.category_Id?.categories_name}
-            </p>
-            <h1 className="mt-5 text-xl font-black leading-tight text-slate-950 sm:text-xl lg:text-2xl">
-              {subCategory?.name}
-            </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base lg:text-lg lg:leading-7">
-              {subCategory?.description}
-            </p>
+      <section className="relative w-full overflow-x-hidden bg-linear-to-r from-blue-300 via-blue-100 to-white">
 
-            {/* <div className="mt-8 flex flex-wrap gap-3">
-              <MetricPill icon={<GridIcon className="h-4 w-4" />}>
-                {products.length} Product{products.length === 1 ? "" : "s"}
-              </MetricPill>
-              <MetricPill icon={<BoltIcon className="h-4 w-4" />}>
-                Reliable Power Range
-              </MetricPill>
-            </div> */}
-          </div>
-        </div>
-      </section>
+  <div className="mx-auto grid grid-cols-1 max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-16">
+
+    {/* LEFT CONTENT */}
+    <div className="max-w-xl w-full">
+      
+      <h1 className="text-2xl sm:text-3xl font-black leading-tight text-black wrap-break-word">
+        {subCategory?.name}
+      </h1>
+
+      <p className="mt-4 text-sm sm:text-base leading-7 font-bold text-black max-w-full sm:max-w-md wrap-break-words">
+        {subCategory?.description}
+      </p>
+
+    </div>
+
+    {/* RIGHT IMAGE */}
+    <div className="relative mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
+  
+  <div className="absolute -inset-4 blur-2xl rounded-full" />
+
+  <img
+    src={subCategory?.image?.url}
+    alt={subCategory?.name}
+    className="relative w-full h-55 sm:h-65 md:h-80 lg:h-95 object-contain"
+  />
+
+</div>
+
+  </div>
+</section>
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -116,7 +115,7 @@ function ClientsSubCategory() {
         </div>
 
         {products.length ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product, index) => (
               <ProductCard
                 key={product._id}
@@ -129,7 +128,6 @@ function ClientsSubCategory() {
         ) : (
           <StateCard
             title="No products found"
-            description="Is sub category ke products backend me add hote hi yahan cards automatic show honge."
           />
         )}
       </section>
@@ -139,32 +137,30 @@ function ClientsSubCategory() {
 
 function ProductCard({ product, index, onOpen }) {
   const image = product?.images?.[0]?.url;
-  const title = product?.product_name || "Product";
-  const description =
-    product?.description ||
-    "Premium Exulted India product designed for dependable power performance and long service life.";
+  const title = product?.product_name;
+  const description =product?.description;
 
   return (
-    <article className="group flex h-107.5 flex-col overflow-hidden rounded-[22px] border border-blue-100 bg-white shadow-[0_18px_55px_rgba(15,91,191,0.10)] transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_85px_rgba(15,91,191,0.18)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-1.5 hover:border-blue-300 hover:shadow-[0_28px_80px_rgba(37,99,235,0.16)]">
       <button
         type="button"
         onClick={onOpen}
-        className="relative h-[58%] w-full overflow-hidden bg-blue-50 text-left"
+        className="relative h-full w-full overflow-hidden bg-blue-50 text-left"
         aria-label={`View ${title}`}
       >
-        <img
-          src={image}
-          alt={title}
-          loading="lazy"
-          className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.48))]" />
-        {/* <span className="absolute left-4 top-4 rounded-full border border-white/40 bg-white/85 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-blue-700 shadow-sm backdrop-blur">
-          {String(index + 1).padStart(2, "0")}
-        </span> */}
-      </button>
+        <div className="relative">
+          <img
+            src={image}
+            alt={title}
+            loading="lazy"
+            className="h-52 w-full object-fit transition duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.48))]" />
 
-      <div className="flex flex-1 flex-col justify-between p-3">
+        </div>
+      
+
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div>
           <h3 className="line-clamp-2 min-h-8 text-base font-black leading-6 text-slate-950">
             {title}
@@ -173,16 +169,8 @@ function ProductCard({ product, index, onOpen }) {
             {description}
           </p>
         </div>
-
-        <button
-          type="button"
-          onClick={onOpen}
-          className="mt-4 inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
-        >
-          View More
-          <ArrowUpRightIcon className="h-4 w-4" />
-        </button>
       </div>
+      </button>
     </article>
   );
 }
@@ -225,7 +213,7 @@ function SubCategoryLoading() {
   );
 }
 
-function StateCard({ title, description, tone = "default" }) {
+function StateCard({ title, tone = "default" }) {
   const isError = tone === "error";
 
   return (
@@ -247,10 +235,7 @@ function StateCard({ title, description, tone = "default" }) {
           <GridIcon className="h-7 w-7" />
         )}
       </div>
-      <h2 className="mt-5 text-2xl font-black text-slate-950">{title}</h2>
-      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-600">
-        {description}
-      </p>
+      <h2 className="mt-5 text-xl font-black text-slate-950">{title}</h2>
     </div>
   );
 }
@@ -266,9 +251,7 @@ function MetricPill({ icon, children }) {
 
 function getProductImage(product, index) {
   return (
-    getProductImages(product)[0] ||
-    fallbackImages[index % fallbackImages.length]
-  );
+    getProductImages(product)[0]);
 }
 
 function getProductImages(product) {

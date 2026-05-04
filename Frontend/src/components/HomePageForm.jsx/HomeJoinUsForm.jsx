@@ -123,9 +123,7 @@ function HomeJoinUsForm({ isOpen, onClose, activeJoinUs, onSubmit }) {
           <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
             {activeJoinUs ? "Update Join Us" : "Add Join Us"}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Manage the title and supporting detail for the join us section.
-          </p>
+
         </div>
 
         <form

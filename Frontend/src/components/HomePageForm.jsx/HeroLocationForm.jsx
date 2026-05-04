@@ -183,10 +183,7 @@ function HeroLocationForm({ isOpen, onClose, activeHeroLocation, onSubmit }) {
           <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
             {activeHeroLocation ? "Update Locations" : "Add Locations"}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Manage the title, detail, and multiple service locations for this
-            section.
-          </p>
+
         </div>
 
         <form
@@ -230,9 +227,7 @@ function HeroLocationForm({ isOpen, onClose, activeHeroLocation, onSubmit }) {
                   <p className="text-sm font-semibold text-slate-700">
                     Locations
                   </p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    Add all required locations. These will be saved as an array.
-                  </p>
+
                 </div>
 
                 <button

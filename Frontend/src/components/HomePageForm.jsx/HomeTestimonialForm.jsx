@@ -208,10 +208,6 @@ function HomeTestimonialForm({
           <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
             {activeTestimonial ? "Update Testimonial" : "Add Testimonial"}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Add the section title and multiple testimonial entries with name,
-            role, and message.
-          </p>
         </div>
 
         <form

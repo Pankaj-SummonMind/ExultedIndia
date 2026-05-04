@@ -3,8 +3,12 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   useGetAllSocialMediaQuery,
   useGetCategoriesQuery,
+  useGetContactsQuery,
+  useGetHomePageQuery,
   useGetSubCategoriesQuery,
 } from "../services/api";
+ import { Phone, Mail, MessageCircle } from "lucide-react";
+
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -18,6 +22,8 @@ function ClientLayout() {
   const { data: categoriesResponse, isLoading } = useGetCategoriesQuery();
   const { data: subCategoryResponse } = useGetSubCategoriesQuery();
   const { data: SocialMediaAccounts } = useGetAllSocialMediaQuery();
+  const {data: contactData } = useGetContactsQuery();
+  const {data : homeData} = useGetHomePageQuery()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
   const [activeCategoryId, setActiveCategoryId] = useState(null);
@@ -179,12 +185,6 @@ const activeSubCategories = useMemo(() => {
           </nav>
 
           <div className="hidden items-center gap-3 lg:flex">
-            {/* <NavLink
-              to="/contact"
-              className="rounded-full border border-blue-200 px-4 py-2 text-sm font-bold text-blue-700 transition hover:border-blue-500 hover:bg-blue-50"
-            >
-              Get Quote
-            </NavLink> */}
             <NavLink
               to="/contact"
               className="rounded-full bg-blue-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition hover:-translate-y-0.5 hover:bg-blue-700"
@@ -301,13 +301,6 @@ const activeSubCategories = useMemo(() => {
               >
                 Get in touch
               </NavLink>
-              {/* <NavLink
-                to="/admin"
-                onClick={closeMobileMenu}
-                className="rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
-              >
-                Partner Login
-              </NavLink> */}
             </div>
           </div>
         </div>
@@ -319,15 +312,6 @@ const activeSubCategories = useMemo(() => {
 
       {/* <Footer /> */}
       <footer className="relative overflow-hidden bg-[#0f172a] text-white">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src="/footer-bg.jpg"
-            alt="Footer Background"
-            className="h-full w-full object-cover opacity-10"
-          />
-          <div className="absolute inset-0 bg-linear-to-r from-[#020617]/95 via-[#0f172a]/92 to-[#111827]/95" />
-        </div>
 
         <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
@@ -349,8 +333,8 @@ const activeSubCategories = useMemo(() => {
               </div>
 
               <p className="mt-5 text-sm leading-7 text-slate-300">
-                Leading manufacturer of Battery, Inverter, Transformer, Online
-                UPS, Gensets and EV Chargers with trusted Pan India support.
+                {homeData?.data?.hero?.detail || "Leading manufacturer of Battery, Inverter, Transformer, Online UPS, Gensets and EV Chargers with trusted Pan India support."}
+                
               </p>
 
               {/* Social */}
@@ -385,7 +369,7 @@ const activeSubCategories = useMemo(() => {
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-lg font-black text-white">Quick Links</h4>
+              <h4 className="text-lg font-bold text-white">Quick Links</h4>
 
               <div className="mt-5 grid gap-3">
                 {navItems.map((item) => (
@@ -402,7 +386,7 @@ const activeSubCategories = useMemo(() => {
 
             {/* Products */}
             <div>
-              <h4 className="text-lg font-black text-white">Products</h4>
+              <h4 className="text-lg font-bold text-white">Products</h4>
 
               <div className="mt-5 grid gap-3">
                 {categories.map((category) => (
@@ -418,48 +402,68 @@ const activeSubCategories = useMemo(() => {
             </div>
 
             {/* Contact */}
-            <div>
-              <h4 className="text-lg font-black text-white">Contact</h4>
 
-              <p className="mt-4 text-sm leading-7 text-slate-300">
-                If you have any questions or need help, feel free to contact
-                with our team.
-              </p>
+<div>
+  <h4 className="text-lg font-bold text-white">Contact</h4>
 
-              <div className="mt-6 space-y-4">
-                {(SocialMediaAccounts?.data || [])
-                  .filter((item) =>
-                    ["phone", "mail", "whatsapp"].includes(
-                      item.key?.toLowerCase(),
-                    ),
-                  )
-                  .map((item) => (
-                    <div key={item._id} className="flex items-start gap-3">
-                      <div
-                        className={`grid h-10 w-10 place-items-center rounded-xl ${
-                          item.key?.toLowerCase() === "phone"
-                            ? "bg-blue-500/20 text-blue-400"
-                            : item.key?.toLowerCase() === "email"
-                              ? "bg-emerald-500/20 text-emerald-400"
-                              : "bg-green-500/20 text-green-400"
-                        }`}
-                      >
-                        {/* Icon */}
-                      </div>
+  <p className="mt-4 text-sm leading-7 text-slate-300">
+    If you have any questions or need help, feel free to contact with
+    our team.
+  </p>
 
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-                          {item.key}
-                        </p>
+  <div className="mt-6 space-y-4">
+    {/* Phone */}
+    <div className="flex items-start gap-3">
+      <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-500/20 text-blue-400">
+        <Phone className="h-5 w-5" />
+      </div>
 
-                        <p className="text-sm font-semibold text-white">
-                          {item.value}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
+      <div>
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+          Phone
+        </p>
+
+        <p className="text-sm font-semibold text-white">
+          {contactData?.data?.phoneNumber}
+        </p>
+      </div>
+    </div>
+
+    {/* Email */}
+    <div className="flex items-start gap-3">
+      <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/20 text-emerald-400">
+        <Mail className="h-5 w-5" />
+      </div>
+
+      <div>
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+          Email
+        </p>
+
+        <p className="text-sm font-semibold text-white">
+          {contactData?.data?.email}
+        </p>
+      </div>
+    </div>
+
+    {/* WhatsApp */}
+    <div className="flex items-start gap-3">
+      <div className="grid h-10 w-10 place-items-center rounded-xl bg-green-500/20 text-green-400">
+        <MessageCircle className="h-5 w-5" />
+      </div>
+
+      <div>
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+          WhatsApp
+        </p>
+
+        <p className="text-sm font-semibold text-white">
+          {contactData?.data?.whatappNumber}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
           </div>
 
           {/* Bottom */}
@@ -595,158 +599,158 @@ function ArrowUpRightIcon({ className }) {
   );
 }
 
-function Footer() {
-  const quickLinks = ["Home", "About", "Products", "Certificates", "Contact"];
+// function Footer() {
+//   const quickLinks = ["Home", "About", "Products", "Certificates", "Contact"];
 
-  const products = [
-    "Battery",
-    "Inverter",
-    "Transformer",
-    "Online UPS",
-    "EV Charger",
-  ];
+//   const products = [
+//     "Battery",
+//     "Inverter",
+//     "Transformer",
+//     "Online UPS",
+//     "EV Charger",
+//   ];
 
-  return (
-    <footer className="relative overflow-hidden bg-[#0f172a] text-white">
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <img
-          src="/footer-bg.jpg"
-          alt="Footer Background"
-          className="h-full w-full object-cover opacity-10"
-        />
-        <div className="absolute inset-0 bg-linear-to-r from-[#020617]/95 via-[#0f172a]/92 to-[#111827]/95" />
-      </div>
+//   return (
+//     <footer className="relative overflow-hidden bg-[#0f172a] text-white">
+//       {/* Background Image */}
+//       <div className="absolute inset-0">
+//         <img
+//           src="/footer-bg.jpg"
+//           alt="Footer Background"
+//           className="h-full w-full object-cover opacity-10"
+//         />
+//         <div className="absolute inset-0 bg-linear-to-r from-[#020617]/95 via-[#0f172a]/92 to-[#111827]/95" />
+//       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          {/* Company Info */}
-          <div>
-            <div className="flex items-center gap-4">
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/30">
-                <BoltIcon className="h-7 w-7 text-white" />
-              </div>
+//       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+//         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+//           {/* Company Info */}
+//           <div>
+//             <div className="flex items-center gap-4">
+//               <div className="grid h-14 w-14 place-items-center rounded-2xl bg-blue-500 shadow-lg shadow-blue-500/30">
+//                 <BoltIcon className="h-7 w-7 text-white" />
+//               </div>
 
-              <div>
-                <h3 className="text-xl font-black tracking-wide">
-                  Exaulted India
-                </h3>
-                <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-300">
-                  Future Power Systems
-                </p>
-              </div>
-            </div>
+//               <div>
+//                 <h3 className="text-xl font-black tracking-wide">
+//                   Exaulted India
+//                 </h3>
+//                 <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-300">
+//                   Future Power Systems
+//                 </p>
+//               </div>
+//             </div>
 
-            <p className="mt-5 text-sm leading-7 text-slate-300">
-              Leading manufacturer of Battery, Inverter, Transformer, Online
-              UPS, Gensets and EV Chargers with trusted Pan India support.
-            </p>
+//             <p className="mt-5 text-sm leading-7 text-slate-300">
+//               Leading manufacturer of Battery, Inverter, Transformer, Online
+//               UPS, Gensets and EV Chargers with trusted Pan India support.
+//             </p>
 
-            {/* Social */}
-            <div className="mt-6 flex gap-3">
-              {["in", "f", "x", "yt"].map((item) => (
-                <a
-                  key={item}
-                  href="/"
-                  className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/5 text-sm font-black text-white transition hover:bg-blue-500 hover:scale-110"
-                >
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
+//             {/* Social */}
+//             <div className="mt-6 flex gap-3">
+//               {["in", "f", "x", "yt"].map((item) => (
+//                 <a
+//                   key={item}
+//                   href="/"
+//                   className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/5 text-sm font-black text-white transition hover:bg-blue-500 hover:scale-110"
+//                 >
+//                   {item}
+//                 </a>
+//               ))}
+//             </div>
+//           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-lg font-black text-white">Quick Links</h4>
+//           {/* Quick Links */}
+//           <div>
+//             <h4 className="text-lg font-black text-white">Quick Links</h4>
 
-            <div className="mt-5 grid gap-3">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.label}
-                  to={item.to}
-                  className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-blue-400"
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </div>
-          </div>
+//             <div className="mt-5 grid gap-3">
+//               {navItems.map((item) => (
+//                 <NavLink
+//                   key={item.label}
+//                   to={item.to}
+//                   className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-blue-400"
+//                 >
+//                   {item.label}
+//                 </NavLink>
+//               ))}
+//             </div>
+//           </div>
 
-          {/* Products */}
-          <div>
-            <h4 className="text-lg font-black text-white">Products</h4>
+//           {/* Products */}
+//           <div>
+//             <h4 className="text-lg font-black text-white">Products</h4>
 
-            <div className="mt-5 grid gap-3">
-              {categories.map((category) => (
-                <a
-                  key={category._id}
-                  href={`/products/category/${category._id}`}
-                  className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-emerald-400"
-                >
-                  {category.name}
-                </a>
-              ))}
-            </div>
-          </div>
+//             <div className="mt-5 grid gap-3">
+//               {categories.map((category) => (
+//                 <a
+//                   key={category._id}
+//                   href={`/products/category/${category._id}`}
+//                   className="text-sm font-medium text-slate-300 transition hover:translate-x-1 hover:text-emerald-400"
+//                 >
+//                   {category.name}
+//                 </a>
+//               ))}
+//             </div>
+//           </div>
 
-          {/* Contact */}
-          <div>
-            <h4 className="text-lg font-black text-white">Contact</h4>
+//           {/* Contact */}
+//           <div>
+//             <h4 className="text-lg font-black text-white">Contact</h4>
 
-            <p className="mt-4 text-sm leading-7 text-slate-300">
-              If you have any questions or need help, feel free to contact with
-              our team.
-            </p>
+//             <p className="mt-4 text-sm leading-7 text-slate-300">
+//               If you have any questions or need help, feel free to contact with
+//               our team.
+//             </p>
 
-            <div className="mt-6 space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-500/20 text-blue-400">
-                  {/* <PhoneIcon className="h-5 w-5" /> */}
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-                    Phone
-                  </p>
-                  <p className="text-sm font-semibold text-white">
-                    +91 98765 43210
-                  </p>
-                </div>
-              </div>
+//             <div className="mt-6 space-y-4">
+//               <div className="flex items-start gap-3">
+//                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-500/20 text-blue-400">
+//                   {/* <PhoneIcon className="h-5 w-5" /> */}
+//                 </div>
+//                 <div>
+//                   <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+//                     Phone
+//                   </p>
+//                   <p className="text-sm font-semibold text-white">
+//                     +91 98765 43210
+//                   </p>
+//                 </div>
+//               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/20 text-emerald-400">
-                  {/* <EnvelopeIcon className="h-5 w-5" /> */}
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-                    Email
-                  </p>
-                  <p className="text-sm font-semibold text-white">
-                    info@exaultedindia.com
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+//               <div className="flex items-start gap-3">
+//                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/20 text-emerald-400">
+//                   {/* <EnvelopeIcon className="h-5 w-5" /> */}
+//                 </div>
+//                 <div>
+//                   <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+//                     Email
+//                   </p>
+//                   <p className="text-sm font-semibold text-white">
+//                     info@exaultedindia.com
+//                   </p>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
 
-        {/* Bottom */}
-        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 Exaulted India. All rights reserved.</p>
+//         {/* Bottom */}
+//         <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+//           <p>© 2026 Exaulted India. All rights reserved.</p>
 
-          <div className="flex gap-6">
-            <a href="/" className="hover:text-white transition">
-              Privacy Policy
-            </a>
-            <a href="/" className="hover:text-white transition">
-              Terms of Use
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
+//           <div className="flex gap-6">
+//             <a href="/" className="hover:text-white transition">
+//               Privacy Policy
+//             </a>
+//             <a href="/" className="hover:text-white transition">
+//               Terms of Use
+//             </a>
+//           </div>
+//         </div>
+//       </div>
+//     </footer>
+//   );
+// }
 
 export default ClientLayout;

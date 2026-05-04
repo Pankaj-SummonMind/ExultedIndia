@@ -25,25 +25,6 @@ function CategoryScreen() {
       createdAt: new Date(item.createdAt).toLocaleDateString(),
     })) || [];
 
-  const stats = useMemo(
-    () => [
-      { label: "Total Categories", value: String(categoryRows.length) },
-      {
-        label: "With Images",
-        value: String(
-          categoryRows.filter((item) => Boolean(item.image)).length,
-        ),
-      },
-      {
-        label: "Updated Today",
-        value: String(
-          categoryRows.filter((item) => item.createdAt === "16 Apr 2026")
-            .length,
-        ).padStart(2, "0"),
-      },
-    ],
-    [categoryRows],
-  );
 
   return (
     <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
@@ -102,7 +83,7 @@ function CategoryScreen() {
         className="group cursor-pointer transition hover:bg-blue-50/70"
       >
         <TableCell>
-          <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs font-bold text-blue-700">
+          <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-blue-100 px-3 py-2 text-xs font-semibold text-blue-700">
             {String(index + 1).padStart(2, "0")}
           </span>
         </TableCell>
@@ -118,7 +99,7 @@ function CategoryScreen() {
         </TableCell>
 
         <TableCell>
-          <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600">
+          <span className="inline-flex rounded-full bg-slate-100 px-3 py-2 text-sm  text-slate-600">
             {row.createdAt}
           </span>
         </TableCell>
@@ -160,7 +141,7 @@ function TableHeading({ children, className = "" }) {
   return (
     <th
       className={[
-        "border-b border-blue-100 bg-white px-5 py-4 text-left text-xs font-semibold uppercase tracking-[0.24em] text-slate-500",
+        "border-b border-blue-100 bg-white px-5 py-4 text-left text-xs font-bold uppercase tracking-[0.24em] text-slate-500",
         className,
       ].join(" ")}
     >

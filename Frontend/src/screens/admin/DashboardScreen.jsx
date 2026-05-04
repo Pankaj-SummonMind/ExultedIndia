@@ -232,9 +232,6 @@ function DashboardScreen() {
             <h2 className="mt-2 text-lg font-bold text-slate-800">
               Latest registrations
             </h2>
-            {/* <p className="mt-2 text-sm leading-6 text-slate-500">
-              Recent joined users ka quick professional snapshot.
-            </p> */}
           </div>
 
           <div className="flex flex-col gap-3 p-5 sm:p-6">

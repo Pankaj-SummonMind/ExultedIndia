@@ -251,62 +251,85 @@ function AboutUsPageForm({
   };
 
   const handleHeroImagesSelect = (event) => {
-    const selectedFiles = Array.from(event.target.files || []);
+  const selectedFiles = Array.from(event.target.files || []);
 
-    if (selectedFiles.length === 0) {
-      return;
-    }
+  if (selectedFiles.length === 0) {
+    return;
+  }
 
-    if (selectedFiles.length > 3) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        "hero.images": "You can upload a maximum of 3 hero images.",
-      }));
-      setFormError("Please fix the highlighted image fields.");
-      setSuccessMessage("");
-      event.target.value = "";
-      return;
-    }
+  const MAX_FILES = 3;
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
-    const invalidFile = selectedFiles.find(
-      (file) => !file.type.startsWith("image/"),
-    );
+  // ✅ count validation
+  if (selectedFiles.length > MAX_FILES) {
+    setFieldErrors((prev) => ({
+      ...prev,
+      "hero.images": "You can upload a maximum of 3 hero images.",
+    }));
+    setFormError("Please fix the highlighted image fields.");
+    setSuccessMessage("");
+    event.target.value = "";
+    return;
+  }
 
-    if (invalidFile) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        "hero.images": "Only image files are allowed for the hero gallery.",
-      }));
-      setFormError("Please fix the highlighted image fields.");
-      setSuccessMessage("");
-      event.target.value = "";
-      return;
-    }
+  // ✅ type validation
+  const invalidFile = selectedFiles.find(
+    (file) => !file.type.startsWith("image/")
+  );
 
-    setFormData((prev) => {
-      prev.hero.images.forEach((item) => {
-        revokeBlobPreview(item.previewUrl);
-      });
+  if (invalidFile) {
+    setFieldErrors((prev) => ({
+      ...prev,
+      "hero.images": "Only image files are allowed for the hero gallery.",
+    }));
+    setFormError("Please fix the highlighted image fields.");
+    setSuccessMessage("");
+    event.target.value = "";
+    return;
+  }
 
-      return {
-        ...prev,
-        hero: {
-          ...prev.hero,
-          images: selectedFiles.map((file, index) => ({
-            id: `${file.name}-${index}`,
-            file,
-            previewUrl: URL.createObjectURL(file),
-            existingUrl: "",
-            label: file.name,
-          })),
-        },
-      };
+  // ✅ size validation (NEW)
+  const oversizedFile = selectedFiles.find(
+    (file) => file.size > MAX_SIZE
+  );
+
+  if (oversizedFile) {
+    setFieldErrors((prev) => ({
+      ...prev,
+      "hero.images": `Image "${oversizedFile.name}" exceeds 10MB.`,
+    }));
+    setFormError("Please fix the highlighted image fields.");
+    toast.error("Image must be less than 10MB.");
+    setSuccessMessage("");
+    event.target.value = "";
+    return;
+  }
+
+  // ✅ update state (same as your logic)
+  setFormData((prev) => {
+    prev.hero.images.forEach((item) => {
+      revokeBlobPreview(item.previewUrl);
     });
 
-    clearFieldError("hero.images");
-    clearMessages();
-    event.target.value = "";
-  };
+    return {
+      ...prev,
+      hero: {
+        ...prev.hero,
+        images: selectedFiles.map((file, index) => ({
+          id: `${file.name}-${index}`,
+          file,
+          previewUrl: URL.createObjectURL(file),
+          existingUrl: "",
+          label: file.name,
+        })),
+      },
+    };
+  });
+
+  clearFieldError("hero.images");
+  clearMessages();
+  event.target.value = "";
+};
 
   const resetHeroImagesToCurrent = () => {
     setFormData((prev) => {
@@ -328,41 +351,59 @@ function AboutUsPageForm({
   };
 
   const handleSingleImageSelect = (sectionKey, event) => {
-    const file = event.target.files?.[0];
+  const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+  if (!file) {
+    return;
+  }
 
-    if (!file.type.startsWith("image/")) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        [`${sectionKey}.image`]: "Please select a valid image file.",
-      }));
-      setFormError("Please fix the highlighted image fields.");
-      setSuccessMessage("");
-      event.target.value = "";
-      return;
-    }
-
-    setFormData((prev) => {
-      revokeBlobPreview(prev[sectionKey].previewUrl);
-
-      return {
-        ...prev,
-        [sectionKey]: {
-          ...prev[sectionKey],
-          imageFile: file,
-          previewUrl: URL.createObjectURL(file),
-          existingUrl: prev[sectionKey].existingUrl,
-        },
-      };
-    });
-
-    clearFieldError(`${sectionKey}.image`);
-    clearMessages();
+  // ✅ TYPE VALIDATION
+  if (!file.type.startsWith("image/")) {
+    setFieldErrors((prev) => ({
+      ...prev,
+      [`${sectionKey}.image`]: "Please select a valid image file.",
+    }));
+    setFormError("Please fix the highlighted image fields.");
+    setSuccessMessage("");
     event.target.value = "";
-  };
+    return;
+  }
+
+  // ✅ SIZE VALIDATION (ADD THIS)
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+  if (file.size > MAX_SIZE) {
+    setFieldErrors((prev) => ({
+      ...prev,
+      [`${sectionKey}.image`]: "Image must be less than 10MB.",
+    }));
+    setFormError("Please fix the highlighted image fields.");
+    toast.error("Image must be less than 10MB.")
+    setSuccessMessage("");
+    event.target.value = "";
+    return;
+  }
+
+  setFormData((prev) => {
+    if (prev[sectionKey]?.previewUrl) {
+      revokeBlobPreview(prev[sectionKey].previewUrl);
+    }
+
+    return {
+      ...prev,
+      [sectionKey]: {
+        ...prev[sectionKey],
+        imageFile: file,
+        previewUrl: URL.createObjectURL(file),
+        existingUrl: prev[sectionKey].existingUrl,
+      },
+    };
+  });
+
+  clearFieldError(`${sectionKey}.image`);
+  clearMessages();
+  event.target.value = "";
+};
 
   const resetSingleImageToCurrent = (sectionKey) => {
     setFormData((prev) => {
@@ -636,7 +677,7 @@ function AboutUsPageForm({
           <UploadIllustration />
 
           <p className="mt-4 text-sm font-semibold text-slate-800">
-            Click to upload up to 3 hero images
+            Click to upload up to 3 hero images and Each Image must be less then 10 mb. 
           </p>
 
           <p className="mt-2 text-xs font-medium text-slate-400">
@@ -670,15 +711,6 @@ function AboutUsPageForm({
         )}
       </div>
 
-      {/* {isUpdateMode && newHeroImageCount > 0 ? (
-        <button
-          type="button"
-          onClick={resetHeroImagesToCurrent}
-          className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
-        >
-          Use Current Hero Images
-        </button>
-      ) : null} */}
     </div>
   </div>
 </SectionCard>
@@ -711,7 +743,6 @@ function AboutUsPageForm({
               <div className="space-y-5">
                 <PanelHeader
                   title="Stat Entries"
-                //   detail="At least one stat required hai. Aap jitne chahein utne pairs add kar sakte hain."
                   actionLabel="Add Stat"
                   onAction={addStat}
                 />
@@ -838,10 +869,6 @@ function AboutUsPageForm({
                 <div>
                   <p className="text-sm font-semibold text-slate-800">
                     Ready to {isUpdateMode ? "update" : "create"} About Us content?
-                  </p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    Form ek structured multipart payload send karega jisme text
-                    fields aur images dono included honge.
                   </p>
                 </div>
 
@@ -971,30 +998,6 @@ function SectionContentEditor({
             minHeightClassName={imageMinHeight}
           />
         </FormField>
-
-        {/* <div className="rounded-[24px] border border-slate-200/80 bg-slate-50/90 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            Upload Status
-          </p>
-
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            {data.imageFile
-              ? "New image selected. Submit ke saath yeh image upload hogi."
-              : data.previewUrl
-              ? "Current image active hai. New file choose karenge to replace ho jayegi."
-              : "Abhi koi image selected nahi hai."}
-          </p>
-
-          {isUpdateMode && data.imageFile ? (
-            <button
-              type="button"
-              onClick={() => onImageReset(sectionKey)}
-              className="mt-4 inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
-            >
-              Use Current Image
-            </button>
-          ) : null}
-        </div> */}
       </div>
     </div>
   );
@@ -1010,9 +1013,7 @@ function SectionCard({ eyebrow, title, description, children }) {
         <h2 className="mt-2 text-xl font-bold text-slate-900 sm:text-2xl">
           {title}
         </h2>
-        {/* <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-500">
-          {description}
-        </p> */}
+
       </div>
 
       <div className="px-5 py-5 sm:px-6">{children}</div>
@@ -1025,7 +1026,6 @@ function PanelHeader({ title, detail, actionLabel, onAction }) {
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <p className="text-sm font-semibold text-slate-700">{title}</p>
-        {/* <p className="mt-1 text-sm text-slate-500">{detail}</p> */}
       </div>
 
       <button

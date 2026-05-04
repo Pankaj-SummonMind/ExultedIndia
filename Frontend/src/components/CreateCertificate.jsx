@@ -51,20 +51,32 @@ function CreateCertificate({ isOpen, onClose, activeCertificate }) {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        setFormError("Please select a valid image file.");
-        return;
-      }
-      setFormError("");
-      setFormData((prev) => ({
-        ...prev,
-        image: file,
-        previewUrl: URL.createObjectURL(file),
-      }));
-    }
-  };
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  // ✅ TYPE VALIDATION
+  if (!file.type.startsWith("image/")) {
+    setFormError("Please select a valid image file.");
+    return;
+  }
+
+  // ✅ SIZE VALIDATION
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+  if (file.size > MAX_SIZE) {
+    setFormError("Image must be less than 10MB.");
+    return;
+  }
+
+  setFormError("");
+
+  setFormData((prev) => ({
+    ...prev,
+    image: file,
+    previewUrl: URL.createObjectURL(file),
+  }));
+};
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
@@ -86,7 +98,6 @@ function CreateCertificate({ isOpen, onClose, activeCertificate }) {
 
     try {
       // Using FormData because we are uploading a file
-      console.log("Submitting form with data:", formData);
       const submitData = new FormData();
       submitData.append("certificate_name", trimmedName);
       if (formData.image) {
@@ -98,11 +109,9 @@ function CreateCertificate({ isOpen, onClose, activeCertificate }) {
         // Note: Depending on your RTK setup, you might need to pass { id: formData.id, data: submitData }
         const res = await updateCertificate(submitData).unwrap();
         toast.success(res?.message || "Certificate updated successfully");
-        console.log("res after updating certificate", res);
       } else {
         const res = await createCertificate(submitData).unwrap();
         toast.success(res?.message || "Certificate created successfully");
-        console.log("res after creating certificate", res);
       }
 
       onClose();
@@ -111,7 +120,6 @@ function CreateCertificate({ isOpen, onClose, activeCertificate }) {
       setFormError(
         error?.data?.message || error.message || "Something went wrong",
       );
-      console.log("error while handling certificate : ", error);
     }
   };
 

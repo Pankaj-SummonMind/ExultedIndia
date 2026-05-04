@@ -20,7 +20,6 @@ async function createSocialMedia(req, res) {
       new ApiResponse(201, socialMedia, "Social media created successfully")
     );
   } catch (error) {
-    console.log("error in create social media:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -32,7 +31,7 @@ async function createSocialMedia(req, res) {
 
 async function getAllSocialMedia(req, res) {
   try {
-    const socialMediaList = await SocialMedia.find({ deletedAt: null }).select("-__v -updatedAt");
+    const socialMediaList = await SocialMedia.find({ deletedAt: null }).sort({ createdAt: -1 }).select("-__v -updatedAt");
 
     if (socialMediaList.length === 0) {
       throw new ApiError(404, "No social media links found");
@@ -42,7 +41,6 @@ async function getAllSocialMedia(req, res) {
       new ApiResponse(200, socialMediaList, "Social media fetched successfully")
     );
   } catch (error) {
-    console.log("error in get all social media:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -70,7 +68,6 @@ async function getSocialMediaById(req, res) {
       new ApiResponse(200, socialMedia, "Social media fetched successfully")
     );
   } catch (error) {
-    console.log("error in get social media by id:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -106,7 +103,6 @@ async function updateSocialMedia(req, res) {
       new ApiResponse(200, updatedSocialMedia, "Social media updated successfully")
     );
   } catch (error) {
-    console.log("error in update social media:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,
@@ -124,8 +120,6 @@ async function deleteSocialMedia(req, res) {
       throw new ApiError(400, "Invalid social media id");
     }
 
-    // const deletedSocialMedia = await SocialMedia.findByIdAndDelete(id);
-
     const deletedSocialMedia = await SocialMedia.findByIdAndUpdate(
           id,
           { deletedAt: new Date() },
@@ -140,7 +134,6 @@ async function deleteSocialMedia(req, res) {
       new ApiResponse(200, null, "Social media deleted successfully")
     );
   } catch (error) {
-    console.log("error in delete social media:", error);
 
     return res.status(error.statusCode || 500).json({
       statusCode: error.statusCode || 500,

@@ -38,17 +38,7 @@ function ProductById() {
         .filter(Boolean),
     [productData?.images],
   );
-  // console.log("id inside getcategoryByid:",id )
-  console.log("data for id :", productDetail);
 
-  // useEffect(() => {
-  //   setCategory({
-  //   id: 1,
-  //   name: "Electronics",
-  //   subCategory: ["Mobiles", "Laptops", "Accessories"],
-  //   createdAt: "15 Apr 2026",
-  // });
-  // }, [id]);
 
   useEffect(() => {
     if (error) {
@@ -59,11 +49,9 @@ function ProductById() {
   const handleDelete = async () => {
     try {
       const res = await deleteProduct(id).unwrap();
-      console.log("respone while deleting categories", res);
       navigate("/admin/product");
       toast.success(res?.message || "Product deleted successfully");
     } catch (error) {
-      console.log("error: ", error);
       toast.error(error?.data?.message || "Failed to delete product");
     }
   };
@@ -110,20 +98,17 @@ function ProductById() {
   }
 
   return (
-    <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5">
+    <section className="flex min-h-[calc(100vh-176px)] flex-col gap-5 overflow-x-hidden">
       <Loader isLoading={isLoading} />
       <div className="`rounded-4xl border border-blue-100 bg-linear-to-br from-white via-blue-50 to-slate-50 p-5 shadow-[0_18px_45px_rgba(59,130,246,0.10)] sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
-            {/* <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-400">
-              Category Detail
-            </p> */}
             <h1 className="mt-2 text-xl font-bold text-slate-800 sm:text-xl">
               {productDetail?.data?.product_name || ""}
             </h1>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <button
               type="button"
               onClick={() => setShowCreateProduct(true)}
@@ -151,9 +136,6 @@ function ProductById() {
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-4xl border border-slate-200 bg-linear-to-br from-slate-50 via-white to-blue-50">
                 <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4">
-                  {/* <span className="rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 shadow-sm backdrop-blur">
-                    Product Gallery
-                  </span> */}
 
                   {productImages.length > 1 ? (
                     <div className="flex items-center gap-2">
@@ -178,7 +160,7 @@ function ProductById() {
                   ) : null}
                 </div>
 
-                <div className="flex min-h-80 items-center justify-center p-6 sm:min-h-105 sm:p-8">
+                <div className="flex w-full min-w-0 items-center justify-center p-4 sm:p-6">
                   {productImages.length > 0 ? (
                     <img
                       src={productImages[currentImageIndex]}
@@ -191,16 +173,13 @@ function ProductById() {
                       <p className="mt-4 text-lg font-semibold text-slate-700">
                         Product image not available
                       </p>
-                      {/* <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
-                        Images add hone par yahan premium gallery preview show hoga.
-                      </p> */}
                     </div>
                   )}
                 </div>
               </div>
 
               {productImages.length > 1 ? (
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
                   {productImages.map((image, index) => (
                     <button
                       key={`${image}-${index}`}
@@ -224,7 +203,7 @@ function ProductById() {
                 </div>
               ) : null}
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 min-w-0">
               <DetailSection
                 title="Product Name"
                 icon={<CubeIcon className="h-5 w-5" />}
@@ -279,9 +258,6 @@ function ProductById() {
                           <FeatureStarIcon className="h-4 w-4" />
                         </span>
                         <div>
-                          {/* <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-500">
-                            {`Feature ${index + 1}`}
-                          </p> */}
                           <p className="mt-1 text-sm font-medium leading-6 text-slate-700 sm:text-base">
                             {feature}
                           </p>
@@ -300,10 +276,6 @@ function ProductById() {
               >
                 {productData?.specifications?.length ? (
                   <div className="overflow-hidden rounded-[28px] border border-slate-200">
-                    {/* <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] bg-slate-100/90 px-4 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500 sm:px-5">
-                      <p>Specification</p>
-                      <p>Value</p>
-                    </div> */}
 
                     <div className="divide-y divide-slate-200 bg-white">
                       {productData.specifications.map((item, index) => (
@@ -343,7 +315,7 @@ function ProductById() {
                       </span>
 
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate sm:max-w-65 md:max-w-[320px] lg:max-w-105">
+                        <span className="block overflow-hidden text-ellipsis break-all">
                           {productData.pdf.fileName || "Open product catalog"}
                         </span>
                       </span>
@@ -359,19 +331,6 @@ function ProductById() {
           </div>
         </div>
       </div>
-
-      {/* <CreateProduct
-        isOpen={isUpdateOpen}
-        onShowList={() => setShowCreateProduct(false)}
-        onClose={() => setIsUpdateOpen(false)}
-        setIsCreateModalOpen={setIsUpdateOpen}
-        mode="update"
-        // initialData={{
-        //   id: data?.data?._id,
-        //   categoryName: data?.data?.categories_name,
-        //   subCategory: data?.data?.subCategories
-        // }}
-      /> */}
     </section>
   );
 }

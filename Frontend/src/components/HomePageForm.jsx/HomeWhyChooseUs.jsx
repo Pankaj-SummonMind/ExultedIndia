@@ -197,9 +197,6 @@ function HomeWhyChooseUs({ isOpen, onClose, activeWhyChooseUs, onSubmit }) {
           <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
             {activeWhyChooseUs ? "Update Why Choose Us" : "Add Why Choose Us"}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Add a title and multiple feature blocks with short descriptions.
-          </p>
         </div>
 
         <form
@@ -228,9 +225,7 @@ function HomeWhyChooseUs({ isOpen, onClose, activeWhyChooseUs, onSubmit }) {
                   <p className="text-sm font-semibold text-slate-700">
                     Feature Blocks
                   </p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    Add feature name and a small description for each item.
-                  </p>
+                
                 </div>
 
                 <button

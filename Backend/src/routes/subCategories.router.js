@@ -1,7 +1,6 @@
 import {Router} from "express"
 import { upload } from "../middlewares/multer.middleware.js";
 import { CreateSubCategories, deleteSubCategory, getSubCategories, getSubCategoryById, updateSubCategory } from "../controllers/subCategory.controllers.js";
-// import { createdSubCategory, deleteSubCategory, getSubCategories, getSubCategoryById, updateSubCategory } from "../controllers/tempSubcategory.controllers.js";
 const router = Router();
 
 

@@ -98,34 +98,54 @@ function HeroDetailForm({ isOpen, onClose, activeHeroDetail, onSubmit }) {
   };
 
   const handleImageChange = (event) => {
-    const file = event.target.files?.[0];
+  const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+  if (!file) {
+    return;
+  }
 
-    if (!file.type.startsWith("image/")) {
-      setFormError("Please select a valid image file.");
-      setFieldErrors((prev) => ({
-        ...prev,
-        image: "Please select a valid image file.",
-      }));
-      return;
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-
-    setFormData((prev) => ({
-      ...prev,
-      image: file,
-      previewUrl,
-    }));
+  // ✅ TYPE VALIDATION
+  if (!file.type.startsWith("image/")) {
+    setFormError("Please select a valid image file.");
     setFieldErrors((prev) => ({
       ...prev,
-      image: "",
+      image: "Please select a valid image file.",
     }));
-    setFormError("");
-  };
+    return;
+  }
+
+  // ✅ SIZE VALIDATION
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+  if (file.size > MAX_SIZE) {
+    setFormError("Image must be less than 10MB.");
+    setFieldErrors((prev) => ({
+      ...prev,
+      image: "Image must be less than 10MB.",
+    }));
+    return;
+  }
+
+  // ✅ REVOKE OLD PREVIEW (memory leak fix)
+  if (formData.previewUrl) {
+    URL.revokeObjectURL(formData.previewUrl);
+  }
+
+  const previewUrl = URL.createObjectURL(file);
+
+  setFormData((prev) => ({
+    ...prev,
+    image: file,
+    previewUrl,
+  }));
+
+  setFieldErrors((prev) => ({
+    ...prev,
+    image: "",
+  }));
+
+  setFormError("");
+};
 
   const validateForm = () => {
     const nextErrors = {};
@@ -223,10 +243,7 @@ function HeroDetailForm({ isOpen, onClose, activeHeroDetail, onSubmit }) {
           <h2 className="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
             {activeHeroDetail ? "Update Hero Detail" : "Add Hero Detail"}
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Manage the title, three stats, and detail image for the hero detail
-            section.
-          </p>
+          
         </div>
 
         <form
@@ -253,7 +270,7 @@ function HeroDetailForm({ isOpen, onClose, activeHeroDetail, onSubmit }) {
               <div>
                 <p className="text-sm font-semibold text-slate-700">Stats</p>
                 <p className="mt-1 text-xs font-medium text-slate-400">
-                  Exactly 3 key-value pairs are required.
+                  Exactly 3 Stats are required.
                 </p>
               </div>
 
@@ -343,7 +360,7 @@ function HeroDetailForm({ isOpen, onClose, activeHeroDetail, onSubmit }) {
                   <div className="flex min-h-56 flex-col items-center justify-center px-6 py-8 text-center">
                     <UploadIllustration />
                     <p className="mt-4 text-sm font-semibold text-slate-700">
-                      Click to upload hero detail image
+                      Image must be less then 10 mb,
                     </p>
                     <p className="mt-2 text-xs font-medium text-slate-400">
                       PNG, JPG, WEBP or any image format

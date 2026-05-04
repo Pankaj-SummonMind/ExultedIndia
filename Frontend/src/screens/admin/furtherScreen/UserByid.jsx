@@ -2,21 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetUserByidQuery } from "../../../services/api";
 import Loader from "../../../components/loader/Loader";
+import toast from "react-hot-toast";
 
 function UserById() {
   const navigate = useNavigate();
   const { id } = useParams();
-  // const {data , isLoading,error} = useGetCategoriesByIdQuery(id);
-  // const [deleteCategories,{isLoading:isDeleteLoading}] = useDeleteCategoriesMutation()
   const {data : userData, isLoading,error} = useGetUserByidQuery(id)
   const [category, setCategory] = useState({});
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
-  console.log("id inside getcategoryByid:",id )
-  console.log("data for id :",userData)
 
   useEffect(() => {
     if (error) {
-      console.log("error while fetching category by id:", error);
+      toast.error("Failed to get user detail")
     }
   }, [error]);
 
@@ -33,10 +30,8 @@ function UserById() {
   const handleDelete = async () => {
     try {
       const res = await deleteCategories(id).unwrap()
-      console.log("respone while deleting categories", res)
       navigate("/admin/category");
     } catch (error) {
-      console.log("error: ", error)
     }
   };
 
@@ -123,19 +118,6 @@ function FeatureStarIcon({ className }) {
             {new Date(userData?.data?.createdAt).toLocaleDateString()}
           </p>
         </div>
-
-        {/* <div className="rounded-3xl bg-white p-5 shadow-md">
-          <p className="text-xs font-semibold uppercase tracking-widest text-blue-500">
-            Last Updated
-          </p>
-          <p className="mt-2 text-base font-medium text-slate-700">
-            {new Date(userData?.data?.updatedAt).toLocaleDateString("en-IN", {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
-        </div> */}
 
         <div className="rounded-3xl h-50 bg-white p-5 shadow-md">
           <p className="text-xs font-semibold uppercase tracking-widest text-blue-500">
